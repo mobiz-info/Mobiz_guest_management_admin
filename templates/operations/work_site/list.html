@@ -1,0 +1,1181 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Work Sites - Guest Management{% endblock %}
+{% block page_title %}Work Sites{% endblock %}
+{% block page_subtitle %}Manage company work sites, addresses and locations{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   WORK SITES LIST - COMPANY LIST DESIGN
+========================================================= */
+
+.worksite-page {
+    width: 1180px;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 auto;
+}
+
+.worksite-card {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+}
+
+/* TOOLBAR */
+
+.worksite-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.worksite-search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 500px;
+    min-width: 0;
+}
+
+.worksite-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.worksite-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.worksite-search-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.worksite-search-btn,
+.worksite-clear-btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.worksite-search-btn:hover,
+.worksite-clear-btn:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+/* =========================================================
+   ADD WORK SITE - GREEN BUTTON
+   Keep this rule after shared styles.
+========================================================= */
+
+.worksite-page .worksite-create-btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 16px;
+    border: 1px solid #16a34a !important;
+    border-radius: 8px;
+    background: #16a34a !important;
+    color: #ffffff !important;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease;
+    flex-shrink: 0;
+}
+
+.worksite-page .worksite-create-btn:hover,
+.worksite-page .worksite-create-btn:focus-visible {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
+}
+
+.worksite-page .worksite-create-btn:focus-visible {
+    outline: 3px solid rgba(22, 163, 74, 0.2);
+    outline-offset: 2px;
+}
+
+/* TABLE */
+
+.worksite-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.worksite-table {
+    width: 100%;
+    min-width: 850px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.worksite-table th:nth-child(1),
+.worksite-table td:nth-child(1) { width: 5%; }
+
+.worksite-table th:nth-child(2),
+.worksite-table td:nth-child(2) { width: 18%; }
+
+.worksite-table th:nth-child(3),
+.worksite-table td:nth-child(3) { width: 17%; }
+
+.worksite-table th:nth-child(4),
+.worksite-table td:nth-child(4) { width: 20%; }
+
+.worksite-table th:nth-child(5),
+.worksite-table td:nth-child(5) { width: 12%; }
+
+.worksite-table th:nth-child(6),
+.worksite-table td:nth-child(6) { width: 15%; }
+
+.worksite-table th:nth-child(7),
+.worksite-table td:nth-child(7) { width: 13%; }
+
+.worksite-table thead th {
+    padding: 12px 6px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.worksite-table tbody td {
+    padding: 13px 6px;
+    border-bottom: 1px solid #edf1f7;
+    color: #334155;
+    font-size: 12px;
+    text-align: center;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+}
+
+.worksite-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.worksite-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* SERIAL NUMBER */
+
+.worksite-serial {
+    color: #64748b !important;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+/* WORK SITE NAME */
+
+.worksite-name-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+    text-align: left;
+}
+
+.worksite-name-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 17px;
+}
+
+.worksite-name {
+    flex: 1;
+    min-width: 0;
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+    text-align: left;
+}
+
+/* COMPANY */
+
+.worksite-company {
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ADDRESS AND LOCATION */
+
+.worksite-address,
+.worksite-location {
+    width: 100%;
+    min-width: 0;
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+.worksite-muted {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+/* STATUS */
+
+.worksite-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 5px 8px;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.worksite-status-inactive {
+    border-color: #fecaca;
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ACTION BUTTONS */
+
+.worksite-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+    width: 100%;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.worksite-actions form {
+    margin: 0;
+}
+
+.worksite-action-btn {
+    min-height: 30px;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 7px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.worksite-edit-btn {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.worksite-edit-btn:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.worksite-delete-btn {
+    border-color: #fecdd3;
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.worksite-delete-btn:hover {
+    background: #ffe4e6;
+    color: #9f1239;
+}
+
+/* EMPTY STATE */
+
+.worksite-empty {
+    padding: 45px 12px !important;
+    text-align: center !important;
+}
+
+.worksite-empty-icon {
+    display: block;
+    margin-bottom: 12px;
+    color: #94a3b8;
+    font-size: 34px;
+}
+
+.worksite-empty-title {
+    margin-bottom: 6px;
+    color: #334155;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.worksite-empty-text {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+/* PAGINATION */
+
+.worksite-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.worksite-pagination-info {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.worksite-pagination-info strong {
+    color: #0f172a;
+}
+
+.worksite-pagination-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.worksite-page-btn,
+.worksite-page-current {
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #475569;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.worksite-page-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+.worksite-page-current {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1200px) {
+    .worksite-table thead th {
+        padding: 10px 4px;
+        font-size: 10px;
+    }
+
+    .worksite-table tbody td {
+        padding: 10px 4px;
+        font-size: 11px;
+    }
+
+    .worksite-action-btn {
+        min-height: 28px;
+        padding: 0 5px;
+        font-size: 10px;
+    }
+
+    .worksite-actions {
+        gap: 3px;
+    }
+}
+
+@media (max-width: 700px) {
+    .worksite-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .worksite-search-form {
+        max-width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .worksite-search-input {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+    .worksite-page .worksite-create-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .worksite-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .worksite-pagination-links {
+        justify-content: flex-start;
+    }
+}
+
+/* =========================================================
+   SHARED OPERATIONS LIST THEME
+   Work Site button is intentionally excluded from
+   shared indigo button rules so it stays green.
+========================================================= */
+
+.ops-list-theme {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+}
+
+.module-wrap,
+.bt-wrap,
+.gv-wrap {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    background: #fff;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, .05);
+    gap: 0;
+}
+
+.module-head,
+.bt-head,
+.gv-head {
+    display: contents;
+}
+
+.module-head > div,
+.bt-head > div,
+.gv-head > div {
+    display: none !important;
+}
+
+.module-btn,
+.bt-btn,
+.gv-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 14px;
+    border: 1px solid #4f46e5;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #6366f1, #4f46e5);
+    color: #fff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.module-head > .module-btn,
+.bt-head > .bt-btn,
+.gv-head > .gv-btn {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 12px 16px 12px 0;
+}
+
+.module-btn:hover,
+.bt-btn:hover,
+.gv-btn:hover {
+    background: #4338ca;
+    border-color: #4338ca;
+    color: #fff;
+}
+
+.module-search,
+.bt-search,
+.gv-search {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+    padding: 12px 16px;
+    background: #fff;
+    border: 0;
+    border-bottom: 1px solid #e2e8f0;
+    border-radius: 0;
+}
+
+.module-search input,
+.bt-search input,
+.gv-search input {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 12px;
+}
+
+.module-search input:focus,
+.bt-search input:focus,
+.gv-search input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .12);
+}
+
+.module-search button,
+.bt-search button,
+.gv-search button {
+    min-height: 38px;
+    padding: 0 13px;
+    border: 1px solid #4f46e5;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.module-search button:hover,
+.bt-search button:hover,
+.gv-search button:hover {
+    background: #4338ca;
+}
+
+.module-card,
+.bt-card,
+.gv-card {
+    grid-column: 1 / -1;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: #fff;
+    overflow: hidden;
+}
+
+.module-table-wrap,
+.bt-table-wrap,
+.gv-scroll {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.module-table,
+.bt-table,
+.gv-table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+}
+
+.module-table th,
+.bt-table th,
+.gv-table th {
+    padding: 11px 9px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: left;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.module-table td,
+.bt-table td,
+.gv-table td {
+    padding: 10px 9px;
+    border-bottom: 1px solid #edf1f7;
+    color: #334155;
+    font-size: 11px;
+    line-height: 1.5;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.module-table tbody tr:hover,
+.bt-table tbody tr:hover,
+.gv-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.module-table tbody tr:last-child td,
+.bt-table tbody tr:last-child td,
+.gv-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.module-status,
+.bt-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.module-status.off,
+.bt-status.off {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.module-actions,
+.bt-actions,
+.gv-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+}
+
+.module-actions form,
+.bt-actions form,
+.gv-actions form {
+    margin: 0;
+}
+
+.module-actions a,
+.module-actions button,
+.bt-actions a,
+.bt-actions button,
+.gv-actions a,
+.gv-actions button,
+.gv-table td form button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 29px;
+    padding: 0 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.edit-link,
+.bt-edit {
+    background: #eef2ff;
+    color: #4338ca;
+    border-color: #c7d2fe !important;
+}
+
+.delete-btn,
+.bt-delete {
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3 !important;
+}
+
+.module-empty,
+.bt-empty,
+.gv-empty {
+    padding: 36px 12px !important;
+    text-align: center;
+    color: #94a3b8 !important;
+}
+
+.module-pagination,
+.bt-pagination,
+.gv-pagination {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.module-pagination a,
+.bt-pagination a,
+.gv-pagination a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 0 10px;
+    margin: 0 2px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #475569;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.module-pagination a:hover,
+.bt-pagination a:hover,
+.gv-pagination a:hover {
+    border-color: #a5b4fc;
+    color: #4338ca;
+}
+
+/* DESIGNATION AND TENANT LISTS */
+
+.designation-list-page,
+.tenant-list-page,
+.worksite-page {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0;
+    margin: 0 auto;
+}
+
+.designation-list-card,
+.tenant-list-card,
+.worksite-card {
+    width: 100%;
+    border-radius: 12px !important;
+    border-color: #dbe3ef !important;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, .05) !important;
+}
+
+.designation-list-header,
+.tenant-toolbar,
+.worksite-toolbar {
+    padding: 12px 16px !important;
+    gap: 12px !important;
+}
+
+/* Keep designation and tenant buttons indigo.
+   Work Site button is styled separately in green above. */
+
+.designation-add-btn,
+.tenant-create-btn {
+    background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+    border-color: #4f46e5 !important;
+    border-radius: 8px !important;
+}
+
+.designation-add-btn:hover,
+.tenant-create-btn:hover {
+    background: #4338ca !important;
+}
+
+.designation-table th,
+.tenant-table th,
+.worksite-table th {
+    background: #f8fafc !important;
+    color: #64748b !important;
+}
+
+.gv-badge {
+    border-radius: 6px;
+}
+
+@media (max-width: 700px) {
+    .module-wrap,
+    .bt-wrap,
+    .gv-wrap {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .module-head > .module-btn,
+    .bt-head > .bt-btn,
+    .gv-head > .gv-btn {
+        grid-column: 1;
+        grid-row: 2;
+        margin: 0 12px 12px;
+        width: calc(100% - 24px);
+        box-sizing: border-box;
+    }
+
+    .module-search,
+    .bt-search,
+    .gv-search {
+        grid-column: 1;
+        grid-row: 1;
+        flex-wrap: wrap;
+        padding: 12px;
+    }
+
+    .module-search input,
+    .bt-search input,
+    .gv-search input {
+        flex-basis: 100%;
+        width: 100%;
+    }
+
+    .module-search button,
+    .bt-search button,
+    .gv-search button {
+        flex: 1;
+    }
+
+    .module-card,
+    .bt-card,
+    .gv-card,
+    .module-pagination,
+    .bt-pagination,
+    .gv-pagination {
+        grid-column: 1;
+    }
+
+    .designation-list-header,
+    .tenant-toolbar,
+    .worksite-toolbar {
+        align-items: stretch !important;
+    }
+}
+</style>
+
+<div class="worksite-page">
+    <div class="worksite-card">
+
+        <!-- SEARCH TOOLBAR -->
+        <div class="worksite-toolbar">
+
+            <form method="get"
+                  action="{% url 'work_site_list' %}"
+                  class="worksite-search-form">
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search|default:'' }}"
+                    placeholder="Search work site, company or location..."
+                    class="worksite-search-input"
+                >
+
+                <button type="submit" class="worksite-search-btn">
+                    <i class="ph ph-magnifying-glass"></i>
+                    Search
+                </button>
+
+                {% if search %}
+                    <a href="{% url 'work_site_list' %}"
+                       class="worksite-clear-btn">
+                        <i class="ph ph-x"></i>
+                        Clear
+                    </a>
+                {% endif %}
+
+            </form>
+
+            <a href="{% url 'work_site_create' %}"
+               class="worksite-create-btn">
+                <i class="ph-bold ph-plus"></i>
+                Add Work Site
+            </a>
+
+        </div>
+
+        <!-- WORK SITES TABLE -->
+        <div class="worksite-table-wrapper">
+            <table class="worksite-table">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Work Site</th>
+
+                        {% if request.user.is_superuser %}
+                            <th>Company / Client</th>
+                        {% endif %}
+
+                        <th>Address</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in page_obj %}
+                        <tr>
+
+                            <td class="worksite-serial">
+                                {{ page_obj.start_index|add:forloop.counter0 }}
+                            </td>
+
+                            <td>
+                                <div class="worksite-name-wrapper">
+                                    <div class="worksite-name-icon">
+                                        <i class="ph ph-buildings"></i>
+                                    </div>
+
+                                    <div class="worksite-name">
+                                        {{ item.name }}
+                                    </div>
+                                </div>
+                            </td>
+
+                            {% if request.user.is_superuser %}
+                                <td>
+                                    <div class="worksite-company">
+                                        {% if item.company %}
+                                            {{ item.company.name }}
+                                        {% else %}
+                                            <span class="worksite-muted">—</span>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            {% endif %}
+
+                            <td>
+                                {% if item.address %}
+                                    <div class="worksite-address"
+                                         title="{{ item.address }}">
+                                        {{ item.address|truncatechars:100 }}
+                                    </div>
+                                {% else %}
+                                    <span class="worksite-muted">
+                                        Address not provided
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if item.location %}
+                                    <div class="worksite-location">
+                                        {{ item.location }}
+                                    </div>
+                                {% else %}
+                                    <span class="worksite-muted">—</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if item.status %}
+                                    <span class="worksite-status">
+                                        <i class="ph-fill ph-check-circle"></i>
+                                        Active
+                                    </span>
+                                {% else %}
+                                    <span class="worksite-status worksite-status-inactive">
+                                        <i class="ph-fill ph-x-circle"></i>
+                                        Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="worksite-actions">
+
+                                    <a href="{% url 'work_site_edit' item.pk %}"
+                                       class="worksite-action-btn worksite-edit-btn"
+                                       title="Edit Work Site">
+                                        <i class="ph ph-pencil-simple"></i>
+                                        Edit
+                                    </a>
+
+                                    <form method="post"
+                                          action="{% url 'work_site_delete' item.pk %}"
+                                          onsubmit="return confirm('Delete this work site and its buildings, floors and units?');">
+                                        {% csrf_token %}
+
+                                        <button type="submit"
+                                                class="worksite-action-btn worksite-delete-btn"
+                                                title="Delete Work Site">
+                                            <i class="ph ph-trash"></i>
+                                            Delete
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+                        <tr>
+                            <td colspan="{% if request.user.is_superuser %}7{% else %}6{% endif %}"
+                                class="worksite-empty">
+
+                                <i class="ph ph-buildings worksite-empty-icon"></i>
+
+                                <div class="worksite-empty-title">
+                                    No work sites found
+                                </div>
+
+                                <div class="worksite-empty-text">
+                                    {% if search %}
+                                        No work sites match "{{ search }}".
+                                        Try another search term.
+                                    {% else %}
+                                        No work site records are available.
+                                    {% endif %}
+                                </div>
+
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        {% if page_obj.paginator.num_pages > 1 %}
+            <div class="worksite-pagination">
+
+                <div class="worksite-pagination-info">
+                    Page
+                    <strong>{{ page_obj.number }}</strong>
+                    of
+                    <strong>{{ page_obj.paginator.num_pages }}</strong>
+                    · Showing
+                    {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                    of
+                    {{ page_obj.paginator.count }}
+                </div>
+
+                <div class="worksite-pagination-links">
+
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if search %}&search={{ search|urlencode }}{% endif %}"
+                           class="worksite-page-btn">
+                            <i class="ph ph-caret-double-left"></i>
+                            First
+                        </a>
+
+                        <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                           class="worksite-page-btn">
+                            <i class="ph ph-caret-left"></i>
+                            Previous
+                        </a>
+                    {% endif %}
+
+                    <span class="worksite-page-current">
+                        {{ page_obj.number }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                           class="worksite-page-btn">
+                            Next
+                            <i class="ph ph-caret-right"></i>
+                        </a>
+
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                           class="worksite-page-btn">
+                            Last
+                            <i class="ph ph-caret-double-right"></i>
+                        </a>
+                    {% endif %}
+
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

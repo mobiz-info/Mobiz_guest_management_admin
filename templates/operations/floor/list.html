@@ -1,0 +1,586 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Floors{% endblock %}
+{% block page_title %}Floors{% endblock %}
+{% block page_subtitle %}Manage floors under each building{% endblock %}
+
+{% block content %}
+
+<style>
+/* Main page */
+.floor-page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 auto;
+    font-family: inherit;
+    color: #334155;
+    font-size: 12px;
+}
+
+/* Main card */
+.floor-card {
+    width: 100%;
+    min-width: 0;
+    background: #fff;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+}
+
+/* Toolbar */
+.floor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.floor-search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 500px;
+    min-width: 0;
+    margin: 0;
+}
+
+.floor-search-form input {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+.floor-search-form input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.floor-search-btn,
+.floor-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 0 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #475569;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.floor-search-btn:hover,
+.floor-clear-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+/* Add Floor button */
+.floor-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px;
+    padding: 0 14px;
+    border: 1px solid #16a34a;
+    border-radius: 8px;
+    background: #16a34a;
+    color: #fff;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    transition: background 0.2s ease;
+}
+
+.floor-add-btn:hover {
+    background: #15803d;
+    border-color: #15803d;
+    color: #fff;
+}
+
+/* Table */
+.floor-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.floor-table {
+    width: 100%;
+    min-width: 950px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.floor-table th {
+    padding: 12px 10px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.floor-table td {
+    padding: 11px 10px;
+    border-bottom: 1px solid #edf1f7;
+    color: #334155;
+    font-size: 12px;
+    line-height: 1.5;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.floor-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.floor-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+/* Column widths */
+.floor-table th:nth-child(1),
+.floor-table td:nth-child(1) {
+    width: 55px;
+    text-align: center;
+}
+
+.floor-table th:nth-child(2),
+.floor-table td:nth-child(2) {
+    width: 170px;
+}
+
+.floor-table th:nth-child(3),
+.floor-table td:nth-child(3) {
+    width: 170px;
+}
+
+.floor-table th:nth-child(4),
+.floor-table td:nth-child(4) {
+    width: 160px;
+}
+
+.floor-table th:nth-child(5),
+.floor-table td:nth-child(5) {
+    width: 160px;
+}
+
+.floor-table th:nth-child(6),
+.floor-table td:nth-child(6) {
+    width: 100px;
+}
+
+.floor-table th:nth-child(7),
+.floor-table td:nth-child(7) {
+    width: 145px;
+}
+
+/* Floor name */
+.floor-name {
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.floor-number {
+    display: inline-block;
+    margin-left: 3px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Related details */
+.floor-related {
+    color: #334155;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.floor-muted {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+/* Status */
+.floor-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.floor-status.inactive {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* Actions */
+.floor-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+}
+
+.floor-actions form {
+    margin: 0;
+}
+
+.floor-actions a,
+.floor-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 29px;
+    padding: 0 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.floor-edit-btn {
+    background: #eef2ff;
+    color: #4338ca;
+    border-color: #c7d2fe !important;
+}
+
+.floor-edit-btn:hover {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.floor-delete-btn {
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3 !important;
+}
+
+.floor-delete-btn:hover {
+    background: #ffe4e6;
+    color: #9f1239;
+}
+
+/* Empty state */
+.floor-empty {
+    padding: 38px 12px !important;
+    text-align: center;
+    color: #94a3b8 !important;
+    font-size: 12px !important;
+}
+
+/* Pagination */
+.floor-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.floor-pagination-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.floor-pagination a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 0 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.floor-pagination a:hover {
+    border-color: #a5b4fc;
+    color: #4338ca;
+}
+
+.floor-page-info {
+    padding: 0 5px;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+    .floor-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 12px;
+    }
+
+    .floor-search-form {
+        max-width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .floor-search-form input {
+        flex-basis: 100%;
+        width: 100%;
+    }
+
+    .floor-search-btn,
+    .floor-clear-btn {
+        flex: 1;
+    }
+
+    .floor-add-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .floor-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+</style>
+
+<div class="floor-page">
+    <div class="floor-card">
+
+        <!-- Search and Add Floor -->
+        <div class="floor-toolbar">
+
+            <form class="floor-search-form" method="get">
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="Search floor or building..."
+                    aria-label="Search floors"
+                >
+
+                <button class="floor-search-btn" type="submit">
+                    <i class="ph ph-magnifying-glass"></i>
+                    Search
+                </button>
+
+                {% if search %}
+                    <a
+                        class="floor-clear-btn"
+                        href="{% url 'floor_list' %}"
+                    >
+                        Clear
+                    </a>
+                {% endif %}
+            </form>
+
+            <a class="floor-add-btn" href="{% url 'floor_create' %}">
+                <i class="ph ph-plus"></i>
+                Add Floor
+            </a>
+
+        </div>
+
+        <!-- Floors Table -->
+        <div class="floor-table-wrap">
+            <table class="floor-table">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Floor</th>
+                        <th>Building</th>
+                        <th>Work Site</th>
+                        <th>Company</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in page_obj %}
+                        <tr>
+
+                            <td>
+                                {{ forloop.counter0|add:page_obj.start_index }}
+                            </td>
+
+                            <td>
+                                <span class="floor-name">
+                                    {{ item.name }}
+                                </span>
+
+                                {% if item.floor_number %}
+                                    <span class="floor-number">
+                                        (#{{ item.floor_number }})
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <span class="floor-related">
+                                    {{ item.building.name|default:"—" }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="floor-related">
+                                    {{ item.building.work_site.name|default:"—" }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="floor-related">
+                                    {{ item.building.company.name|default:"—" }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {% if item.status %}
+                                    <span class="floor-status">
+                                        Active
+                                    </span>
+                                {% else %}
+                                    <span class="floor-status inactive">
+                                        Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="floor-actions">
+
+                                    <a
+                                        class="floor-edit-btn"
+                                        href="{% url 'floor_edit' item.pk %}"
+                                    >
+                                        <i class="ph ph-pencil-simple"></i>
+                                        Edit
+                                    </a>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'floor_delete' item.pk %}"
+                                        onsubmit="return confirm('Delete this floor? Units assigned to it will become unassigned.');"
+                                    >
+                                        {% csrf_token %}
+
+                                        <button
+                                            class="floor-delete-btn"
+                                            type="submit"
+                                        >
+                                            <i class="ph ph-trash"></i>
+                                            Delete
+                                        </button>
+                                    </form>
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="floor-empty">
+                                <i class="ph ph-buildings" style="font-size:22px;"></i>
+                                <div>No floors found.</div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if page_obj.paginator.num_pages > 1 %}
+            <div class="floor-pagination">
+
+                <span>
+                    Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                    of {{ page_obj.paginator.count }}
+                </span>
+
+                <div class="floor-pagination-links">
+
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1&amp;search={{ search|urlencode }}">
+                            First
+                        </a>
+
+                        <a href="?page={{ page_obj.previous_page_number }}&amp;search={{ search|urlencode }}">
+                            Previous
+                        </a>
+                    {% endif %}
+
+                    <span class="floor-page-info">
+                        Page {{ page_obj.number }}
+                        of {{ page_obj.paginator.num_pages }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}&amp;search={{ search|urlencode }}">
+                            Next
+                        </a>
+
+                        <a href="?page={{ page_obj.paginator.num_pages }}&amp;search={{ search|urlencode }}">
+                            Last
+                        </a>
+                    {% endif %}
+
+                </div>
+            </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

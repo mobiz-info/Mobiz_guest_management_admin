@@ -1,0 +1,780 @@
+
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_subtitle %}Create an advance or walk-in guest request for tenant approval{% endblock %}
+
+{% block content %}
+
+<style>
+.gv-form-wrap{width:100%;max-width:720px;margin:0 auto}
+.gv-form-card{background:#fff;border:1px solid #e2e8f0;border-radius:13px;overflow:hidden;box-shadow:0 7px 24px rgba(15,23,42,.06)}
+.gv-form-title{position:relative;min-height:42px;padding:7px 14px;display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#eff6ff,#fff);border-bottom:1px solid #e2e8f0;color:#172033;font-size:14px;font-weight:800}
+.gv-form-title:after{content:"";position:absolute;left:0;bottom:0;width:75px;height:2px;background:linear-gradient(90deg,#6366f1,#3b82f6)}
+.gv-form-title i{width:27px;height:27px;display:flex;align-items:center;justify-content:center;flex:0 0 27px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:16px}
+.gv-form-body{padding:11px 13px}
+.gv-error-box{padding:5px 8px;margin-bottom:9px;background:#fff7f7;border:1px solid #fecaca;border-left:3px solid #ef4444;border-radius:7px;color:#991b1b;font-size:11px}
+.gv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 10px}
+.gv-field{min-width:0}
+.gv-field.full,.gv-section{grid-column:1/-1}
+.gv-field label{display:block;margin-bottom:3px;color:#334155;font-size:11px;font-weight:750}
+.gv-field label .text-danger{color:#ef4444!important}
+.gv-field input:not([type=checkbox]):not([type=radio]):not([type=hidden]),.gv-field select,.gv-field textarea{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;border:1px solid #d7dee8;border-radius:7px;background:#fff;color:#172033;font-family:inherit;font-size:11.5px;outline:none;transition:.18s}
+.gv-field textarea{min-height:48px;height:48px;resize:vertical;line-height:1.4}
+.gv-field input::placeholder,.gv-field textarea::placeholder{color:#94a3b8}
+.gv-field input:focus,.gv-field select:focus,.gv-field textarea:focus{border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.09)}
+.gv-field select:disabled{background:#f1f5f9;color:#94a3b8;cursor:not-allowed}
+.gv-help{margin-top:3px;color:#64748b;font-size:9.5px;line-height:1.35}
+.gv-error{margin-top:3px;color:#dc2626;font-size:9.5px;line-height:1.3}
+.gv-phone-wrap{display:flex;width:100%;height:32px}
+.gv-dial-code{width:62px;min-width:62px;height:32px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:0 8px;background:#f8fafc;border:1px solid #d7dee8;border-right:0;border-radius:7px 0 0 7px;color:#475569;font-size:11px;font-weight:800;white-space:nowrap}
+.gv-phone-wrap input{flex:1;min-width:0;height:32px;box-sizing:border-box;border-radius:0 7px 7px 0!important}
+.gv-phone-wrap:focus-within .gv-dial-code{border-color:#6366f1;background:#f5f3ff;color:#4f46e5}
+.gv-time-wrap{position:relative;width:100%}
+.gv-time-display{width:100%;min-height:32px;box-sizing:border-box;padding:5px 34px 5px 9px;border:1px solid #d7dee8;border-radius:7px;background:#fff;color:#172033;font-family:inherit;font-size:11.5px;cursor:pointer}
+.gv-time-icon{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:#6366f1;font-size:16px;pointer-events:none}
+.gv-time-picker{position:absolute;z-index:1000;top:calc(100% + 6px);left:0;width:225px;padding:9px;background:#fff;border:1px solid #dbe3ef;border-radius:11px;box-shadow:0 15px 35px rgba(15,23,42,.16);display:none}
+.gv-time-wrap.open .gv-time-picker{display:block}
+.gv-time-picker-title{margin-bottom:9px;color:#1e293b;font-size:11px;font-weight:800}
+.gv-time-select-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.gv-time-select{width:100%;min-height:31px;padding:5px 6px;border:1px solid #d7dee8;border-radius:7px;background:#f8fafc;color:#172033;font-size:11px;cursor:pointer}
+.gv-time-picker-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:7px;padding-top:9px;border-top:1px solid #e2e8f0}
+.gv-time-clear,.gv-time-done{min-height:30px;padding:0 10px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer}
+.gv-time-clear{background:#fff;border:1px solid #cbd5e1;color:#475569}
+.gv-time-done{background:linear-gradient(135deg,#6366f1,#4f46e5);border:1px solid #4f46e5;color:#fff}
+.gv-camera-card{position:relative;overflow:hidden;border:1px solid #d9e2f0;border-radius:14px;padding:12px;background:linear-gradient(145deg,#f8fbff,#fff);box-shadow:0 8px 22px rgba(15,23,42,.05)}
+.gv-camera-card:before{content:"";position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#4f46e5,#06b6d4,#8b5cf6)}
+.gv-camera-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+.gv-camera-title{display:flex;align-items:center;gap:8px;color:#172033;font-size:12px;font-weight:850}
+.gv-camera-title i{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:#eef2ff;color:#4f46e5;font-size:17px}
+.gv-optional-badge{padding:5px 8px;border-radius:999px;background:#eef2ff;border:1px solid #c7d2fe;color:#4338ca;font-size:8px;font-weight:900}
+.gv-camera-stage{position:relative;min-height:112px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:11px;background:linear-gradient(135deg,#f1f5ff,#f8fafc 55%,#ecfeff);border:1px dashed #c7d2fe}
+.gv-camera-placeholder{display:flex;align-items:center;gap:9px;color:#64748b;font-size:10px;font-weight:750}
+.gv-camera-placeholder i{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:11px;background:#fff;color:#6366f1;font-size:20px}
+.gv-photo-preview-wrap{position:relative;width:76px;height:76px;flex:0 0 76px;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;background:#fff;border:1px solid #dbe3ef}
+.gv-photo-preview-wrap img{display:none;width:100%;height:100%;object-fit:cover}
+.gv-photo-preview-wrap img.active{display:block}
+.gv-camera-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:9px}
+.gv-camera-status{color:#64748b;font-size:9.5px;font-weight:700}
+.gv-camera-btn{min-height:34px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:8px;font-size:10px;font-weight:850;cursor:pointer}
+.gv-camera-btn.primary{background:linear-gradient(135deg,#6366f1,#4f46e5);border:1px solid #4f46e5;color:#fff}
+.gv-camera-btn.secondary{background:#fff;border:1px solid #cbd5e1;color:#334155}
+.gv-camera-note{margin-top:7px;color:#94a3b8;font-size:9px;line-height:1.35}
+.gv-section{margin-top:3px;padding-top:10px;border-top:1px solid #e2e8f0}
+.gv-section h4{margin:0 0 5px;color:#1e293b;font-size:12px;font-weight:800}
+.gv-person-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:7px;margin:6px 0}
+.gv-person-row input{width:100%;min-height:31px;box-sizing:border-box;padding:5px 8px;border:1px solid #d7dee8;border-radius:7px;font-size:11px}
+.gv-add,.gv-remove{min-height:31px;padding:0 10px;border-radius:7px;font-size:10px;font-weight:800;cursor:pointer}
+.gv-add{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.gv-remove{background:#fff;color:#475569;border:1px solid #cbd5e1}
+.gv-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin-top:10px;padding-top:9px;border-top:1px solid #e2e8f0}
+.gv-actions a,.gv-actions button{min-height:31px;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0 10px;border-radius:7px;font-size:10.5px;font-weight:800;text-decoration:none;cursor:pointer}
+.gv-cancel{background:#fff;border:1px solid #cbd5e1;color:#475569}
+.gv-save{background:linear-gradient(135deg,#6366f1,#4f46e5);border:1px solid #4f46e5;color:#fff}
+@media(max-width:650px){.gv-form-wrap{max-width:100%}.gv-grid{grid-template-columns:1fr}.gv-field.full,.gv-section{grid-column:auto}.gv-person-row{grid-template-columns:1fr}.gv-remove{justify-self:start}.gv-time-picker{width:100%;box-sizing:border-box}}
+@media(max-width:480px){.gv-form-body{padding:10px}.gv-form-title{padding:7px 10px}.gv-actions{flex-direction:column-reverse}.gv-actions a,.gv-actions button{width:100%;box-sizing:border-box}}
+</style>
+
+<div class="gv-form-wrap">
+<div class="gv-form-card">
+<div class="gv-form-title">
+    <i class="ph ph-user-plus"></i>
+    <span>{{ title }}</span>
+</div>
+
+<div class="gv-form-body">
+
+{% if non_field_errors %}
+<div class="gv-error-box">
+    {% for error in non_field_errors %}<div>{{ error }}</div>{% endfor %}
+</div>
+{% endif %}
+
+<form method="post">
+{% csrf_token %}
+
+<div class="gv-grid">
+
+{% if is_tenant_self_service %}
+<input type="hidden" name="tenant" value="{{ self_service_tenant.pk }}">
+
+<div class="gv-field full">
+    <label for="id_visit_type">Visit Type *</label>
+    <select name="visit_type" id="id_visit_type" required>
+        <option value="advance" {% if values.visit_type == 'advance' %}selected{% endif %}>Advance Visit — submit for approval</option>
+        <option value="walk_in" {% if values.visit_type == 'walk_in' %}selected{% endif %}>Walk-in Visit — send to Unit for acceptance</option>
+    </select>
+    <div class="gv-help" id="gv-visit-type-help">Advance visits are approved by the Tenant. Walk-in requests require Unit acceptance, then Tenant approval.</div>
+    {% for error in errors.visit_type %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+{% else %}
+
+<div class="gv-field full">
+    <label for="id_tenant">Visiting Tenant *</label>
+    <select name="tenant" id="id_tenant" required>
+        <option value="">Select tenant</option>
+        {% for tenant in tenants %}
+        <option value="{{ tenant.pk }}" {% if values.tenant == tenant.pk|stringformat:'s' %}selected{% endif %}>{{ tenant.full_name }}</option>
+        {% endfor %}
+    </select>
+    {% for error in errors.tenant %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field">
+    <label for="id_visit_type">Visit Type *</label>
+    <select name="visit_type" id="id_visit_type" required>
+        <option value="advance" {% if values.visit_type == 'advance' %}selected{% endif %}>Advance Visit</option>
+        <option value="walk_in" {% if values.visit_type == 'walk_in' %}selected{% endif %}>Walk-in Visit (arrived at gate)</option>
+    </select>
+    {% for error in errors.visit_type %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    <div class="gv-help">Unit advance requests are sent to the selected Tenant for approval.</div>
+</div>
+
+{% endif %}
+
+<div class="gv-field">
+    <label for="id_building">Building *</label>
+    <select name="building" id="id_building" required>
+        <option value="">Select building</option>
+        {% for building in allocated_buildings %}
+        <option
+            data-tenant="{{ building.tenant_id }}"
+            data-dial-code="{{ building.company.country.dial_code|default:'' }}"
+            value="{{ building.id }}"
+            {% if values.building == building.id|stringformat:'s' %}selected{% endif %}
+        >{{ building.name }}</option>
+        {% endfor %}
+    </select>
+    {% for error in errors.building %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field">
+    <label for="id_unit">Unit being visited *</label>
+    <select name="unit" id="id_unit" required disabled>
+        <option value="">Select building first</option>
+        {% for tenant in tenants %}
+            {% for allocation in tenant.active_unit_allocations %}
+            <option
+                data-tenant="{{ tenant.pk }}"
+                data-building="{{ allocation.unit.building_id }}"
+                data-dial-code="{{ allocation.unit.building.company.country.dial_code|default:'' }}"
+                value="{{ allocation.unit.pk }}"
+                {% if values.tenant == tenant.pk|stringformat:'s' and values.unit == allocation.unit.pk|stringformat:'s' %}selected{% endif %}
+            >{{ allocation.unit.name }} — {{ allocation.unit.building.name }}</option>
+            {% endfor %}
+        {% endfor %}
+    </select>
+    {% for error in errors.unit %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field">
+    <label for="id_guest_name">Guest Name *</label>
+    <input id="id_guest_name" name="guest_name" maxlength="150" required value="{{ values.guest_name }}" placeholder="Enter visitor name">
+    {% for error in errors.guest_name %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field">
+    <label for="id_guest_mobile_number">Guest Mobile Number *</label>
+    <div class="gv-phone-wrap">
+        <input id="id_guest_mobile_number" name="guest_mobile_number" maxlength="30" required value="{{ values.guest_mobile_number }}" placeholder="Enter visitor mobile number">
+    </div>
+    {% for error in errors.guest_mobile_number %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field full">
+    <label>Guest Photo <span style="font-weight:600;color:#64748b">(Optional)</span></label>
+    <div class="gv-camera-card">
+        <div class="gv-camera-top">
+            <div>
+                <div class="gv-camera-title"><i class="ph ph-camera"></i>Capture Guest Photo</div>
+                <div class="gv-help">Open the camera in a separate window, capture the guest photo, and return here.</div>
+            </div>
+            <span class="gv-optional-badge">OPTIONAL</span>
+        </div>
+        <div class="gv-camera-stage">
+            <div class="gv-camera-placeholder" id="camera-placeholder">
+                <i class="ph ph-camera-slash"></i>
+                <span id="camera-status-text">No guest photo captured</span>
+            </div>
+            <div class="gv-photo-preview-wrap">
+                <img id="guest-photo-preview" alt="Guest photo preview">
+            </div>
+        </div>
+        <div class="gv-camera-actions">
+            <span class="gv-camera-status" id="camera-window-status">Camera opens separately for a cleaner capture experience.</span>
+            <button type="button" class="gv-camera-btn primary" id="start-camera"><i class="ph ph-video-camera"></i>Open Camera</button>
+            <button type="button" class="gv-camera-btn secondary" id="retake-camera" style="display:none"><i class="ph ph-arrow-counter-clockwise"></i>Retake Photo</button>
+        </div>
+        <div class="gv-camera-note">Your captured photo is placed into this form automatically.</div>
+    </div>
+    <input type="hidden" name="webcam_photo" id="webcam-photo-data">
+    {% for error in errors.guest_photo %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field">
+    <label for="id_additional_visitors">Additional Visitors <span style="font-weight:500;color:#94a3b8">(excluding main guest)</span></label>
+    <input type="number" min="0" max="100" id="id_additional_visitors" name="additional_visitors" value="{{ values.additional_visitors|default:'0' }}">
+    <div class="gv-help">Example: 4 additional visitors = 5 people in total.</div>
+    {% for error in errors.additional_visitors %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field">
+    <label for="id_purpose_of_visit">Purpose of Visit *</label>
+    <select name="purpose_of_visit" id="id_purpose_of_visit" required>
+        <option value="">Select purpose</option>
+        {% for purpose in purposes %}
+        <option value="{{ purpose.pk }}" {% if values.purpose_of_visit == purpose.pk|stringformat:'s' %}selected{% endif %}>{{ purpose.name }}</option>
+        {% endfor %}
+    </select>
+    {% for error in errors.purpose_of_visit %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field">
+    <label for="id_visit_date">Visit Date *</label>
+    <input type="date" name="visit_date" id="id_visit_date" required value="{{ values.visit_date }}">
+    {% for error in errors.visit_date %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field">
+    <label for="id_visit_time_display">Expected Visit Time <span style="font-weight:500;color:#94a3b8">(optional)</span></label>
+    <div class="gv-time-wrap" id="gv-time-wrap">
+        <input type="text" id="id_visit_time_display" class="gv-time-display" placeholder="Select time" readonly autocomplete="off">
+        <i class="ph ph-clock gv-time-icon"></i>
+        <input type="hidden" name="visit_time" id="id_visit_time" value="{{ values.visit_time }}">
+        <div class="gv-time-picker" id="gv-time-picker">
+            <div class="gv-time-picker-title">Select Expected Visit Time</div>
+            <div class="gv-time-select-row">
+                <select id="gv-time-hour" class="gv-time-select">
+                    <option value="">Hour</option>
+                    {% for hour in "123456789" %}<option value="{{ forloop.counter }}">{{ forloop.counter }}</option>{% endfor %}
+                    <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                </select>
+                <select id="gv-time-minute" class="gv-time-select">
+                    <option value="">Min</option>
+                    {% for minute in "000510152025303540455055"|make_list %}{% endfor %}
+                    <option value="00">00</option><option value="05">05</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                </select>
+                <select id="gv-time-period" class="gv-time-select"><option value="">AM/PM</option><option value="AM">AM</option><option value="PM">PM</option></select>
+            </div>
+            <div class="gv-time-picker-actions">
+                <button type="button" class="gv-time-clear" id="gv-time-clear">Clear</button>
+                <button type="button" class="gv-time-done" id="gv-time-done">Done</button>
+            </div>
+        </div>
+    </div>
+    {% for error in errors.visit_time %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field">
+    <label for="id_vehicle_details">Vehicle Details <span style="font-weight:500;color:#94a3b8">(optional)</span></label>
+    <input type="text" name="vehicle_details" id="id_vehicle_details" maxlength="150" value="{{ values.vehicle_details }}" placeholder="Vehicle type / registration number">
+    {% for error in errors.vehicle_details %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-section">
+    <h4>Accompanying Persons <span style="font-weight:500;color:#94a3b8">(optional)</span></h4>
+    <div class="gv-help">Add the name and mobile number for each person coming with the main guest.</div>
+    <div id="gv-person-list">
+        {% for row in accompanying_rows %}
+        <div class="gv-person-row">
+            <input name="accompanying_name" maxlength="150" value="{{ row.name }}" placeholder="Person name">
+            <input name="accompanying_mobile" maxlength="30" value="{{ row.mobile }}" placeholder="Mobile number">
+            <button type="button" class="gv-remove" {% if forloop.first and forloop.last %}style="display:none"{% endif %}>Remove</button>
+        </div>
+        {% empty %}
+        <div class="gv-person-row">
+            <input name="accompanying_name" maxlength="150" placeholder="Person name">
+            <input name="accompanying_mobile" maxlength="30" placeholder="Mobile number">
+            <button type="button" class="gv-remove" style="display:none">Remove</button>
+        </div>
+        {% endfor %}
+    </div>
+    <button type="button" class="gv-add" id="gv-add-person">+ Add accompanying person</button>
+    {% for error in errors.accompanying_people %}<div class="gv-error">{{ error }}</div>{% endfor %}
+</div>
+
+<div class="gv-field full">
+    <label for="id_notes">Notes <span style="font-weight:500;color:#94a3b8">(optional)</span></label>
+    <textarea name="notes" id="id_notes" placeholder="Optional visit notes">{{ values.notes }}</textarea>
+</div>
+
+</div>
+
+<div class="gv-actions">
+    <a class="gv-cancel" href="{% url 'guest_visit_list' %}">Cancel</a>
+    <button class="gv-save" id="gv-submit-button" type="submit">Send for Approval</button>
+</div>
+
+</form>
+</div>
+</div>
+</div>
+<script>
+(function () {
+    'use strict';
+
+    const tenantSelect = document.getElementById('id_tenant');
+    const buildingSelect = document.getElementById('id_building');
+    const unitSelect = document.getElementById('id_unit');
+    const dialCode = document.getElementById('guestDialCode');
+
+    const visitTypeSelect = document.getElementById('id_visit_type');
+    const submitButton = document.getElementById('gv-submit-button');
+    const visitTypeHelp = document.getElementById('gv-visit-type-help');
+
+    const selfServiceTenantId =
+        '{{ self_service_tenant.pk|default:""|escapejs }}';
+
+    const defaultDialCode =
+        '{{ dial_code|default:""|escapejs }}';
+
+    if (!buildingSelect || !unitSelect) {
+        return;
+    }
+
+    // Save all original unit options before filtering.
+    const unitOptions = Array.from(unitSelect.options)
+        .filter(function (option) {
+            return option.value !== '';
+        })
+        .map(function (option) {
+            return {
+                value: option.value,
+                text: option.textContent.trim(),
+                tenant: String(option.dataset.tenant || ''),
+                building: String(option.dataset.building || ''),
+                dialCode: String(option.dataset.dialCode || '')
+            };
+        });
+
+    // Save all original building options.
+    const buildingOptions = Array.from(buildingSelect.options)
+        .filter(function (option) {
+            return option.value !== '';
+        })
+        .map(function (option) {
+            return {
+                value: option.value,
+                text: option.textContent.trim(),
+                tenant: String(option.dataset.tenant || ''),
+                dialCode: String(option.dataset.dialCode || '')
+            };
+        });
+
+    function getTenantId() {
+        if (tenantSelect) {
+            return String(tenantSelect.value || '');
+        }
+
+        return String(selfServiceTenantId || '');
+    }
+
+    function updateDialCode() {
+        if (!dialCode) {
+            return;
+        }
+
+        let code = '';
+
+        // Prefer the selected unit's country dial code.
+        if (unitSelect.value) {
+            const unit = unitSelect.selectedOptions[0];
+
+            if (unit) {
+                code = unit.dataset.dialCode || '';
+            }
+        }
+
+        // If no unit is selected, use the building's dial code.
+        if (!code && buildingSelect.value) {
+            const building = buildingSelect.selectedOptions[0];
+
+            if (building) {
+                code = building.dataset.dialCode || '';
+            }
+        }
+
+        if (!code) {
+            code = defaultDialCode;
+        }
+
+        code = String(code).trim();
+
+        if (code && !code.startsWith('+')) {
+            code = '+' + code;
+        }
+
+        dialCode.textContent = code;
+    }
+
+    // Show buildings belonging to the selected tenant.
+    function filterBuildings() {
+        const tenantId = getTenantId();
+        const currentBuildingId = String(buildingSelect.value || '');
+
+        buildingSelect.innerHTML = '';
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+        placeholder.textContent = tenantId
+            ? 'Select building'
+            : 'Select tenant first';
+
+        buildingSelect.appendChild(placeholder);
+
+        buildingOptions.forEach(function (building) {
+            const tenantMatches =
+                !tenantId || building.tenant === tenantId;
+
+            if (!tenantMatches) {
+                return;
+            }
+
+            const option = document.createElement('option');
+
+            option.value = building.value;
+            option.textContent = building.text;
+            option.dataset.tenant = building.tenant;
+            option.dataset.dialCode = building.dialCode;
+
+            buildingSelect.appendChild(option);
+        });
+
+        // Restore the building only if it is still available.
+        if (currentBuildingId) {
+            const exists = Array.from(buildingSelect.options).some(
+                function (option) {
+                    return option.value === currentBuildingId;
+                }
+            );
+
+            if (exists) {
+                buildingSelect.value = currentBuildingId;
+            }
+        }
+    }
+
+    // Show ONLY units belonging to the selected building.
+    function filterUnits() {
+        const tenantId = getTenantId();
+        const buildingId = String(buildingSelect.value || '');
+
+        const previousUnitId = String(unitSelect.value || '');
+
+        // Always clear the old unit options first.
+        unitSelect.innerHTML = '';
+
+        const placeholder = document.createElement('option');
+        placeholder.value = '';
+
+        if (!buildingId) {
+            placeholder.textContent = 'Select building first';
+            unitSelect.disabled = true;
+            unitSelect.appendChild(placeholder);
+            updateDialCode();
+            return;
+        }
+
+        placeholder.textContent = 'Select unit';
+        unitSelect.appendChild(placeholder);
+
+        let matchingUnits = 0;
+
+        unitOptions.forEach(function (unit) {
+            const buildingMatches = unit.building === buildingId;
+
+            const tenantMatches =
+                !tenantId || unit.tenant === tenantId;
+
+            // Building AND tenant must match.
+            if (!buildingMatches || !tenantMatches) {
+                return;
+            }
+
+            const option = document.createElement('option');
+
+            option.value = unit.value;
+            option.textContent = unit.text;
+            option.dataset.tenant = unit.tenant;
+            option.dataset.building = unit.building;
+            option.dataset.dialCode = unit.dialCode;
+
+            unitSelect.appendChild(option);
+            matchingUnits++;
+        });
+
+        unitSelect.disabled = matchingUnits === 0;
+
+        if (matchingUnits === 0) {
+            placeholder.textContent = 'No units available in this building';
+        }
+
+        // Keep the previous unit only if it is still in this building.
+        if (previousUnitId && matchingUnits > 0) {
+            const stillAvailable = Array.from(unitSelect.options).some(
+                function (option) {
+                    return option.value === previousUnitId;
+                }
+            );
+
+            if (stillAvailable) {
+                unitSelect.value = previousUnitId;
+            }
+        }
+
+        updateDialCode();
+    }
+
+    // Tenant change: reset building and unit.
+    if (tenantSelect) {
+        tenantSelect.addEventListener('change', function () {
+            buildingSelect.value = '';
+            unitSelect.value = '';
+
+            filterBuildings();
+            filterUnits();
+        });
+    }
+
+    // Building change: reset unit and load that building's units.
+    buildingSelect.addEventListener('change', function () {
+        unitSelect.value = '';
+        filterUnits();
+    });
+
+    // Unit change: update the phone dial code.
+    unitSelect.addEventListener('change', updateDialCode);
+
+    // Initialise the form, including after validation errors.
+    const initialBuildingId = String(buildingSelect.value || '');
+    const initialUnitId = String(unitSelect.value || '');
+
+    filterBuildings();
+
+    if (initialBuildingId) {
+        buildingSelect.value = initialBuildingId;
+    }
+
+    filterUnits();
+
+    if (initialUnitId) {
+        const unitExists = Array.from(unitSelect.options).some(
+            function (option) {
+                return option.value === initialUnitId;
+            }
+        );
+
+        if (unitExists) {
+            unitSelect.value = initialUnitId;
+        }
+    }
+
+    updateDialCode();
+
+    // Update submit button according to visit type.
+    function updateVisitTypeText() {
+        if (!visitTypeSelect || !submitButton) {
+            return;
+        }
+
+        const walkIn = visitTypeSelect.value === 'walk_in';
+
+        const isTenantSelfService =
+            '{{ is_tenant_self_service|yesno:"true,false" }}' === 'true';
+
+        if (isTenantSelfService) {
+            submitButton.textContent = walkIn
+                ? 'Create Walk-in & Generate Gate Pass'
+                : 'Send Advance Visit for Approval';
+
+            if (visitTypeHelp) {
+                visitTypeHelp.textContent = walkIn
+                    ? 'Submitting a walk-in will approve it automatically and generate a Gate Pass.'
+                    : 'Advance visits are saved as pending and follow the approval workflow.';
+            }
+        } else {
+            submitButton.textContent = 'Send for Tenant Approval';
+        }
+    }
+
+    if (visitTypeSelect) {
+        visitTypeSelect.addEventListener(
+            'change',
+            updateVisitTypeText
+        );
+    }
+
+    updateVisitTypeText();
+
+    // Guest photo camera
+    const openCameraButton = document.getElementById('start-camera');
+    const retakeCameraButton = document.getElementById('retake-camera');
+    const webcamPhotoInput = document.getElementById('webcam-photo-data');
+    const guestPhotoPreview = document.getElementById('guest-photo-preview');
+    const cameraPlaceholder = document.getElementById('camera-placeholder');
+    const cameraStatusText = document.getElementById('camera-status-text');
+    const cameraWindowStatus = document.getElementById('camera-window-status');
+    let cameraWindow = null;
+
+    function showGuestPhoto(photo) {
+        if (!photo || !webcamPhotoInput) return;
+
+        webcamPhotoInput.value = photo;
+
+        if (guestPhotoPreview) {
+            guestPhotoPreview.src = photo;
+            guestPhotoPreview.classList.add('active');
+        }
+
+        if (cameraPlaceholder) {
+            cameraPlaceholder.style.display = 'none';
+        }
+
+        if (cameraStatusText) {
+            cameraStatusText.textContent = 'Guest photo captured successfully';
+        }
+
+        if (cameraWindowStatus) {
+            cameraWindowStatus.textContent = 'Photo captured and added to this form.';
+            cameraWindowStatus.style.color = '#166534';
+        }
+
+        if (openCameraButton) {
+            openCameraButton.style.display = 'none';
+        }
+
+        if (retakeCameraButton) {
+            retakeCameraButton.style.display = 'inline-flex';
+        }
+    }
+
+    window.addEventListener('message', function (event) {
+        if (event.origin !== window.location.origin) return;
+        if (!event.data || event.data.type !== 'guest-photo-captured') return;
+
+        showGuestPhoto(event.data.photo);
+
+        if (cameraWindow && !cameraWindow.closed) {
+            try { cameraWindow.close(); } catch (e) {}
+        }
+    });
+
+    if (openCameraButton) {
+        openCameraButton.addEventListener('click', function () {
+            const cameraUrl = '{% url "guest_visit_camera" %}';
+
+            cameraWindow = window.open(
+                cameraUrl,
+                'guestCameraWindow',
+                'width=900,height=760,resizable=yes,scrollbars=yes'
+            );
+
+            if (!cameraWindow) {
+                if (cameraWindowStatus) {
+                    cameraWindowStatus.textContent = 'Camera window was blocked. Please allow pop-ups for this site and try again.';
+                    cameraWindowStatus.style.color = '#b91c1c';
+                }
+                return;
+            }
+
+            if (cameraWindowStatus) {
+                cameraWindowStatus.textContent = 'Camera window opened. Allow camera permission, capture the photo, then click Use This Photo.';
+                cameraWindowStatus.style.color = '#64748b';
+            }
+
+            cameraWindow.focus();
+        });
+    }
+
+    if (retakeCameraButton) {
+        retakeCameraButton.addEventListener('click', function () {
+            if (webcamPhotoInput) webcamPhotoInput.value = '';
+            if (guestPhotoPreview) {
+                guestPhotoPreview.removeAttribute('src');
+                guestPhotoPreview.classList.remove('active');
+            }
+            if (cameraPlaceholder) cameraPlaceholder.style.display = 'flex';
+            if (cameraStatusText) cameraStatusText.textContent = 'No guest photo captured';
+            if (openCameraButton) openCameraButton.style.display = 'inline-flex';
+            if (retakeCameraButton) retakeCameraButton.style.display = 'none';
+            if (cameraWindowStatus) {
+                cameraWindowStatus.textContent = 'Camera opens separately for a cleaner capture experience.';
+                cameraWindowStatus.style.color = '#64748b';
+            }
+        });
+    }
+
+    // Accompanying persons.
+    const peopleList = document.getElementById('gv-person-list');
+    const addButton = document.getElementById('gv-add-person');
+
+    function updateRemoveButtons() {
+        if (!peopleList) {
+            return;
+        }
+
+        const rows = peopleList.querySelectorAll('.gv-person-row');
+
+        rows.forEach(function (row) {
+            const button = row.querySelector('.gv-remove');
+
+            if (button) {
+                button.style.display =
+                    rows.length > 1 ? '' : 'none';
+            }
+        });
+    }
+
+    if (peopleList && addButton) {
+        addButton.addEventListener('click', function () {
+            const row = document.createElement('div');
+            row.className = 'gv-person-row';
+
+            const name = document.createElement('input');
+            name.name = 'accompanying_name';
+            name.maxLength = 150;
+            name.placeholder = 'Person name';
+
+            const mobile = document.createElement('input');
+            mobile.name = 'accompanying_mobile';
+            mobile.maxLength = 30;
+            mobile.placeholder = 'Mobile number';
+
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'gv-remove';
+            remove.textContent = 'Remove';
+
+            row.appendChild(name);
+            row.appendChild(mobile);
+            row.appendChild(remove);
+
+            peopleList.appendChild(row);
+            updateRemoveButtons();
+        });
+
+        peopleList.addEventListener('click', function (event) {
+            const target = event.target;
+
+            if (
+                target &&
+                target.classList &&
+                target.classList.contains('gv-remove')
+            ) {
+                const row = target.closest('.gv-person-row');
+
+                if (row) {
+                    row.remove();
+                }
+
+                updateRemoveButtons();
+            }
+        });
+
+        updateRemoveButtons();
+    }
+})();
+</script>
+{% endblock %}

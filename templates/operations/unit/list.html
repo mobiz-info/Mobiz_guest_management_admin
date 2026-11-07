@@ -1,0 +1,908 @@
+{% extends 'base.html' %}
+
+{% block title %}Units{% endblock %}
+{% block page_title %}Units{% endblock %}
+{% block page_subtitle %}Manage individual flats, villas, offices and other units{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* ============================================================
+   UNITS PAGE
+============================================================ */
+
+.unit-page {
+    width: 100%;
+    max-width: 1400px;
+    min-width: 0;
+    margin: 0 auto;
+    font-family: inherit;
+    color: #334155;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.unit-card {
+    width: 100%;
+    min-width: 0;
+    background: #fff;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+}
+
+
+/* ============================================================
+   TOOLBAR
+============================================================ */
+
+.unit-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.unit-search-form {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    width: 100%;
+    max-width: 600px;
+    min-width: 0;
+    margin: 0;
+}
+
+.unit-search-form input {
+    flex: 1;
+    min-width: 0;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    outline: none;
+    background: #fff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 12px;
+    box-sizing: border-box;
+}
+
+.unit-search-form input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.10);
+}
+
+.unit-search-btn,
+.unit-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 38px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #475569;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.unit-search-btn:hover,
+.unit-clear-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+
+/* ============================================================
+   ADD BUTTON
+============================================================ */
+
+.unit-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 38px;
+    padding: 0 13px;
+    border: 1px solid #16a34a;
+    border-radius: 7px;
+    background: #16a34a;
+    color: #fff;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    transition: 0.2s ease;
+}
+
+.unit-add-btn:hover {
+    background: #15803d;
+    border-color: #15803d;
+    color: #fff;
+}
+
+
+/* ============================================================
+   TABLE WRAPPER
+   NO HORIZONTAL SCROLL
+============================================================ */
+
+.unit-table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: visible;
+}
+
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+.unit-table {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    table-layout: fixed;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+
+/* ============================================================
+   TABLE HEADER
+============================================================ */
+
+.unit-table th {
+    padding: 10px 6px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: normal;
+    line-height: 1.3;
+}
+
+
+/* ============================================================
+   TABLE CELLS
+============================================================ */
+
+.unit-table td {
+    padding: 10px 6px;
+    border-bottom: 1px solid #edf1f7;
+    color: #334155;
+    font-size: 12px;
+    line-height: 1.4;
+    vertical-align: middle;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.unit-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.unit-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.unit-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+
+/* ============================================================
+   COLUMN WIDTHS
+============================================================ */
+
+.unit-table th:nth-child(1),
+.unit-table td:nth-child(1) {
+    width: 3%;
+    text-align: center;
+}
+
+.unit-table th:nth-child(2),
+.unit-table td:nth-child(2) {
+    width: 8%;
+}
+
+.unit-table th:nth-child(3),
+.unit-table td:nth-child(3) {
+    width: 8%;
+}
+
+.unit-table th:nth-child(4),
+.unit-table td:nth-child(4) {
+    width: 11%;
+}
+
+.unit-table th:nth-child(5),
+.unit-table td:nth-child(5) {
+    width: 12%;
+}
+
+.unit-table th:nth-child(6),
+.unit-table td:nth-child(6) {
+    width: 12%;
+}
+
+.unit-table th:nth-child(7),
+.unit-table td:nth-child(7) {
+    width: 11%;
+}
+
+.unit-table th:nth-child(8),
+.unit-table td:nth-child(8) {
+    width: 7%;
+}
+
+.unit-table th:nth-child(9),
+.unit-table td:nth-child(9) {
+    width: 8%;
+}
+
+.unit-table th:nth-child(10),
+.unit-table td:nth-child(10) {
+    width: 7%;
+}
+
+.unit-table th:nth-child(11),
+.unit-table td:nth-child(11) {
+    width: 13%;
+}
+
+
+/* ============================================================
+   UNIT NAME
+============================================================ */
+
+.unit-name {
+    display: block;
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+
+/* ============================================================
+   RELATED DETAILS
+============================================================ */
+
+.unit-related {
+    color: #334155;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.unit-muted {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+
+/* ============================================================
+   BADGES
+============================================================ */
+
+.unit-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 4px 7px;
+    border-radius: 5px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 9px;
+    font-weight: 800;
+    white-space: nowrap;
+    box-sizing: border-box;
+}
+
+.unit-badge.inactive {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.unit-badge.occupied {
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.unit-badge.available {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.unit-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.unit-actions form {
+    margin: 0;
+    padding: 0;
+}
+
+.unit-actions a,
+.unit-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 28px;
+    padding: 0 7px;
+    border: 1px solid #e2e8f0;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+.unit-edit-btn {
+    background: #eef2ff;
+    color: #4338ca;
+    border-color: #c7d2fe !important;
+}
+
+.unit-edit-btn:hover {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.unit-delete-btn {
+    background: #fff1f2;
+    color: #be123c;
+    border-color: #fecdd3 !important;
+}
+
+.unit-delete-btn:hover {
+    background: #ffe4e6;
+    color: #9f1239;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.unit-empty {
+    padding: 38px 10px !important;
+    text-align: center;
+    color: #94a3b8 !important;
+    font-size: 12px !important;
+}
+
+.unit-empty i {
+    display: block;
+    margin-bottom: 7px;
+    color: #94a3b8;
+}
+
+
+/* ============================================================
+   PAGINATION
+============================================================ */
+
+.unit-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 11px 15px;
+    border-top: 1px solid #e2e8f0;
+    background: #fff;
+    color: #64748b;
+    font-size: 11px;
+}
+
+.unit-pagination-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.unit-pagination a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 29px;
+    padding: 0 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    background: #fff;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.unit-pagination a:hover {
+    border-color: #a5b4fc;
+    color: #4338ca;
+}
+
+.unit-page-info {
+    padding: 0 4px;
+    color: #64748b;
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1100px) {
+
+    .unit-table th {
+        padding: 9px 5px;
+        font-size: 9px;
+    }
+
+    .unit-table td {
+        padding: 9px 5px;
+        font-size: 11px;
+    }
+
+    .unit-name {
+        font-size: 11px;
+    }
+
+    .unit-related {
+        font-size: 10px;
+    }
+
+    .unit-actions a,
+    .unit-actions button {
+        min-height: 26px;
+        padding: 0 6px;
+        font-size: 9px;
+    }
+
+    .unit-badge {
+        padding: 3px 6px;
+        font-size: 8px;
+    }
+}
+
+
+@media (max-width: 850px) {
+
+    .unit-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .unit-search-form {
+        max-width: 100%;
+    }
+
+    .unit-add-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .unit-table th {
+        padding: 8px 4px;
+        font-size: 8px;
+    }
+
+    .unit-table td {
+        padding: 8px 4px;
+        font-size: 10px;
+    }
+
+    .unit-name {
+        font-size: 10px;
+    }
+
+    .unit-related {
+        font-size: 9px;
+    }
+
+    .unit-actions {
+        gap: 3px;
+    }
+
+    .unit-actions a,
+    .unit-actions button {
+        min-height: 25px;
+        padding: 0 5px;
+        font-size: 8px;
+    }
+
+    .unit-actions i {
+        display: none;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    .unit-toolbar {
+        padding: 10px;
+    }
+
+    .unit-search-form {
+        flex-wrap: wrap;
+    }
+
+    .unit-search-form input {
+        flex-basis: 100%;
+        width: 100%;
+    }
+
+    .unit-search-btn,
+    .unit-clear-btn {
+        flex: 1;
+    }
+
+    .unit-table th {
+        padding: 7px 3px;
+        font-size: 7px;
+    }
+
+    .unit-table td {
+        padding: 7px 3px;
+        font-size: 9px;
+    }
+
+    .unit-name {
+        font-size: 9px;
+    }
+
+    .unit-related {
+        font-size: 8px;
+    }
+
+    .unit-badge {
+        font-size: 7px;
+        padding: 3px 4px;
+    }
+
+    .unit-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 10px;
+    }
+}
+
+</style>
+
+
+<div class="unit-page">
+
+    <div class="unit-card">
+
+        <!-- SEARCH / TOOLBAR -->
+
+        <div class="unit-toolbar">
+
+            <form class="unit-search-form" method="get">
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="Search unit, building, work site or company..."
+                    aria-label="Search units"
+                >
+
+                <button
+                    class="unit-search-btn"
+                    type="submit"
+                >
+                    <i class="ph ph-magnifying-glass"></i>
+                    Search
+                </button>
+
+                {% if search %}
+
+                    <a
+                        class="unit-clear-btn"
+                        href="{% url 'unit_list' %}"
+                    >
+                        Clear
+                    </a>
+
+                {% endif %}
+
+            </form>
+
+
+            <a
+                class="unit-add-btn"
+                href="{% url 'unit_create' %}"
+            >
+                <i class="ph ph-plus"></i>
+                Add Unit
+            </a>
+
+        </div>
+
+
+        <!-- UNITS TABLE -->
+
+        <div class="unit-table-wrap">
+
+            <table class="unit-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>#</th>
+                        <th>Unit</th>
+                        <th>Unit Type</th>
+                        <th>Establishment</th>
+                        <th>Company</th>
+                        <th>Work Site</th>
+                        <th>Building</th>
+                        <th>Floor</th>
+                        <th>Allocation</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for item in page_obj %}
+
+                        <tr>
+
+                            <td>
+                                {{ forloop.counter0|add:page_obj.start_index }}
+                            </td>
+
+                            <td>
+                                <span class="unit-name">
+                                    {{ item.name }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="unit-related">
+                                    {{ item.get_unit_type_display }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="unit-related">
+                                    {{ item.establishment_type.name|default:"—" }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="unit-related">
+                                    {{ item.company.name|default:"—" }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="unit-related">
+                                    {{ item.work_site.name|default:"—" }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="unit-related">
+                                    {{ item.building.name|default:"—" }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="unit-related">
+                                    {{ item.floor.name|default:"—" }}
+                                </span>
+                            </td>
+
+                            <td>
+
+                                {% if item.tenant_allocations.exists %}
+
+                                    <span class="unit-badge occupied">
+                                        Occupied
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="unit-badge available">
+                                        Available
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                {% if item.status %}
+
+                                    <span class="unit-badge">
+                                        Active
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="unit-badge inactive">
+                                        Inactive
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                <div class="unit-actions">
+
+                                    <a
+                                        class="unit-edit-btn"
+                                        href="{% url 'unit_edit' item.pk %}"
+                                    >
+                                        <i class="ph ph-pencil-simple"></i>
+                                        Edit
+                                    </a>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'unit_delete' item.pk %}"
+                                        onsubmit="return confirm('Delete this unit?');"
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <button
+                                            class="unit-delete-btn"
+                                            type="submit"
+                                        >
+                                            <i class="ph ph-trash"></i>
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="11"
+                                class="unit-empty"
+                            >
+
+                                <i
+                                    class="ph ph-buildings"
+                                    style="font-size:22px;"
+                                ></i>
+
+                                <div>
+                                    No units found.
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- PAGINATION -->
+
+        {% if page_obj.paginator.num_pages > 1 %}
+
+            <div class="unit-pagination">
+
+                <span>
+                    Showing
+                    {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                    of
+                    {{ page_obj.paginator.count }}
+                </span>
+
+                <div class="unit-pagination-links">
+
+                    {% if page_obj.has_previous %}
+
+                        <a
+                            href="?page=1&amp;search={{ search|urlencode }}"
+                        >
+                            First
+                        </a>
+
+                        <a
+                            href="?page={{ page_obj.previous_page_number }}&amp;search={{ search|urlencode }}"
+                        >
+                            Previous
+                        </a>
+
+                    {% endif %}
+
+                    <span class="unit-page-info">
+                        Page
+                        {{ page_obj.number }}
+                        of
+                        {{ page_obj.paginator.num_pages }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+
+                        <a
+                            href="?page={{ page_obj.next_page_number }}&amp;search={{ search|urlencode }}"
+                        >
+                            Next
+                        </a>
+
+                        <a
+                            href="?page={{ page_obj.paginator.num_pages }}&amp;search={{ search|urlencode }}"
+                        >
+                            Last
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
+```

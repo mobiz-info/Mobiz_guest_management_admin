@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+
+{% block title %}District Master - Guest Management{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block extra_css %}
+
+<style>
+.premium-form-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 28px;
+    box-sizing: border-box;
+    background: #ffffff;
+    border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.045);
+}
+
+.premium-form-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 19px;
+    font-weight: 750;
+    color: #172033;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+}
+
+.premium-form-title i {
+    color: #315ee7;
+    font-size: 25px;
+}
+
+.form-group {
+    margin-bottom: 21px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 8px;
+}
+
+.form-group select,
+.form-group input {
+    display: block;
+    width: 100%;
+    height: 46px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border: 1px solid #d8e0eb;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-group select:hover,
+.form-group input:hover {
+    border-color: #aab8cc;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+    border-color: #315ee7;
+    box-shadow: 0 0 0 3px rgba(49, 94, 231, 0.09);
+}
+
+.form-group input::placeholder {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.form-separator {
+    height: 1px;
+    background: #e8edf5;
+    margin: 5px 0 22px;
+}
+
+.error-text {
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 11px;
+    padding-top: 21px;
+    margin-top: 12px;
+    border-top: 1px solid #e8edf5;
+}
+
+.btn-secondary,
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 41px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-secondary {
+    border: 1px solid #dbe3ef;
+    background: #ffffff;
+    color: #475569;
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+    border-color: #b8c5d6;
+    color: #1e293b;
+}
+
+.btn-primary {
+    border: 1px solid #315ee7;
+    background: #315ee7;
+    color: #ffffff;
+    box-shadow: 0 2px 5px rgba(49, 94, 231, 0.15);
+}
+
+.btn-primary:hover {
+    background: #244bc5;
+    border-color: #244bc5;
+    box-shadow: 0 3px 8px rgba(49, 94, 231, 0.2);
+}
+
+.btn-primary i,
+.btn-secondary i {
+    font-size: 16px;
+}
+
+@media (max-width: 650px) {
+    .premium-form-container {
+        max-width: 100%;
+        padding: 19px 16px;
+    }
+
+    .premium-form-title {
+        font-size: 17px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .btn-secondary,
+    .btn-primary {
+        width: 100%;
+    }
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="premium-form-container">
+
+    <div class="premium-form-title">
+        <i class="ph ph-map-pin"></i>
+        {{ title }}
+    </div>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {% if non_field_errors %}
+            <div class="error-text">
+                {% for error in non_field_errors %}
+                    {{ error }}{% if not forloop.last %}<br>{% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- STATE / PROVINCE / EMIRATE -->
+        <div class="form-group">
+
+            <label for="id_state">
+                State / Province / Emirate
+            </label>
+
+            <select name="state" id="id_state" class="form-control" required>
+
+                <option value="">Select State</option>
+
+                {% for state in states %}
+                    <option value="{{ state.pk }}" {% if values.state == state.pk|stringformat:"s" %}selected{% endif %}>
+                        {{ state.name }} - {{ state.country.name }}
+                    </option>
+                {% endfor %}
+
+            </select>
+
+            {% if errors.state %}
+                <div class="error-text">
+                    {% for error in errors.state %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <div class="form-separator"></div>
+
+        <!-- DISTRICT -->
+        <div class="form-group">
+
+            <label for="id_name">
+                District Name
+            </label>
+
+            <input
+                type="text"
+                name="name"
+                id="id_name"
+                class="form-control"
+                maxlength="100"
+                value="{{ values.name|default:'' }}"
+                placeholder="Enter district name"
+                required
+            >
+
+            {% if errors.name %}
+                <div class="error-text">
+                    {% for error in errors.name %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+        </div>
+
+        <!-- ACTIONS -->
+        <div class="form-actions">
+
+            <a href="{% url 'district_list' %}" class="btn-secondary">
+                <i class="ph ph-x"></i>
+                Cancel
+            </a>
+
+            <button type="submit" class="btn-primary">
+                <i class="ph ph-check-circle"></i>
+
+                {% if is_edit %}
+                    Update District
+                {% else %}
+                    Save District
+                {% endif %}
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}

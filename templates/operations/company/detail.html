@@ -1,0 +1,925 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Company Details - Guest Management
+{% endblock %}
+
+{% block page_title %}
+    Company Details
+{% endblock %}
+
+{% block page_subtitle %}
+    View company / client information
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* ============================================================
+   COMPANY DETAIL PAGE
+============================================================ */
+
+.company-detail-page {
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+
+/* ============================================================
+   MAIN CARD
+============================================================ */
+
+.company-detail-card {
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow:
+        0 5px 16px rgba(15, 23, 42, 0.05),
+        0 2px 4px rgba(15, 23, 42, 0.02);
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.company-detail-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 13px;
+    background: linear-gradient(
+        135deg,
+        #eff6ff 0%,
+        #ffffff 85%
+    );
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.company-detail-header-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.company-detail-header-icon {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 7px;
+    background: #dbeafe;
+    border: 1px solid #bfdbfe;
+    color: #2563eb;
+    font-size: 15px;
+}
+
+.company-detail-header-title {
+    color: #0f172a;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.company-detail-header-subtitle {
+    margin-top: 2px;
+    color: #64748b;
+    font-size: 10px;
+}
+
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+.company-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 7px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.company-status.active {
+    background: #dcfce7;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+}
+
+.company-status.inactive {
+    background: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+.company-status-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+
+/* ============================================================
+   BODY
+============================================================ */
+
+.company-detail-body {
+    padding: 10px;
+}
+
+
+/* ============================================================
+   SECTION
+============================================================ */
+
+.company-section {
+    margin-bottom: 8px;
+}
+
+.company-section:last-child {
+    margin-bottom: 0;
+}
+
+.company-section-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-bottom: 4px;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.company-section-title i {
+    color: #2563eb;
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   DETAIL GRID
+============================================================ */
+
+.company-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+}
+
+
+/* ============================================================
+   DETAIL ITEM
+============================================================ */
+
+.company-detail-item {
+    min-height: 39px;
+    padding: 5px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #ffffff;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.company-detail-item:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.company-detail-label {
+    margin-bottom: 2px;
+    color: #94a3b8;
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.company-detail-value {
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.25;
+    word-break: break-word;
+}
+
+.company-detail-value.muted {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+
+/* ============================================================
+   FULL WIDTH
+============================================================ */
+
+.company-detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+
+/* ============================================================
+   TAX STATUS
+============================================================ */
+
+.tax-enabled,
+.tax-disabled {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.tax-enabled {
+    color: #15803d;
+}
+
+.tax-disabled {
+    color: #64748b;
+}
+
+
+/* ============================================================
+   ADMIN
+============================================================ */
+
+.admin-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 5px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    background: #f8fafc;
+}
+
+.admin-card-left {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-width: 0;
+}
+
+.admin-avatar {
+    width: 27px;
+    height: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 7px;
+    background: #e0e7ff;
+    color: #4338ca;
+    font-size: 13px;
+}
+
+.admin-name {
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.admin-username {
+    margin-top: 1px;
+    color: #64748b;
+    font-size: 9px;
+    line-height: 1.25;
+}
+
+.admin-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 6px;
+    border-radius: 5px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 9px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.company-detail-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: 8px;
+    padding-top: 7px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.company-btn {
+    min-height: 29px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 9px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 800;
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        transform 0.18s ease;
+}
+
+.company-btn:hover {
+    transform: translateY(-1px);
+}
+
+
+/* ============================================================
+   BACK BUTTON
+============================================================ */
+
+.company-btn-back {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+}
+
+.company-btn-back:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+
+
+/* ============================================================
+   EDIT BUTTON
+============================================================ */
+
+.company-btn-edit {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+}
+
+.company-btn-edit:hover {
+    background: #dbeafe;
+    border-color: #93c5fd;
+    color: #1e40af;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .company-detail-page {
+        max-width: 100%;
+    }
+
+    .company-detail-header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 9px 11px;
+    }
+
+    .company-detail-body {
+        padding: 8px;
+    }
+
+    .company-detail-grid {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+    .company-detail-item.full-width {
+        grid-column: auto;
+    }
+
+    .company-detail-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .company-btn {
+        width: 100%;
+    }
+
+    .admin-card {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 6px;
+    }
+}
+
+</style>
+
+
+<div class="company-detail-page">
+
+    <div class="company-detail-card">
+
+
+        <!-- ==================================================
+             HEADER
+        ================================================== -->
+
+        <div class="company-detail-header">
+
+            <div class="company-detail-header-left">
+
+                <div class="company-detail-header-icon">
+                    <i class="ph-fill ph-buildings"></i>
+                </div>
+
+                <div>
+
+                    <div class="company-detail-header-title">
+                        {{ company.name }}
+                    </div>
+
+                    <div class="company-detail-header-subtitle">
+                        Company / Client Information
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- STATUS -->
+
+            {% if company.status %}
+
+                <div class="company-status active">
+
+                    <span class="company-status-dot"></span>
+
+                    Active
+
+                </div>
+
+            {% else %}
+
+                <div class="company-status inactive">
+
+                    <span class="company-status-dot"></span>
+
+                    Inactive
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- ==================================================
+             BODY
+        ================================================== -->
+
+        <div class="company-detail-body">
+
+
+            <!-- =================================================
+                 COMPANY INFORMATION
+            ================================================= -->
+
+            <div class="company-section">
+
+                <div class="company-section-title">
+
+                    <i class="ph ph-buildings"></i>
+
+                    Company Information
+
+                </div>
+
+
+                <div class="company-detail-grid">
+
+
+                    <!-- COMPANY NAME -->
+
+                    <div class="company-detail-item">
+
+                        <div class="company-detail-label">
+                            Company / Client Name
+                        </div>
+
+                        <div class="company-detail-value">
+                            {{ company.name }}
+                        </div>
+
+                    </div>
+
+
+                    <!-- TAX NUMBER -->
+
+                    <div class="company-detail-item">
+
+                        <div class="company-detail-label">
+                            Tax Number
+                        </div>
+
+                        <div class="company-detail-value">
+
+                            {% if company.tax_number %}
+
+                                {{ company.tax_number }}
+
+                            {% else %}
+
+                                <span class="company-detail-value muted">
+                                    Not provided
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- ADDRESS -->
+
+                    <div class="company-detail-item full-width">
+
+                        <div class="company-detail-label">
+                            Address
+                        </div>
+
+                        <div class="company-detail-value">
+
+                            {% if company.address %}
+
+                                {{ company.address|linebreaksbr }}
+
+                            {% else %}
+
+                                <span class="company-detail-value muted">
+                                    Not provided
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 LOCATION
+            ================================================== -->
+
+            <div class="company-section">
+
+                <div class="company-section-title">
+
+                    <i class="ph ph-map-pin"></i>
+
+                    Location
+
+                </div>
+
+
+                <div class="company-detail-grid">
+
+
+                    <!-- COUNTRY -->
+
+                    <div class="company-detail-item">
+
+                        <div class="company-detail-label">
+                            Country
+                        </div>
+
+                        <div class="company-detail-value">
+
+                            {% if company.country %}
+
+                                {{ company.country.name }}
+
+                            {% else %}
+
+                                <span class="company-detail-value muted">
+                                    Not provided
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STATE -->
+
+                    <div class="company-detail-item">
+
+                        <div class="company-detail-label">
+                            State / Province / Emirate
+                        </div>
+
+                        <div class="company-detail-value">
+
+                            {% if company.state %}
+
+                                {{ company.state.name }}
+
+                            {% else %}
+
+                                <span class="company-detail-value muted">
+                                    Not provided
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- DISTRICT -->
+
+                    <div class="company-detail-item">
+
+                        <div class="company-detail-label">
+                            District
+                        </div>
+
+                        <div class="company-detail-value">
+
+                            {% if company.district %}
+
+                                {{ company.district.name }}
+
+                            {% else %}
+
+                                <span class="company-detail-value muted">
+                                    Not provided
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- AREA -->
+
+                    <div class="company-detail-item">
+
+                        <div class="company-detail-label">
+                            Area
+                        </div>
+
+                        <div class="company-detail-value">
+
+                            {% if company.area %}
+
+                                {{ company.area.name }}
+
+                            {% else %}
+
+                                <span class="company-detail-value muted">
+                                    Not provided
+                                </span>
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 TAX INFORMATION
+            ================================================== -->
+
+            <div class="company-section">
+
+                <div class="company-section-title">
+
+                    <i class="ph ph-receipt"></i>
+
+                    Tax Information
+
+                </div>
+
+
+                <div class="company-detail-grid">
+
+                    <div class="company-detail-item">
+
+                        <div class="company-detail-label">
+                            Applicable Tax
+                        </div>
+
+                        {% if company.applicable_tax %}
+
+                            <div class="tax-enabled">
+
+                                <i class="ph-fill ph-check-circle"></i>
+
+                                Tax Applicable
+
+                            </div>
+
+                        {% else %}
+
+                            <div class="tax-disabled">
+
+                                <i class="ph-fill ph-minus-circle"></i>
+
+                                Tax Not Applicable
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================================
+                 COMPANY ADMIN
+            ================================================== -->
+
+            <div class="company-section">
+
+                <div class="company-section-title">
+
+                    <i class="ph ph-user-circle"></i>
+
+                    Company Admin
+
+                </div>
+
+
+                {% for admin in company.admins.all %}
+
+                    <div class="admin-card">
+
+                        <div class="admin-card-left">
+
+                            <div class="admin-avatar">
+
+                                <i class="ph-fill ph-user"></i>
+
+                            </div>
+
+
+                            <div>
+
+                                <div class="admin-name">
+
+                                    {% if admin.user.get_full_name %}
+
+                                        {{ admin.user.get_full_name }}
+
+                                    {% else %}
+
+                                        {{ admin.user.username }}
+
+                                    {% endif %}
+
+                                </div>
+
+
+                                <div class="admin-username">
+
+                                    Username: {{ admin.user.username }}
+
+                                    {% if admin.user.email %}
+
+                                        &nbsp; • &nbsp;
+
+                                        {{ admin.user.email }}
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        {% if admin.status %}
+
+                            <div class="admin-status">
+
+                                <i class="ph-fill ph-check-circle"></i>
+
+                                Active
+
+                            </div>
+
+                        {% else %}
+
+                            <div
+                                class="admin-status"
+                                style="background:#fee2e2;color:#b91c1c;"
+                            >
+
+                                <i class="ph-fill ph-x-circle"></i>
+
+                                Inactive
+
+                            </div>
+
+                        {% endif %}
+
+                    </div>
+
+                {% empty %}
+
+                    <div class="company-detail-item">
+
+                        <span class="company-detail-value muted">
+                            No company admin assigned.
+                        </span>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <!-- =================================================
+                 ACTIONS
+            ================================================== -->
+
+            <div class="company-detail-actions">
+
+                <a
+                    href="{% url 'company_list' %}"
+                    class="company-btn company-btn-back"
+                >
+
+                    <i class="ph ph-arrow-left"></i>
+
+                    Back to Companies
+
+                </a>
+
+
+                {% if request.user.is_superuser %}
+
+                    <a
+                        href="{% url 'company_edit' company.pk %}"
+                        class="company-btn company-btn-edit"
+                    >
+
+                        <i class="ph ph-pencil-simple"></i>
+
+                        Edit Company
+
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+{% endblock %}

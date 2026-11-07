@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_subtitle %}{% if self_service %}Add or update your family member details{% else %}Family member details for {{ tenant.full_name }}{% endif %}{% endblock %}
+{% block content %}
+<style>
+.family-form-wrap{max-width:650px;margin:0 auto}.family-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px #0f172a0f}.family-title{padding:17px 20px;background:linear-gradient(135deg,#eff6ff,#fff);border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;font-weight:800;color:#1e293b}.family-title i{color:#2563eb;font-size:20px}.family-body{padding:22px}.family-field{margin-bottom:17px}.family-field label{display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:7px}.family-field input,.family-field select,.family-field textarea{width:100%;box-sizing:border-box;min-height:42px;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#0f172a;font-family:inherit;font-size:13px}.family-field input:focus,.family-field select:focus,.family-field textarea:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px #3b82f61a}.family-error{color:#dc2626;font-size:11px;margin-top:5px}.family-error-box{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 12px;border-radius:8px;margin-bottom:16px;font-size:12px}.family-actions{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #e2e8f0;padding-top:18px;margin-top:20px}.family-actions a,.family-actions button{min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 15px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:800;cursor:pointer}.family-cancel{background:#fff;border:1px solid #cbd5e1;color:#475569}.family-save{background:#2563eb;border:1px solid #2563eb;color:#fff}@media(max-width:600px){.family-body{padding:15px}.family-actions{flex-direction:column-reverse}.family-actions a,.family-actions button{width:100%;box-sizing:border-box}}
+
+
+/* Shared compact premium form sizing for Operations templates */
+.content-area [class*="-form-wrap"] { width:100%; max-width:720px !important; min-width:0; margin-left:auto !important; margin-right:auto !important; }
+.content-area [class*="-form-card"] { border-radius:12px !important; box-shadow:0 6px 22px rgba(15,23,42,.06) !important; }
+.content-area [class*="-form-title"] { padding:13px 17px !important; font-size:14px !important; }
+.content-area [class*="-form-body"] { padding:17px !important; }
+.content-area [class*="-field"] { margin-bottom:12px !important; }
+.content-area [class*="-field"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.content-area [class*="-field"] select,
+.content-area [class*="-field"] textarea,
+.content-area .tenant-field input:not([type="checkbox"]),
+.content-area .tenant-field select,
+.content-area .tenant-field textarea {
+    min-height:37px; padding:8px 10px; border-radius:8px; font-size:12px;
+}
+.content-area [class*="-field"] textarea { min-height:62px; }
+.content-area [class*="-actions"] { margin-top:15px !important; padding-top:13px !important; gap:8px !important; }
+.content-area [class*="-actions"] a,
+.content-area [class*="-actions"] button { min-height:36px !important; padding:0 13px !important; border-radius:8px !important; font-size:11px !important; }
+.content-area [class*="-save"] { background:linear-gradient(135deg,#6366f1,#4f46e5) !important; border-color:#4f46e5 !important; color:#fff !important; }
+.content-area [class*="-save"]:hover { background:#4338ca !important; }
+.content-area .tenant-form-wrap { max-width:760px !important; }
+.content-area .tenant-grid { gap:11px 14px !important; }
+.content-area .unit-check-grid { gap:7px !important; }
+.content-area .unit-option { padding:9px !important; border-radius:8px !important; }
+@media(max-width:600px) {
+    .content-area [class*="-form-body"] { padding:13px !important; }
+    .content-area [class*="-form-wrap"] { max-width:100% !important; }
+}
+
+.family-phone-wrap{display:flex;align-items:stretch;width:100%}.family-dial-code{display:flex;align-items:center;justify-content:center;min-width:68px;padding:0 10px;border:1px solid #cbd5e1;border-right:0;border-radius:8px 0 0 8px;background:#f8fafc;color:#334155;font-size:12px;font-weight:800}.family-phone-wrap input{border-radius:0 8px 8px 0 !important;flex:1}.family-phone-wrap:focus-within .family-dial-code{border-color:#3b82f6;background:#eff6ff;color:#1d4ed8}
+</style>
+<div class="family-form-wrap"><div class="family-card"><div class="family-title"><i class="ph ph-users-three"></i>{{ title }}</div><div class="family-body">
+{% if non_field_errors %}<div class="family-error-box">{% for error in non_field_errors %}<div>{{ error }}</div>{% endfor %}</div>{% endif %}
+<form method="post">{% csrf_token %}
+  <div class="family-field"><label for="id_name">Family Member Name <span style="color:#dc2626">*</span></label><input id="id_name" name="name" value="{{ values.name|default:'' }}" maxlength="150" required placeholder="Enter full name">{% for error in errors.name %}<div class="family-error">{{ error }}</div>{% endfor %}</div>
+  <div class="family-field"><label for="id_mobile_number">Mobile Number <span style="color:#dc2626">*</span></label><div class="family-phone-wrap"><span class="family-dial-code" id="familyDialCode"></span><input id="id_mobile_number" name="mobile_number" value="{{ values.mobile_number|default:'' }}" maxlength="30" required placeholder="Enter mobile number"></div>{% for error in errors.mobile_number %}<div class="family-error">{{ error }}</div>{% endfor %}</div>
+  <div class="family-field"><label for="id_email">Email (optional)</label><input type="email" id="id_email" name="email" value="{{ values.email|default:'' }}" maxlength="254" placeholder="name@example.com">{% for error in errors.email %}<div class="family-error">{{ error }}</div>{% endfor %}</div>
+  <div class="family-field"><label for="id_address">Address *</label><textarea id="id_address" name="address" rows="3" required placeholder="Enter address">{{ values.address|default:'' }}</textarea>{% for error in errors.address %}<div class="family-error">{{ error }}</div>{% endfor %}</div>
+  <div class="family-field"><label for="id_unit">Building / Floor / Unit *</label><select id="id_unit" name="unit" required><option value="">Select allocated unit</option>{% for unit in units %}<option value="{{ unit.pk }}" data-dial-code="{{ unit.building.company.country.dial_code|default:'' }}" {% if values.unit_id == unit.pk|stringformat:'s' %}selected{% endif %}>{{ unit.building.name }}{% if unit.floor %} · {{ unit.floor.name }}{% endif %} · {{ unit.name }}</option>{% endfor %}</select>{% for error in errors.unit %}<div class="family-error">{{ error }}</div>{% endfor %}<div class="family-error">{% if not units %}No active unit allocation is available for this tenant.{% endif %}</div></div>
+  <div class="family-actions">{% if self_service %}<a class="family-cancel" href="{% url 'my_family_members' %}"><i class="ph ph-x"></i> Cancel</a>{% else %}<a class="family-cancel" href="{% url 'tenant_family_member_list' tenant.pk %}"><i class="ph ph-x"></i> Cancel</a>{% endif %}<button class="family-save" type="submit"><i class="ph ph-check"></i> Save Family Member</button></div>
+</form>
+</div></div></div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const unit = document.getElementById("id_unit");
+    const dial = document.getElementById("familyDialCode");
+    if (!unit || !dial) return;
+    function update() {
+        const option = unit.options[unit.selectedIndex];
+        const code = option ? (option.getAttribute("data-dial-code") || "").trim() : "";
+        dial.textContent = code ? (code.startsWith("+") ? code : "+" + code) : "";
+    }
+    unit.addEventListener("change", update);
+    update();
+});
+</script>
+{% endblock %}

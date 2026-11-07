@@ -1,0 +1,1360 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if is_edit %}Edit Company / Client{% else %}Create Company / Client{% endif %} - Guest Management
+{% endblock %}
+
+{% block page_title %}
+    {% if is_edit %}Edit Company / Client{% else %}Create Company / Client{% endif %}
+{% endblock %}
+
+{% block page_subtitle %}
+    Manage company, location and staff information
+{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================
+   COMPACT PREMIUM COMPANY FORM
+   Uses the navbar's primary blue when available
+========================================= */
+
+.company-form-page,
+.company-form-page * {
+    box-sizing: border-box;
+}
+
+.company-form-page {
+    --company-blue: var(--primary-color, #1769c2);
+    --company-blue-dark: var(--primary-dark, #12549e);
+    --company-blue-light: #edf5ff;
+    --company-border: #dce5ef;
+    --company-text: #243447;
+    --company-muted: #64748b;
+
+    width: 100%;
+    max-width: 1150px;
+    margin: 0 auto;
+    padding: 4px 8px 16px;
+    color: var(--company-text);
+    font-family: Inter, "Segoe UI", Arial, sans-serif;
+    font-size: 13px;
+}
+
+.company-form-card {
+    width: 100%;
+    background: #fff;
+    border: 1px solid var(--company-border);
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(15, 45, 75, .05);
+    overflow: hidden;
+}
+
+.company-form-body {
+    padding: 14px;
+}
+
+/* ERROR MESSAGE */
+
+.company-form-nonfield-errors {
+    margin-bottom: 12px;
+    padding: 10px 12px;
+    background: #fff1f2;
+    border: 1px solid #fecdd3;
+    border-radius: 7px;
+    color: #be123c;
+    font-size: 12px;
+}
+
+.company-form-nonfield-errors ul {
+    margin: 5px 0 0;
+    padding-left: 18px;
+}
+
+/* TWO COLUMNS */
+
+.company-main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, .92fr);
+    gap: 14px;
+    align-items: stretch;
+}
+
+.company-column {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--company-border);
+    border-radius: 10px;
+    background: #fff;
+}
+
+/* COMPANY PANEL */
+
+.company-left-column {
+    border-color: var(--company-blue);
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(23, 105, 194, .07);
+}
+
+/* STAFF PANEL */
+
+.company-right-column {
+    border-color: var(--company-border);
+    background: #fff;
+    box-shadow: 0 3px 12px rgba(15, 45, 75, .035);
+}
+
+/* SECTIONS */
+
+.company-form-section {
+    min-width: 0;
+    margin: 0;
+    padding: 15px;
+    background: #ffff;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.company-form-section + .company-form-section {
+    border-top: 1px solid var(--company-border);
+}
+
+/* SECTION HEADINGS */
+
+.company-section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0 0 13px;
+    padding: 0 0 9px;
+    border-bottom: 1px solid #e8edf3;
+    color: var(--company-blue-dark);
+    font-size: 13px;
+    font-weight: 750;
+    letter-spacing: .1px;
+    text-transform: none;
+}
+
+.company-section-title i {
+    width: 29px;
+    height: 29px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 7px;
+    background: var(--company-blue-light);
+    color: var(--company-blue);
+    font-size: 16px;
+}
+
+/* COMPANY HEADER */
+
+.company-info-section {
+    padding: 0 15px 16px;
+    background: #fff;
+}
+
+.company-info-section .company-section-title {
+    margin: 0 -15px 15px;
+    padding: 14px 16px;
+    color: #fff;
+    background: #6559ee;
+    border: 0;
+    border-radius: 0;
+    font-size: 16px;
+    font-weight: 750;
+}
+
+.company-info-section .company-section-title i {
+    width: 36px;
+    height: 36px;
+    color: #fff;
+    background: rgba(255, 255, 255, .16);
+    border: 1px solid rgba(255, 255, 255, .25);
+    border-radius: 8px;
+    font-size: 19px;
+}
+
+/* STAFF HEADER */
+
+.staff-section {
+    padding: 0 15px 16px;
+    background: #fff;
+}
+
+.staff-section .company-section-title {
+    margin: 0 -15px 15px;
+    padding: 14px 15px;
+    background: #6559ee;
+    color: #ffff;
+    border-bottom: 1px solid var(--company-border);
+    font-size: 16px;
+    font-weight: 750;
+}
+
+.staff-section .company-section-title i {
+    width: 36px;
+    height: 36px;
+    background: #eaf0f7;
+    color: #42566d;
+    border-radius: 8px;
+    font-size: 19px;
+}
+
+.company-right-column .company-form-section + .company-form-section {
+    border-top: 1px solid var(--company-border);
+}
+
+.company-right-column
+.company-form-section:not(.staff-section)
+.company-section-title {
+    color: #42566d;
+    border-bottom-color: #e8edf3;
+}
+
+.company-right-column
+.company-form-section:not(.staff-section)
+.company-section-title i {
+    background: #eef2f7;
+    color: #42566d;
+}
+
+/* FORM GRID */
+
+.company-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px 13px;
+}
+
+.company-form-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.company-form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+/* LABELS */
+
+.company-form-label {
+    display: block;
+    margin-bottom: 5px;
+    color: #344256;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.required {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+/* INPUTS */
+
+.company-form-body input:not([type="checkbox"]),
+.company-form-body select,
+.company-form-body textarea {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    min-height: 36px;
+    padding: 8px 10px;
+    border: 1px solid #d3deea;
+    border-radius: 6px;
+    outline: none;
+    background: #fff;
+    color: #243447;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+    transition: border-color .18s, box-shadow .18s;
+}
+
+.company-form-body textarea {
+    min-height: 58px;
+    resize: vertical;
+}
+
+.company-form-body input::placeholder,
+.company-form-body textarea::placeholder {
+    color: #9aa8b8;
+    font-weight: 400;
+}
+
+.company-form-body input:hover,
+.company-form-body select:hover,
+.company-form-body textarea:hover {
+    border-color: var(--company-blue);
+}
+
+.company-form-body input:focus,
+.company-form-body select:focus,
+.company-form-body textarea:focus {
+    border-color: var(--company-blue);
+    box-shadow: 0 0 0 2px rgba(23, 105, 194, .11);
+}
+
+.company-form-body input:disabled,
+.company-form-body select:disabled {
+    background: #f1f5f9;
+    color: #64748b;
+    cursor: not-allowed;
+}
+
+/* COMPANY INPUTS */
+
+.company-left-column input:not([type="checkbox"]),
+.company-left-column select,
+.company-left-column textarea {
+    border-color: #cbdcf0;
+}
+
+/* PHONE NUMBER */
+
+.phone-input-group {
+    display: flex;
+    align-items: stretch;
+    width: 100%;
+    min-width: 0;
+}
+
+.phone-code {
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 6px;
+    border: 1px solid #cbd5e1;
+    border-right: 0;
+    border-radius: 6px 0 0 6px;
+    background: #edf5ff;
+    color: var(--company-blue-dark);
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.company-form-body .phone-input-group input {
+    flex: 1;
+    min-width: 0;
+    border-radius: 0 6px 6px 0;
+}
+
+/* ERRORS AND HELP TEXT */
+
+.company-field-error {
+    margin-top: 4px;
+    color: #dc2626;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.company-help-text {
+    margin-top: 8px;
+    color: var(--company-muted);
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.location-loading {
+    display: none;
+    margin-top: 4px;
+    color: var(--company-muted);
+    font-size: 10px;
+}
+
+/* TAX AND STATUS */
+
+.company-inline-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.company-option-card {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 45px;
+    padding: 8px 9px;
+    border: 1px solid #d3deea;
+    border-radius: 7px;
+    background: #fff;
+    cursor: pointer;
+    transition: background .18s, border-color .18s;
+}
+
+.company-option-card:hover {
+    background: var(--company-blue-light);
+    border-color: var(--company-blue);
+}
+
+.company-option-card input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    margin: 0;
+    flex-shrink: 0;
+    accent-color: var(--company-blue);
+    cursor: pointer;
+}
+
+.company-option-title {
+    display: block;
+    color: #243447;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.company-option-description {
+    display: block;
+    margin-top: 2px;
+    color: #718096;
+    font-size: 10px;
+    line-height: 1.35;
+}
+
+/* ACTION BUTTONS */
+
+.company-form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 14px;
+    padding-top: 13px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.company-form-btn {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 8px 16px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .18s, border-color .18s;
+}
+
+.company-cancel-btn {
+    border-color: #d5dee8;
+    background: #fff;
+    color: #475569;
+}
+
+.company-cancel-btn:hover {
+    background: #f1f5f9;
+    border-color: #b8c5d4;
+}
+
+.company-save-btn {
+    border-color: var(--company-blue);
+    background: var(--company-blue);
+    color: #fff;
+    box-shadow: 0 2px 6px rgba(23, 105, 194, .15);
+}
+
+.company-save-btn:hover {
+    background: var(--company-blue-dark);
+    border-color: var(--company-blue-dark);
+}
+
+/* TABLET */
+
+@media (max-width: 900px) {
+    .company-main-grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .company-form-body {
+        padding: 10px;
+    }
+
+    .company-form-section {
+        padding: 12px;
+    }
+
+    .company-info-section,
+    .staff-section {
+        padding: 0 12px 13px;
+    }
+
+    .company-info-section .company-section-title,
+    .staff-section .company-section-title {
+        margin-left: -12px;
+        margin-right: -12px;
+        padding: 12px;
+    }
+
+    .company-form-grid {
+        gap: 10px;
+    }
+}
+
+/* MOBILE */
+
+@media (max-width: 650px) {
+    .company-form-page {
+        padding: 3px;
+    }
+
+    .company-form-body {
+        padding: 9px;
+    }
+
+    .company-main-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .company-form-section,
+    .company-info-section,
+    .staff-section {
+        padding: 12px;
+    }
+
+    .company-info-section .company-section-title,
+    .staff-section .company-section-title {
+        margin: 0 -12px 13px;
+        padding: 12px;
+        font-size: 15px;
+    }
+
+    .company-form-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .company-form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .company-inline-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .company-form-actions {
+        flex-direction: row;
+        justify-content: stretch;
+    }
+
+    .company-form-btn {
+        flex: 1;
+    }
+}
+
+@media (max-width: 380px) {
+    .company-form-grid,
+    .company-inline-options {
+        grid-template-columns: 1fr;
+    }
+
+    .company-form-group.full-width {
+        grid-column: auto;
+    }
+
+    .company-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .company-form-btn {
+        width: 100%;
+    }
+}
+
+
+/* Shared compact premium form sizing for Operations templates */
+.content-area [class*="-form-wrap"] { width:100%; max-width:720px !important; min-width:0; margin-left:auto !important; margin-right:auto !important; }
+.content-area [class*="-form-card"] { border-radius:12px !important; box-shadow:0 6px 22px rgba(15,23,42,.06) !important; }
+.content-area [class*="-form-title"] { padding:13px 17px !important; font-size:14px !important; }
+.content-area [class*="-form-body"] { padding:17px !important; }
+.content-area [class*="-field"] { margin-bottom:12px !important; }
+.content-area [class*="-field"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.content-area [class*="-field"] select,
+.content-area [class*="-field"] textarea,
+.content-area .tenant-field input:not([type="checkbox"]),
+.content-area .tenant-field select,
+.content-area .tenant-field textarea {
+    min-height:37px; padding:8px 10px; border-radius:8px; font-size:12px;
+}
+.content-area [class*="-field"] textarea { min-height:62px; }
+.content-area [class*="-actions"] { margin-top:15px !important; padding-top:13px !important; gap:8px !important; }
+.content-area [class*="-actions"] a,
+.content-area [class*="-actions"] button { min-height:36px !important; padding:0 13px !important; border-radius:8px !important; font-size:11px !important; }
+.content-area [class*="-save"] { background:linear-gradient(135deg,#6366f1,#4f46e5) !important; border-color:#4f46e5 !important; color:#fff !important; }
+.content-area [class*="-save"]:hover { background:#4338ca !important; }
+.content-area .tenant-form-wrap { max-width:760px !important; }
+.content-area .tenant-grid { gap:11px 14px !important; }
+.content-area .unit-check-grid { gap:7px !important; }
+.content-area .unit-option { padding:9px !important; border-radius:8px !important; }
+@media(max-width:600px) {
+    .content-area [class*="-form-body"] { padding:13px !important; }
+    .content-area [class*="-form-wrap"] { max-width:100% !important; }
+}
+
+</style>
+
+<div class="company-form-page">
+    <div class="company-form-card">
+        <div class="company-form-body">
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if non_field_errors %}
+                    <div class="company-form-nonfield-errors">
+                        {% for error in non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="company-main-grid">
+
+                    <!-- LEFT COLUMN: COMPANY -->
+
+                    <div class="company-column company-left-column">
+
+                        <section class="company-form-section company-info-section">
+
+                            <div class="company-section-title">
+                                <i class="ph-bold ph-buildings"></i>
+                                Company Information
+                            </div>
+
+                            <div class="company-form-grid">
+
+                                <div class="company-form-group full-width">
+                                    <label for="id_name" class="company-form-label">
+                                        Company / Client Name
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        id="id_name"
+                                        value="{{ values.name|default:'' }}"
+                                        maxlength="200"
+                                        placeholder="Enter company / client name"
+                                        required
+                                    >
+
+                                    {% for error in errors.name %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="company-form-group full-width">
+                                    <label for="id_address" class="company-form-label">
+                                        Company Address
+                                    </label>
+
+                                    <textarea
+                                        name="address"
+                                        id="id_address"
+                                        rows="2"
+                                        placeholder="Enter company address"
+                                    >{{ values.address|default:'' }}</textarea>
+
+                                    {% for error in errors.address %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="company-form-group full-width">
+                                    <label for="id_tax_number" class="company-form-label">
+                                        Tax Number
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="tax_number"
+                                        id="id_tax_number"
+                                        value="{{ values.tax_number|default:'' }}"
+                                        maxlength="100"
+                                        placeholder="Enter tax number"
+                                    >
+
+                                    {% for error in errors.tax_number %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="company-form-group full-width">
+                                    <label class="company-form-label">Tax &amp; Status</label>
+
+                                    <div class="company-inline-options">
+
+                                        <label class="company-option-card">
+                                            <input
+                                                type="checkbox"
+                                                name="applicable_tax"
+                                                id="id_applicable_tax"
+                                                value="on"
+                                                {% if values.applicable_tax == 'on' or values.applicable_tax == 'yes' or values.applicable_tax == True or values.applicable_tax == 'True' %}checked{% endif %}
+                                            >
+
+                                            <span>
+                                                <span class="company-option-title">Applicable Tax</span>
+                                                <span class="company-option-description">
+                                                    Tax applies to this company
+                                                </span>
+                                            </span>
+                                        </label>
+
+                                        <label class="company-option-card">
+                                            <input
+                                                type="checkbox"
+                                                name="status"
+                                                id="id_status"
+                                                value="on"
+                                                {% if values.status == 'on' or values.status == True or values.status == 'True' %}checked{% endif %}
+                                            >
+
+                                            <span>
+                                                <span class="company-option-title">Active Status</span>
+                                                <span class="company-option-description">
+                                                    Keep this company active
+                                                </span>
+                                            </span>
+                                        </label>
+
+                                    </div>
+
+                                    {% for error in errors.applicable_tax %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+
+                                    {% for error in errors.status %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+                        </section>
+
+                        <!-- LOCATION -->
+
+                        <section class="company-form-section">
+
+                            <div class="company-section-title">
+                                <i class="ph-bold ph-map-pin"></i>
+                                Location Information
+                            </div>
+
+                            <div class="company-form-grid">
+
+                                <div class="company-form-group">
+                                    <label for="id_country" class="company-form-label">
+                                        Country
+                                    </label>
+
+                                    <select name="country" id="id_country">
+                                        <option value="">Select Country</option>
+
+                                        {% for country in countries %}
+                                            <option
+                                                value="{{ country.pk }}"
+                                                data-phone-code="{{ country.dial_code|default:'' }}"
+                                                {% if values.country|stringformat:"s" == country.pk|stringformat:"s" %}selected{% endif %}
+                                            >
+                                                {{ country.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+
+                                    {% for error in errors.country %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="company-form-group">
+                                    <label for="id_state" class="company-form-label">
+                                        State / Province / Emirate
+                                    </label>
+
+                                    <select name="state" id="id_state">
+                                        <option value="">Select State / Province / Emirate</option>
+
+                                        {% for state in states %}
+                                            <option
+                                                value="{{ state.pk }}"
+                                                {% if values.state|stringformat:"s" == state.pk|stringformat:"s" %}selected{% endif %}
+                                            >
+                                                {{ state.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <div id="state-loading" class="location-loading">
+                                        Loading states...
+                                    </div>
+
+                                    {% for error in errors.state %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="company-form-group">
+                                    <label for="id_district" class="company-form-label">
+                                        District
+                                    </label>
+
+                                    <select name="district" id="id_district">
+                                        <option value="">Select District</option>
+
+                                        {% for district in districts %}
+                                            <option
+                                                value="{{ district.pk }}"
+                                                {% if values.district|stringformat:"s" == district.pk|stringformat:"s" %}selected{% endif %}
+                                            >
+                                                {{ district.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <div id="district-loading" class="location-loading">
+                                        Loading districts...
+                                    </div>
+
+                                    {% for error in errors.district %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="company-form-group">
+                                    <label for="id_area" class="company-form-label">
+                                        Area
+                                    </label>
+
+                                    <select name="area" id="id_area">
+                                        <option value="">Select Area</option>
+
+                                        {% for area in areas %}
+                                            <option
+                                                value="{{ area.pk }}"
+                                                {% if values.area|stringformat:"s" == area.pk|stringformat:"s" %}selected{% endif %}
+                                            >
+                                                {{ area.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+
+                                    <div id="area-loading" class="location-loading">
+                                        Loading areas...
+                                    </div>
+
+                                    {% for error in errors.area %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+                        </section>
+
+                        <!-- COMPANY CONTACT -->
+
+                        <section class="company-form-section">
+
+                            <div class="company-section-title">
+                                <i class="ph-bold ph-phone"></i>
+                                Company Contact
+                            </div>
+
+                            <div class="company-form-grid">
+
+                                <div class="company-form-group">
+                                    <label for="id_phone" class="company-form-label">
+                                        Company Mobile Number
+                                    </label>
+
+                                    <div class="phone-input-group">
+                                        <span class="phone-code" id="company-phone-code">+--</span>
+
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            id="id_phone"
+                                            value="{{ values.phone|default:'' }}"
+                                            maxlength="30"
+                                            inputmode="tel"
+                                            placeholder="Enter mobile number"
+                                        >
+                                    </div>
+
+                                    {% for error in errors.phone %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="company-form-group">
+                                    <label for="id_email" class="company-form-label">
+                                        Company Email
+                                    </label>
+
+                                    <input
+                                        type="email"
+                                        name="email"
+                                        id="id_email"
+                                        value="{{ values.email|default:'' }}"
+                                        maxlength="254"
+                                        placeholder="Enter company email"
+                                    >
+
+                                    {% for error in errors.email %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+                        </section>
+
+                    </div>
+
+                    <!-- RIGHT COLUMN: STAFF -->
+
+                    <div class="company-column company-right-column">
+
+                        <section class="company-form-section staff-section">
+
+                            <div class="company-section-title">
+                                <i class="ph-bold ph-user"></i>
+                                Staff Information
+                            </div>
+
+                            <div class="company-form-grid">
+
+                                <div class="company-form-group full-width">
+                                    <label for="id_concerned_staff_name" class="company-form-label">
+                                        Staff Name
+                                    </label>
+
+                                    <input
+                                        type="text"
+                                        name="concerned_staff_name"
+                                        id="id_concerned_staff_name"
+                                        value="{{ values.concerned_staff_name|default:'' }}"
+                                        maxlength="150"
+                                        placeholder="Enter staff name"
+                                    >
+
+                                    {% for error in errors.concerned_staff_name %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="company-form-group full-width">
+                                    <label for="id_concerned_staff_designation" class="company-form-label">
+                                        Staff Designation
+                                    </label>
+
+                                    <select
+                                        name="concerned_staff_designation"
+                                        id="id_concerned_staff_designation"
+                                    >
+                                        <option value="">Select Designation</option>
+
+                                        {% for designation in all_designations %}
+                                            <option
+                                                value="{{ designation.name }}"
+                                                {% if values.concerned_staff_designation|stringformat:"s" == designation.name|stringformat:"s" %}selected{% endif %}
+                                            >
+                                                {{ designation.name }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+
+                                    {% for error in errors.concerned_staff_designation %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                                <div class="company-form-group full-width">
+                                    <label for="id_concerned_staff_mobile" class="company-form-label">
+                                        Staff Mobile Number
+                                    </label>
+
+                                    <div class="phone-input-group">
+                                        <span class="phone-code" id="staff-phone-code">+--</span>
+
+                                        <input
+                                            type="tel"
+                                            name="concerned_staff_mobile"
+                                            id="id_concerned_staff_mobile"
+                                            value="{{ values.concerned_staff_mobile|default:'' }}"
+                                            maxlength="30"
+                                            inputmode="tel"
+                                            placeholder="Enter staff mobile number"
+                                        >
+                                    </div>
+
+                                    {% for error in errors.concerned_staff_mobile %}
+                                        <div class="company-field-error">{{ error }}</div>
+                                    {% endfor %}
+                                </div>
+
+                            </div>
+                        </section>
+
+                        <!-- STAFF LOGIN -->
+
+                        <section class="company-form-section">
+
+                            <div class="company-section-title">
+                                <i class="ph-bold ph-lock-key"></i>
+                                Staff Login
+                            </div>
+
+                            {% if is_edit %}
+
+                                <div class="company-help-text">
+                                    Existing staff login credentials are retained.
+                                    Use the user management page to change credentials.
+                                </div>
+
+                            {% else %}
+
+                                <div class="company-form-grid">
+
+                                    <div class="company-form-group full-width">
+                                        <label for="id_staff_username" class="company-form-label">
+                                            Staff Username
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            name="staff_username"
+                                            id="id_staff_username"
+                                            value="{{ request.POST.staff_username|default:'' }}"
+                                            maxlength="150"
+                                            autocomplete="username"
+                                            placeholder="Enter staff username"
+                                            required
+                                        >
+
+                                        {% for error in errors.staff_username %}
+                                            <div class="company-field-error">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div class="company-form-group">
+                                        <label for="id_staff_password" class="company-form-label">
+                                            Staff Password
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <input
+                                            type="password"
+                                            name="staff_password"
+                                            id="id_staff_password"
+                                            autocomplete="new-password"
+                                            placeholder="Enter password"
+                                            required
+                                        >
+
+                                        {% for error in errors.staff_password %}
+                                            <div class="company-field-error">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+
+                                    <div class="company-form-group">
+                                        <label for="id_staff_password_confirm" class="company-form-label">
+                                            Confirm Staff Password
+                                            <span class="required">*</span>
+                                        </label>
+
+                                        <input
+                                            type="password"
+                                            name="staff_password_confirm"
+                                            id="id_staff_password_confirm"
+                                            autocomplete="new-password"
+                                            placeholder="Confirm password"
+                                            required
+                                        >
+
+                                        {% for error in errors.staff_password_confirm %}
+                                            <div class="company-field-error">{{ error }}</div>
+                                        {% endfor %}
+                                    </div>
+
+                                </div>
+
+                                <div class="company-help-text">
+                                    These credentials will be used by the company staff member to log in.
+                                </div>
+
+                            {% endif %}
+
+                        </section>
+
+                    </div>
+                </div>
+
+                <!-- ACTION BUTTONS -->
+
+                <div class="company-form-actions">
+
+                    <a href="{% url 'company_list' %}"
+                       class="company-form-btn company-cancel-btn">
+                        <i class="ph ph-x"></i>
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="company-form-btn company-save-btn">
+                        <i class="ph-bold ph-check"></i>
+                        {% if is_edit %}Update Company{% else %}Create Company{% endif %}
+                    </button>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const countrySelect = document.getElementById("id_country");
+    const stateSelect = document.getElementById("id_state");
+    const districtSelect = document.getElementById("id_district");
+    const areaSelect = document.getElementById("id_area");
+
+    const companyPhoneCode = document.getElementById("company-phone-code");
+    const staffPhoneCode = document.getElementById("staff-phone-code");
+
+    const stateLoading = document.getElementById("state-loading");
+    const districtLoading = document.getElementById("district-loading");
+    const areaLoading = document.getElementById("area-loading");
+
+    if (!countrySelect) return;
+
+    function getDialCode() {
+        const option = countrySelect.options[countrySelect.selectedIndex];
+
+        if (!option || !countrySelect.value) return "";
+
+        return option.getAttribute("data-phone-code") || "";
+    }
+
+    function updatePhoneCodes() {
+        const code = getDialCode();
+
+        if (companyPhoneCode) {
+            companyPhoneCode.textContent = code;
+        }
+
+        if (staffPhoneCode) {
+            staffPhoneCode.textContent = code;
+        }
+    }
+
+    function resetSelect(select, placeholder) {
+        if (!select) return;
+
+        select.innerHTML = "";
+
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = placeholder;
+
+        select.appendChild(option);
+    }
+
+    function setLoading(element, show) {
+        if (element) {
+            element.style.display = show ? "block" : "none";
+        }
+    }
+
+    async function fetchItems(url) {
+        const response = await fetch(url, {
+            headers: {
+                "X-Requested-With": "XMLHttpRequest"
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error("Request failed: " + response.status);
+        }
+
+        const data = await response.json();
+
+        if (Array.isArray(data)) return data;
+        if (data && Array.isArray(data.results)) return data.results;
+
+        throw new Error("Unexpected dropdown response format");
+    }
+
+    function populateSelect(select, items, placeholder, selectedValue) {
+        resetSelect(select, placeholder);
+
+        items.forEach(function (item) {
+            const option = document.createElement("option");
+
+            option.value = item.id ?? item.pk;
+            option.textContent = item.name;
+
+            if (String(option.value) === String(selectedValue || "")) {
+                option.selected = true;
+            }
+
+            select.appendChild(option);
+        });
+    }
+
+    const initialState = "{{ values.state|default:''|escapejs }}";
+    const initialDistrict = "{{ values.district|default:''|escapejs }}";
+    const initialArea = "{{ values.area|default:''|escapejs }}";
+
+    async function loadStates(countryId, selectedState = "") {
+        resetSelect(stateSelect, "Select State / Province / Emirate");
+        resetSelect(districtSelect, "Select District");
+        resetSelect(areaSelect, "Select Area");
+
+        if (stateSelect) stateSelect.disabled = true;
+        if (districtSelect) districtSelect.disabled = true;
+        if (areaSelect) areaSelect.disabled = true;
+
+        if (!countryId) return;
+
+        setLoading(stateLoading, true);
+
+        try {
+            const items = await fetchItems(
+                "/api/states/?country=" + encodeURIComponent(countryId)
+            );
+
+            populateSelect(
+                stateSelect,
+                items,
+                "Select State / Province / Emirate",
+                selectedState
+            );
+
+            stateSelect.disabled = false;
+
+            if (selectedState) {
+                await loadDistricts(selectedState, initialDistrict);
+            }
+        } catch (error) {
+            console.error("Unable to load states:", error);
+        } finally {
+            setLoading(stateLoading, false);
+        }
+    }
+
+    async function loadDistricts(stateId, selectedDistrict = "") {
+        resetSelect(districtSelect, "Select District");
+        resetSelect(areaSelect, "Select Area");
+
+        if (districtSelect) districtSelect.disabled = true;
+        if (areaSelect) areaSelect.disabled = true;
+
+        if (!stateId) return;
+
+        setLoading(districtLoading, true);
+
+        try {
+            const items = await fetchItems(
+                "/api/districts/?state=" + encodeURIComponent(stateId)
+            );
+
+            populateSelect(
+                districtSelect,
+                items,
+                "Select District",
+                selectedDistrict
+            );
+
+            districtSelect.disabled = false;
+
+            if (selectedDistrict) {
+                await loadAreas(selectedDistrict, initialArea);
+            }
+        } catch (error) {
+            console.error("Unable to load districts:", error);
+        } finally {
+            setLoading(districtLoading, false);
+        }
+    }
+
+    async function loadAreas(districtId, selectedArea = "") {
+        resetSelect(areaSelect, "Select Area");
+
+        if (areaSelect) areaSelect.disabled = true;
+
+        if (!districtId) return;
+
+        setLoading(areaLoading, true);
+
+        try {
+            const items = await fetchItems(
+                "/api/areas/?district=" + encodeURIComponent(districtId)
+            );
+
+            populateSelect(
+                areaSelect,
+                items,
+                "Select Area",
+                selectedArea
+            );
+
+            areaSelect.disabled = false;
+        } catch (error) {
+            console.error("Unable to load areas:", error);
+        } finally {
+            setLoading(areaLoading, false);
+        }
+    }
+
+    countrySelect.addEventListener("change", function () {
+        updatePhoneCodes();
+        loadStates(this.value);
+    });
+
+    if (stateSelect) {
+        stateSelect.addEventListener("change", function () {
+            loadDistricts(this.value);
+        });
+    }
+
+    if (districtSelect) {
+        districtSelect.addEventListener("change", function () {
+            loadAreas(this.value);
+        });
+    }
+
+    updatePhoneCodes();
+
+    if (countrySelect.value) {
+        loadStates(countrySelect.value, initialState);
+    } else {
+        if (stateSelect) stateSelect.disabled = true;
+        if (districtSelect) districtSelect.disabled = true;
+        if (areaSelect) areaSelect.disabled = true;
+    }
+});
+</script>
+
+{% endblock %}

@@ -1,0 +1,377 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_subtitle %}Create or update a Building Type Master record{% endblock %}
+
+{% block content %}
+
+<style>
+.bt-form-wrap {
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.bt-form-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px #0f172a0f;
+}
+
+.bt-form-head {
+    padding: 18px 22px;
+    background: linear-gradient(135deg, #eff6ff, #fff);
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    color: #1e293b;
+    font-weight: 800;
+}
+
+.bt-form-head i {
+    font-size: 21px;
+    color: #2563eb;
+}
+
+.bt-form-body {
+    padding: 22px;
+}
+
+.bt-field {
+    margin-bottom: 17px;
+}
+
+.bt-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 7px;
+}
+
+.bt-field input:not([type=checkbox]),
+.bt-field select {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-size: 13px;
+    color: #1e293b;
+}
+
+.bt-field input:focus,
+.bt-field select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .09);
+}
+
+.bt-field input::placeholder {
+    color: #94a3b8;
+}
+
+.bt-field select:invalid {
+    color: #94a3b8;
+}
+
+.bt-field select option {
+    color: #1e293b;
+}
+
+.bt-field select option[value=""] {
+    color: #94a3b8;
+}
+
+.bt-error {
+    color: #dc2626;
+    font-size: 11px;
+    margin-top: 5px;
+}
+
+.bt-error-box {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+    padding: 10px 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 12px;
+}
+
+.bt-check {
+    display: flex !important;
+    align-items: center;
+    gap: 9px;
+    background: #f8fafc;
+    padding: 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.bt-check input {
+    width: 16px;
+    height: 16px;
+    accent-color: #2563eb;
+}
+
+.bt-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 18px;
+    margin-top: 20px;
+}
+
+.bt-actions a,
+.bt-actions button {
+    min-height: 39px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 15px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+}
+
+.bt-cancel {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+}
+
+.bt-save {
+    background: #2563eb;
+    border: 1px solid #2563eb;
+    color: #fff;
+}
+
+/* Shared compact premium form sizing */
+.content-area [class*="-form-wrap"] {
+    width: 100%;
+    max-width: 720px !important;
+    min-width: 0;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+.content-area [class*="-form-card"] {
+    border-radius: 12px !important;
+    box-shadow: 0 6px 22px rgba(15, 23, 42, .06) !important;
+}
+
+.content-area [class*="-form-title"] {
+    padding: 13px 17px !important;
+    font-size: 14px !important;
+}
+
+.content-area [class*="-form-body"] {
+    padding: 17px !important;
+}
+
+.content-area [class*="-field"] {
+    margin-bottom: 12px !important;
+}
+
+.content-area [class*="-field"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.content-area [class*="-field"] select,
+.content-area [class*="-field"] textarea,
+.content-area .tenant-field input:not([type="checkbox"]),
+.content-area .tenant-field select,
+.content-area .tenant-field textarea {
+    min-height: 37px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.content-area [class*="-actions"] {
+    margin-top: 15px !important;
+    padding-top: 13px !important;
+    gap: 8px !important;
+}
+
+.content-area [class*="-actions"] a,
+.content-area [class*="-actions"] button {
+    min-height: 36px !important;
+    padding: 0 13px !important;
+    border-radius: 8px !important;
+    font-size: 11px !important;
+}
+
+.content-area [class*="-save"] {
+    background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+    border-color: #4f46e5 !important;
+    color: #fff !important;
+}
+
+.content-area [class*="-save"]:hover {
+    background: #4338ca !important;
+}
+
+.content-area .tenant-form-wrap {
+    max-width: 760px !important;
+}
+
+.content-area .tenant-grid {
+    gap: 11px 14px !important;
+}
+
+.content-area .unit-check-grid {
+    gap: 7px !important;
+}
+
+.content-area .unit-option {
+    padding: 9px !important;
+    border-radius: 8px !important;
+}
+
+@media(max-width: 600px) {
+    .bt-form-body {
+        padding: 15px;
+    }
+
+    .bt-actions {
+        flex-direction: column-reverse;
+    }
+
+    .bt-actions a,
+    .bt-actions button {
+        width: 100%;
+    }
+
+    .content-area [class*="-form-body"] {
+        padding: 13px !important;
+    }
+
+    .content-area [class*="-form-wrap"] {
+        max-width: 100% !important;
+    }
+}
+</style>
+
+<div class="bt-form-wrap">
+
+    <div class="bt-form-card">
+
+        <div class="bt-form-head">
+            <i class="ph ph-buildings"></i>
+            {{ title }}
+        </div>
+
+        <div class="bt-form-body">
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                {% if non_field_errors %}
+                    <div class="bt-error-box">
+                        {% for error in non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- BUILDING TYPE NAME -->
+                <div class="bt-field">
+
+                    <label for="id_name">
+                        Building Type Name *
+                    </label>
+
+                    <input
+                        type="text"
+                        id="id_name"
+                        name="name"
+                        maxlength="100"
+                        value="{{ values.name|default:'' }}"
+                        placeholder="Apartment, Residential, Office Building"
+                        required
+                    >
+
+                    {% for error in errors.name %}
+                        <div class="bt-error">{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+<!-- PROPERTY CATEGORY -->
+<div class="bt-field">
+
+    <label for="id_code">
+        Property Category *
+    </label>
+
+    <select id="id_code" name="code" required>
+
+        <option value="" selected>
+            Select Property
+        </option>
+
+        {% for key, label in type_choices %}
+            <option value="{{ key }}">
+                {{ label }}
+            </option>
+        {% endfor %}
+
+    </select>
+
+    <small style="display:block;color:#64748b;margin-top:6px">
+        The category controls which floor/unit count fields are shown for this type.
+    </small>
+
+    {% for error in errors.code %}
+        <div class="bt-error">{{ error }}</div>
+    {% endfor %}
+
+</div>
+                <!-- STATUS -->
+                <div class="bt-field">
+
+                    <label class="bt-check">
+                        <input
+                            type="checkbox"
+                            name="status"
+                            {% if values.status %}checked{% endif %}
+                        >
+                        Active Building Type
+                    </label>
+
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="bt-actions">
+
+                    <a class="bt-cancel" href="{% url 'building_type_list' %}">
+                        <i class="ph ph-x"></i>
+                        Cancel
+                    </a>
+
+                    <button class="bt-save" type="submit">
+                        <i class="ph ph-check"></i>
+                        Save Building Type
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
+```

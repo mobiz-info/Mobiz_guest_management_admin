@@ -1,0 +1,492 @@
+
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block page_subtitle %}Create or update a work site{% endblock %}
+
+{% block content %}
+
+<style>
+    .op-form-wrap {
+        max-width: 560px;
+        margin: 0 auto;
+        padding: 4px 0 18px;
+    }
+
+    .op-form-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 14px;
+        overflow: hidden;
+        box-shadow: 0 6px 22px rgba(15, 23, 42, 0.06);
+    }
+
+    .op-form-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 15px 20px;
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .op-title-icon {
+        width: 35px;
+        height: 35px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.17);
+        font-size: 19px;
+        flex-shrink: 0;
+    }
+
+    .op-form-body {
+        padding: 20px;
+    }
+
+    .op-field {
+        margin-bottom: 15px;
+    }
+
+    .op-field label:not(.op-check) {
+        display: block;
+        margin-bottom: 6px;
+        color: #334155;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .op-required {
+        color: #dc2626;
+        margin-left: 2px;
+    }
+
+    .op-input-wrap {
+        position: relative;
+    }
+
+    .op-input-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #818cf8;
+        font-size: 16px;
+        pointer-events: none;
+    }
+
+    .op-field input:not([type="checkbox"]),
+    .op-field select,
+    .op-field textarea {
+        width: 100%;
+        box-sizing: border-box;
+        min-height: 39px;
+        padding: 9px 12px;
+        border: 1px solid #dbe2ee;
+        border-radius: 8px;
+        background: #ffffff;
+        color: #0f172a;
+        font-family: inherit;
+        font-size: 12px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .op-input-wrap input,
+    .op-input-wrap select {
+        padding-left: 36px !important;
+    }
+
+    .op-field textarea {
+        min-height: 68px;
+        resize: vertical;
+        line-height: 1.5;
+    }
+
+    .op-field input:focus,
+    .op-field select:focus,
+    .op-field textarea:focus {
+        outline: none;
+        border-color: #6366f1;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+    }
+
+    .op-field input::placeholder,
+    .op-field textarea::placeholder {
+        color: #94a3b8;
+    }
+
+    .op-field input:disabled {
+        background: #f8fafc;
+        color: #64748b;
+        cursor: not-allowed;
+    }
+
+    .op-check {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 11px 13px;
+        border: 1px solid #e2e8f0;
+        border-radius: 9px;
+        background: #f8fafc;
+        cursor: pointer;
+    }
+
+    .op-check-content {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .op-check-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        background: #e0e7ff;
+        color: #4338ca;
+        font-size: 17px;
+    }
+
+    .op-check-text strong {
+        display: block;
+        color: #1e293b;
+        font-size: 12px;
+    }
+
+    .op-check-text small {
+        display: block;
+        margin-top: 3px;
+        color: #64748b;
+        font-size: 10px;
+    }
+
+    .op-check input {
+        width: 16px;
+        height: 16px;
+        margin: 0;
+        accent-color: #4f46e5;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .op-error {
+        margin-top: 5px;
+        color: #dc2626;
+        font-size: 11px;
+    }
+
+    .op-error-box {
+        margin-bottom: 15px;
+        padding: 10px 12px;
+        border: 1px solid #fecaca;
+        border-radius: 8px;
+        background: #fef2f2;
+        color: #b91c1c;
+        font-size: 12px;
+    }
+
+    .op-actions {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 9px;
+        margin-top: 19px;
+        padding-top: 16px;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    .op-actions a,
+    .op-actions button {
+        min-height: 37px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 0 15px;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .op-cancel {
+        border: 1px solid #dbe2ee;
+        background: #ffffff;
+        color: #475569;
+    }
+
+    .op-cancel:hover {
+        border-color: #a5b4fc;
+        background: #f8fafc;
+        color: #4338ca;
+    }
+
+    .op-save {
+        border: 1px solid #4f46e5;
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: #ffffff;
+        box-shadow: 0 3px 8px rgba(79, 70, 229, 0.18);
+    }
+
+    .op-save:hover {
+        border-color: #4338ca;
+        background: #4338ca;
+        box-shadow: 0 5px 12px rgba(79, 70, 229, 0.22);
+        transform: translateY(-1px);
+    }
+
+    @media (max-width: 600px) {
+        .op-form-wrap {
+            max-width: 100%;
+            padding: 0 0 14px;
+        }
+
+        .op-form-body {
+            padding: 15px;
+        }
+
+        .op-form-title {
+            padding: 13px 15px;
+        }
+
+        .op-actions {
+            flex-direction: column-reverse;
+        }
+
+        .op-actions a,
+        .op-actions button {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+
+
+/* Shared compact premium form sizing for Operations templates */
+.content-area [class*="-form-wrap"] { width:100%; max-width:720px !important; min-width:0; margin-left:auto !important; margin-right:auto !important; }
+.content-area [class*="-form-card"] { border-radius:12px !important; box-shadow:0 6px 22px rgba(15,23,42,.06) !important; }
+.content-area [class*="-form-title"] { padding:13px 17px !important; font-size:14px !important; }
+.content-area [class*="-form-body"] { padding:17px !important; }
+.content-area [class*="-field"] { margin-bottom:12px !important; }
+.content-area [class*="-field"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.content-area [class*="-field"] select,
+.content-area [class*="-field"] textarea,
+.content-area .tenant-field input:not([type="checkbox"]),
+.content-area .tenant-field select,
+.content-area .tenant-field textarea {
+    min-height:37px; padding:8px 10px; border-radius:8px; font-size:12px;
+}
+.content-area [class*="-field"] textarea { min-height:62px; }
+.content-area [class*="-actions"] { margin-top:15px !important; padding-top:13px !important; gap:8px !important; }
+.content-area [class*="-actions"] a,
+.content-area [class*="-actions"] button { min-height:36px !important; padding:0 13px !important; border-radius:8px !important; font-size:11px !important; }
+.content-area [class*="-save"] { background:linear-gradient(135deg,#6366f1,#4f46e5) !important; border-color:#4f46e5 !important; color:#fff !important; }
+.content-area [class*="-save"]:hover { background:#4338ca !important; }
+.content-area .tenant-form-wrap { max-width:760px !important; }
+.content-area .tenant-grid { gap:11px 14px !important; }
+.content-area .unit-check-grid { gap:7px !important; }
+.content-area .unit-option { padding:9px !important; border-radius:8px !important; }
+@media(max-width:600px) {
+    .content-area [class*="-form-body"] { padding:13px !important; }
+    .content-area [class*="-form-wrap"] { max-width:100% !important; }
+}
+
+</style>
+
+<div class="op-form-wrap">
+    <div class="op-form-card">
+
+        <div class="op-form-title">
+            <span class="op-title-icon">
+                <i class="ph ph-map-pin"></i>
+            </span>
+            <span>{{ title }}</span>
+        </div>
+
+        <div class="op-form-body">
+
+            <form method="post">
+                {% csrf_token %}
+
+                {% if non_field_errors %}
+                    <div class="op-error-box">
+                        {% for error in non_field_errors %}
+                            {{ error }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if request.user.is_superuser %}
+                    <div class="op-field">
+                        <label for="id_company">
+                            Company / Client
+                            <span class="op-required">*</span>
+                        </label>
+
+                        <div class="op-input-wrap">
+                            <i class="ph ph-buildings op-input-icon"></i>
+
+                            <select name="company" id="id_company" required>
+                                <option value="">Select Company</option>
+
+                                {% for item in companies %}
+                                    <option
+                                        value="{{ item.pk }}"
+                                        {% if values.company|stringformat:"s" == item.pk|stringformat:"s" %}selected{% endif %}
+                                    >
+                                        {{ item.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        {% for error in errors.company %}
+                            <div class="op-error">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="op-field">
+                        <label for="id_company_display">
+                            Company / Client
+                        </label>
+
+                        <div class="op-input-wrap">
+                            <i class="ph ph-buildings op-input-icon"></i>
+                            <input
+                                type="text"
+                                id="id_company_display"
+                                value="{{ company.name }}"
+                                disabled
+                            >
+                        </div>
+                    </div>
+                {% endif %}
+
+                <div class="op-field">
+                    <label for="id_name">
+                        Work Site Name
+                        <span class="op-required">*</span>
+                    </label>
+
+                    <div class="op-input-wrap">
+                        <i class="ph ph-map-pin op-input-icon"></i>
+                        <input
+                            type="text"
+                            name="name"
+                            id="id_name"
+                            maxlength="200"
+                            value="{{ values.name|default:'' }}"
+                            placeholder="Enter work site name"
+                            required
+                        >
+                    </div>
+
+                    {% for error in errors.name %}
+                        <div class="op-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="op-field">
+                    <label for="id_address">
+                        Address
+                        <span class="op-required">*</span>
+                    </label>
+
+                    <textarea
+                        name="address"
+                        id="id_address"
+                        placeholder="Enter complete site address"
+                        required
+                    >{{ values.address|default:'' }}</textarea>
+
+                    {% for error in errors.address %}
+                        <div class="op-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="op-field">
+                    <label for="id_location">
+                        Location
+                        <span class="op-required">*</span>
+                    </label>
+
+                    <div class="op-input-wrap">
+                        <i class="ph ph-navigation-arrow op-input-icon"></i>
+                        <input
+                            type="text"
+                            name="location"
+                            id="id_location"
+                            maxlength="255"
+                            value="{{ values.location|default:'' }}"
+                            placeholder="Enter city or area"
+                            required
+                        >
+                    </div>
+
+                    {% for error in errors.location %}
+                        <div class="op-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="op-field">
+                    <label class="op-check" for="id_status">
+                        <span class="op-check-content">
+                            <span class="op-check-icon">
+                                <i class="ph ph-check-circle"></i>
+                            </span>
+
+                            <span class="op-check-text">
+                                <strong>Active Status</strong>
+                                <small>Enable this work site</small>
+                            </span>
+                        </span>
+
+                        <input
+                            type="checkbox"
+                            name="status"
+                            id="id_status"
+                            {% if values.status == True or values.status == 'True' or values.status == 'on' %}checked{% endif %}
+                        >
+                    </label>
+                </div>
+
+                <div class="op-actions">
+                    <a
+                        class="op-cancel"
+                        href="{% url 'work_site_list' %}"
+                    >
+                        <i class="ph ph-x"></i>
+                        Cancel
+                    </a>
+
+                    <button class="op-save" type="submit">
+                        <i class="ph ph-check"></i>
+
+                        {% if is_edit %}
+                            Update Work Site
+                        {% else %}
+                            Save Work Site
+                        {% endif %}
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

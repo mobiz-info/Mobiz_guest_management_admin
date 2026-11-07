@@ -1,0 +1,731 @@
+```html
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block page_subtitle %}
+    {% if is_superadmin %}
+        Super Admin management report
+    {% elif is_company_admin %}
+        Company operational report
+    {% else %}
+        Tenant guest activity report
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+.report-heading {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    padding: 15px 17px;
+    background: linear-gradient(135deg, #f8faff, #ffffff);
+    border: 1px solid #e3e8f2;
+    border-radius: 13px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, .035);
+}
+
+.report-heading-icon {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: #eef2ff;
+    color: #4f46e5;
+    font-size: 20px;
+}
+
+.report-heading-text {
+    min-width: 0;
+    flex: 1;
+}
+
+.report-heading-text h2 {
+    margin: 0;
+    color: #172033;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.25;
+}
+
+.report-heading-text p {
+    margin: 4px 0 0;
+    color: #718096;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.report-heading-count {
+    flex: 0 0 auto;
+    padding: 7px 10px;
+    border: 1px solid #e0e7ff;
+    border-radius: 8px;
+    background: #f5f7ff;
+    color: #4f46e5;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.report-detail {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 8px 0 30px;
+    color: #172033;
+    box-sizing: border-box;
+}
+
+/* FILTER CARD */
+
+.filter-card {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    background: #fff;
+    border: 1px solid #e5eaf2;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 5px 22px rgba(15, 23, 42, .045);
+}
+
+.filter-card form {
+    width: 100%;
+    margin: 0;
+}
+
+.filter-row {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 10px;
+    width: 100%;
+}
+
+.filter-item {
+    flex: 1 1 135px;
+    min-width: 0;
+}
+
+.filter-item.search-item {
+    flex: 2 1 200px;
+}
+
+.filter-label {
+    display: block;
+    margin-bottom: 6px;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+
+.filter-card .form-control,
+.filter-card .form-select {
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    padding: 0 10px;
+    background: #fbfcfe;
+    border: 1px solid #dce3ed;
+    border-radius: 9px;
+    color: #273449;
+    font-size: 12px;
+    box-shadow: none;
+}
+
+.filter-card .form-control::placeholder {
+    color: #9aa6b7;
+}
+
+.filter-card .form-control:focus,
+.filter-card .form-select:focus {
+    border-color: #6366f1;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .10);
+}
+
+/* FILTER ACTIONS */
+
+.filter-actions {
+    display: flex;
+    flex: 0 0 auto;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+}
+
+.filter-actions .btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 12px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 750;
+    white-space: nowrap;
+    transition: all .2s ease;
+}
+
+.filter-actions .btn:hover {
+    transform: translateY(-1px);
+}
+
+.filter-actions .btn-primary {
+    color: #fff;
+    background: #4f46e5;
+    border-color: #4f46e5;
+}
+
+.filter-actions .btn-primary:hover {
+    color: #fff;
+    background: #4338ca;
+    border-color: #4338ca;
+}
+
+.filter-actions .btn-light {
+    color: #475569;
+    background: #fff;
+    border: 1px solid #dce3ed;
+}
+
+.filter-actions .btn-light:hover {
+    color: #1e293b;
+    background: #f8fafc;
+}
+
+/* PDF BUTTON */
+
+.filter-actions .btn-export-pdf {
+    color: #fff !important;
+    background: linear-gradient(135deg, #ef4444, #b91c1c);
+    border: 1px solid #b91c1c;
+    box-shadow: 0 3px 9px rgba(220, 38, 38, .20);
+}
+
+.filter-actions .btn-export-pdf:hover {
+    color: #fff !important;
+    background: linear-gradient(135deg, #dc2626, #991b1b);
+}
+
+/* EXCEL BUTTON */
+
+.filter-actions .btn-export-excel {
+    color: #fff !important;
+    background: linear-gradient(135deg, #16a34a, #047857);
+    border: 1px solid #047857;
+    box-shadow: 0 3px 9px rgba(22, 163, 74, .20);
+}
+
+.filter-actions .btn-export-excel:hover {
+    color: #fff !important;
+    background: linear-gradient(135deg, #15803d, #065f46);
+}
+
+.filter-actions .btn-export-pdf i,
+.filter-actions .btn-export-excel i {
+    font-size: 15px;
+}
+
+.filter-actions .btn-export:active {
+    transform: translateY(0);
+}
+
+/* TABLE CARD */
+
+.table-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e4e9f1;
+    border-radius: 14px;
+    box-shadow: 0 6px 24px rgba(15, 23, 42, .045);
+}
+
+/* No horizontal scrolling on the page or table */
+
+.report-scroll {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+.report-table {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+    margin: 0;
+    border-collapse: collapse;
+    font-size: 11px;
+}
+
+.report-table thead th {
+    padding: 10px 8px;
+    background: #f5f7fc;
+    border-bottom: 1px solid #e1e7f0;
+    color: #475569;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .025em;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+    vertical-align: middle;
+}
+
+.report-table tbody tr {
+    background: #fff;
+    transition: background-color .15s ease;
+}
+
+.report-table tbody tr:hover {
+    background: #f8faff;
+}
+
+.report-table tbody td {
+    padding: 9px 8px;
+    border-bottom: 1px solid #edf1f6;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.4;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.report-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.report-table tbody td strong {
+    color: #172033;
+    font-weight: 750;
+}
+
+.report-table .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 4px 7px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 750;
+    line-height: 1.3;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+/* EMPTY STATE */
+
+.report-empty {
+    padding: 42px 12px !important;
+    text-align: center !important;
+    color: #8996a9 !important;
+    font-size: 12px !important;
+    line-height: 1.7;
+}
+
+.report-empty i {
+    display: block;
+    margin-bottom: 10px;
+    color: #c3cddd;
+    font-size: 32px;
+}
+
+/* FOOTER */
+
+.report-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 12px 2px 0;
+    color: #7b8798;
+    font-size: 10px;
+}
+
+.report-footer-text {
+    line-height: 1.6;
+}
+
+.record-count {
+    display: inline-flex;
+    align-items: center;
+    min-height: 29px;
+    padding: 0 10px;
+    background: #f5f7fb;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 992px) {
+    .filter-row {
+        gap: 10px;
+    }
+
+    .filter-item,
+    .filter-item.search-item {
+        flex: 1 1 180px;
+    }
+
+    .filter-actions {
+        flex: 1 1 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .report-detail {
+        padding-top: 4px;
+    }
+
+    .report-heading {
+        padding: 13px 14px;
+    }
+
+    .report-heading-text h2 {
+        font-size: 15px;
+    }
+
+    .report-heading-count {
+        display: none;
+    }
+
+    .filter-card {
+        padding: 14px;
+        border-radius: 12px;
+        margin-bottom: 14px;
+    }
+
+    .filter-row {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .filter-item,
+    .filter-item.search-item {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .filter-item.search-item,
+    .filter-actions {
+        grid-column: 1 / -1;
+    }
+
+    .filter-actions {
+        display: flex;
+        flex-wrap: wrap;
+        padding-top: 2px;
+    }
+
+    .filter-actions .btn {
+        flex: 1 1 auto;
+    }
+
+    .table-card {
+        border-radius: 11px;
+    }
+
+    .report-table thead th {
+        padding: 8px 5px;
+        font-size: 8px;
+    }
+
+    .report-table tbody td {
+        padding: 8px 5px;
+        font-size: 10px;
+    }
+
+    .report-footer {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .filter-row {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-item.search-item,
+    .filter-actions {
+        grid-column: auto;
+    }
+
+    .filter-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 7px;
+    }
+
+    .filter-actions .btn {
+        width: 100%;
+        min-width: 0;
+        padding: 0 7px;
+        font-size: 10px;
+    }
+
+    .report-table thead th {
+        padding: 7px 4px;
+        font-size: 7px;
+        letter-spacing: 0;
+    }
+
+    .report-table tbody td {
+        padding: 7px 4px;
+        font-size: 9px;
+    }
+
+    .report-empty {
+        padding: 30px 8px !important;
+    }
+}
+</style>
+
+<div class="report-detail">
+
+    <!-- REPORT HEADING -->
+
+    <div class="report-heading">
+        <div class="report-heading-icon">
+            {% if 'guest' in report_type %}
+                <i class="ph ph-users-three"></i>
+            {% elif 'duration' in report_type %}
+                <i class="ph ph-clock-countdown"></i>
+            {% elif 'id-card' in report_type or 'tag' in report_type %}
+                <i class="ph ph-identification-card"></i>
+            {% elif 'tenant' in report_type %}
+                <i class="ph ph-house-line"></i>
+            {% elif 'building' in report_type %}
+                <i class="ph ph-buildings"></i>
+            {% elif 'work-site' in report_type %}
+                <i class="ph ph-map-pin-line"></i>
+            {% elif 'hold-document' in report_type %}
+                <i class="ph ph-package"></i>
+            {% else %}
+                <i class="ph ph-chart-bar"></i>
+            {% endif %}
+        </div>
+
+        <div class="report-heading-text">
+            <h2>{{ title }}</h2>
+            <p>
+                {% if is_superadmin %}
+                    Management data across the complete system.
+                {% elif is_company_admin %}
+                    Accurate operational data for your company only.
+                {% else %}
+                    Guest and visitor data within your authorized access.
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="report-heading-count">
+            {{ rows|length }} Records
+        </div>
+    </div>
+
+    <!-- FILTERS -->
+
+    <div class="filter-card">
+        <form method="get">
+            <div class="filter-row">
+
+                <div class="filter-item search-item">
+                    <label class="filter-label" for="report-search">
+                        Search
+                    </label>
+                    <input
+                        id="report-search"
+                        type="text"
+                        class="form-control"
+                        name="search"
+                        value="{{ search }}"
+                        placeholder="Search guest, tenant, purpose, ID..."
+                    >
+                </div>
+
+                {% if show_date_filters %}
+                    <div class="filter-item">
+                        <label class="filter-label" for="start-date">
+                            From
+                        </label>
+                        <input
+                            id="start-date"
+                            type="date"
+                            class="form-control"
+                            name="start_date"
+                            value="{{ start_date }}"
+                        >
+                    </div>
+
+                    <div class="filter-item">
+                        <label class="filter-label" for="end-date">
+                            To
+                        </label>
+                        <input
+                            id="end-date"
+                            type="date"
+                            class="form-control"
+                            name="end_date"
+                            value="{{ end_date }}"
+                        >
+                    </div>
+                {% endif %}
+
+                {% if status_choices %}
+                    <div class="filter-item">
+                        <label class="filter-label" for="report-status">
+                            Status
+                        </label>
+                        <select
+                            id="report-status"
+                            class="form-select"
+                            name="status"
+                        >
+                            <option value="">All statuses</option>
+
+                            {% for key, label in status_choices %}
+                                <option
+                                    value="{{ key }}"
+                                    {% if selected_status == key %}selected{% endif %}
+                                >
+                                    {{ label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endif %}
+
+                <div class="filter-actions">
+
+                    <button class="btn btn-primary" type="submit">
+                        <i class="ph ph-funnel"></i>
+                        Filter
+                    </button>
+
+                    {% if search or start_date or end_date or selected_status %}
+                        <a
+                            class="btn btn-light"
+                            href="{% url 'report_detail' report_type %}"
+                        >
+                            <i class="ph ph-arrow-counter-clockwise"></i>
+                            Reset
+                        </a>
+                    {% endif %}
+
+                    <button
+                        class="btn btn-export btn-export-pdf"
+                        type="submit"
+                        name="download"
+                        value="pdf"
+                    >
+                        <i class="ph ph-file-pdf"></i>
+                        Export PDF
+                    </button>
+
+                    <button
+                        class="btn btn-export btn-export-excel"
+                        type="submit"
+                        name="download"
+                        value="excel"
+                    >
+                        <i class="ph ph-file-xls"></i>
+                        Export Excel
+                    </button>
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- REPORT TABLE -->
+
+    <div class="table-card">
+        <div class="report-scroll">
+            <table class="table report-table align-middle">
+
+                <thead>
+                    <tr>
+                        {% for h in headers %}
+                            {% if not hide_company_column or h|lower != 'company' and h|lower != 'company name' %}
+                                <th>{{ h }}</th>
+                            {% endif %}
+                        {% empty %}
+                            <th>Report details</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            {% for value in row %}
+                                {% if not hide_company_column or forloop.counter0 != company_column_index %}
+                                    <td>
+                                        {{ value|default:'—' }}
+                                    </td>
+                                {% endif %}
+                            {% empty %}
+                                <td>—</td>
+                            {% endfor %}
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td
+                                colspan="{{ headers|length|default:1 }}"
+                                class="report-empty"
+                            >
+                                <i class="ph ph-file-magnifying-glass"></i>
+                                No records found for the selected filters.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+
+    <div class="report-footer">
+        <span class="report-footer-text">
+            Exported reports follow the same filters and authorized access scope.
+        </span>
+
+        <span class="record-count">
+            Records: {{ rows|length }}
+        </span>
+    </div>
+
+</div>
+
+{% endblock %}
+```

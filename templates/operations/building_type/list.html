@@ -1,0 +1,768 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Building Types - Guest Management
+{% endblock %}
+
+{% block page_title %}
+    Building Type Master
+{% endblock %}
+
+{% block page_subtitle %}
+    Maintain the property categories available when creating buildings
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* ============================================================
+   BUILDING TYPE LIST PAGE
+============================================================ */
+
+.bt-wrap {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* MAIN CARD */
+
+.bt-card {
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow:
+        0 10px 28px rgba(15, 23, 42, 0.06),
+        0 2px 6px rgba(15, 23, 42, 0.03);
+}
+
+/* HEADER */
+
+.bt-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 17px;
+    background: linear-gradient(
+        135deg,
+        #eff6ff 0%,
+        #ffffff 75%
+    );
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* SEARCH */
+
+.bt-search {
+    position: relative;
+    width: 290px;
+    display: flex;
+    align-items: center;
+}
+
+.bt-search .bt-search-icon {
+    position: absolute;
+    left: 11px;
+    color: #94a3b8;
+    font-size: 15px;
+    pointer-events: none;
+}
+
+.bt-search input {
+    width: 100%;
+    height: 36px;
+    box-sizing: border-box;
+    padding: 0 11px 0 33px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 12px;
+    font-family: inherit;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.bt-search input::placeholder {
+    color: #94a3b8;
+}
+
+.bt-search input:hover {
+    border-color: #94a3b8;
+}
+
+.bt-search input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+.bt-search button {
+    display: none;
+}
+
+/* ADD BUILDING TYPE BUTTON */
+
+.bt-btn {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 13px;
+    border-radius: 8px;
+    background: #28a745;
+    border: 1px solid #28a745;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(40, 167, 69, 0.16);
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.bt-btn:hover {
+    background: #218838;
+    border-color: #218838;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 13px rgba(40, 167, 69, 0.23);
+}
+
+.bt-btn i {
+    font-size: 14px;
+}
+
+/* TABLE WRAPPER */
+
+.bt-table-wrap {
+    padding: 15px 17px 4px;
+    overflow-x: auto;
+}
+
+/* TABLE */
+
+.bt-table {
+    width: 100%;
+    min-width: 980px;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* TABLE HEADER */
+
+.bt-table thead {
+    background: linear-gradient(
+        180deg,
+        #f8fafc,
+        #f1f5f9
+    );
+}
+
+.bt-table th {
+    height: 42px;
+    padding: 0 12px;
+    text-align: left;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.bt-table th:first-child {
+    width: 55px;
+    text-align: center;
+}
+
+.bt-table th:last-child {
+    width: 180px;
+    text-align: center;
+}
+
+/* TABLE BODY */
+
+.bt-table td {
+    height: 52px;
+    padding: 6px 12px;
+    color: #334155;
+    font-size: 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.bt-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.bt-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.bt-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* SERIAL NUMBER */
+
+.bt-serial {
+    text-align: center;
+    color: #94a3b8 !important;
+    font-size: 11px !important;
+    font-weight: 700;
+}
+
+/* BUILDING TYPE NAME */
+
+.bt-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bt-icon {
+    width: 31px;
+    height: 31px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    color: #2563eb;
+    font-size: 15px;
+}
+
+.bt-name {
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 750;
+    overflow-wrap: anywhere;
+}
+
+/* CATEGORY */
+
+.bt-category {
+    color: #475569;
+    font-size: 11px;
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+/* DESCRIPTION */
+
+.bt-description {
+    color: #64748b;
+    font-size: 11px;
+    min-width: 160px;
+    max-width: 250px;
+    overflow-wrap: anywhere;
+}
+
+/* BUILDING COUNT */
+
+.bt-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 28px;
+    min-height: 25px;
+    padding: 0 8px;
+    border-radius: 6px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    color: #1d4ed8;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* STATUS */
+
+.bt-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 9px;
+    border-radius: 6px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.bt-status.off {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ACTIONS */
+
+.bt-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.bt-actions form {
+    display: inline;
+    margin: 0;
+}
+
+.bt-actions a,
+.bt-actions button {
+    min-height: 29px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 9px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 750;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.bt-actions a:hover,
+.bt-actions button:hover {
+    transform: translateY(-1px);
+}
+
+.bt-actions i {
+    font-size: 12px;
+}
+
+/* EDIT BUTTON */
+
+.bt-edit {
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    color: #1d4ed8;
+}
+
+.bt-edit:hover {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* DELETE BUTTON */
+
+.bt-delete {
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #dc2626;
+}
+
+.bt-delete:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* EMPTY STATE */
+
+.bt-empty {
+    padding: 42px 20px !important;
+    text-align: center !important;
+    color: #94a3b8 !important;
+}
+
+.bt-empty i {
+    display: block;
+    margin-bottom: 10px;
+    color: #cbd5e1;
+    font-size: 38px;
+}
+
+.bt-empty-title {
+    margin-bottom: 5px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.bt-empty-text {
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+/* PAGINATION */
+
+.bt-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 17px 16px;
+    border-top: 1px solid #f1f5f9;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.bt-pagination-links {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bt-pagination a {
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 11px;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    color: #475569;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 750;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.bt-pagination a:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+.bt-page-number {
+    color: #1e293b;
+    font-weight: 800;
+}
+
+/* MOBILE */
+
+@media (max-width: 700px) {
+
+    .bt-wrap {
+        max-width: 100%;
+    }
+
+    .bt-card {
+        border-radius: 13px;
+    }
+
+    .bt-head {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px;
+    }
+
+    .bt-search {
+        width: 100%;
+    }
+
+    .bt-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .bt-table-wrap {
+        padding: 10px 10px 3px;
+    }
+
+    .bt-table {
+        min-width: 980px;
+    }
+
+    .bt-table th {
+        height: 38px;
+        padding: 0 9px;
+        font-size: 9px;
+    }
+
+    .bt-table td {
+        height: 48px;
+        padding: 5px 9px;
+        font-size: 11px;
+    }
+
+    .bt-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+
+    .bt-name {
+        font-size: 11px;
+    }
+
+    .bt-pagination {
+        flex-direction: column;
+        gap: 10px;
+        padding: 11px 10px 13px;
+    }
+
+}
+
+</style>
+
+
+<div class="bt-wrap">
+
+    <div class="bt-card">
+
+        <!-- HEADER -->
+
+        <div class="bt-head">
+
+            <!-- SEARCH -->
+
+            <form method="get"
+                  action="{% url 'building_type_list' %}"
+                  class="bt-search">
+
+                <i class="ph ph-magnifying-glass bt-search-icon"></i>
+
+                <input
+                    type="search"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="Search building type, category or description..."
+                    aria-label="Search building types"
+                >
+
+                <button type="submit">Search</button>
+
+            </form>
+
+            <!-- ADD BUILDING TYPE -->
+
+            <a class="bt-btn"
+               href="{% url 'building_type_create' %}">
+
+                <i class="ph-bold ph-plus"></i>
+                Add Building Type
+
+            </a>
+
+        </div>
+
+
+        <!-- TABLE -->
+
+        <div class="bt-table-wrap">
+
+            <table class="bt-table">
+
+                <thead>
+
+                    <tr>
+                        <th>#</th>
+                        <th>Building Type</th>
+                        <th>Category</th>
+                        <th>Buildings</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for item in page_obj %}
+
+                        <tr>
+
+                            <!-- SERIAL NUMBER -->
+
+                            <td class="bt-serial">
+                                {{ page_obj.start_index|add:forloop.counter0 }}
+                            </td>
+
+                            <!-- BUILDING TYPE -->
+
+                            <td>
+
+                                <div class="bt-name-wrapper">
+
+                                    <div class="bt-icon">
+                                        <i class="ph-fill ph-buildings"></i>
+                                    </div>
+
+                                    <span class="bt-name">
+                                        {{ item.name }}
+                                    </span>
+
+                                </div>
+
+                            </td>
+
+                            <!-- CATEGORY -->
+
+                            <td class="bt-category">
+                                {{ item.get_code_display }}
+                            </td>
+
+
+                            <!-- BUILDINGS COUNT -->
+
+                            <td>
+                                <span class="bt-count">
+                                    {{ item.buildings.count }}
+                                </span>
+                            </td>
+
+                            <!-- STATUS -->
+
+                            <td>
+
+                                {% if item.status %}
+                                    <span class="bt-status">Active</span>
+                                {% else %}
+                                    <span class="bt-status off">Inactive</span>
+                                {% endif %}
+
+                            </td>
+
+                            <!-- ACTIONS -->
+
+                            <td>
+
+                                <div class="bt-actions">
+
+                                    <a
+                                        class="bt-edit"
+                                        href="{% url 'building_type_edit' item.pk %}"
+                                        title="Edit Building Type"
+                                    >
+                                        <i class="ph ph-pencil-simple"></i>
+                                        Edit
+                                    </a>
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'building_type_delete' item.pk %}"
+                                        onsubmit="return confirm('Delete this Building Type? Types in use cannot be deleted.');"
+                                    >
+
+                                        {% csrf_token %}
+
+                                        <button
+                                            class="bt-delete"
+                                            type="submit"
+                                            title="Delete Building Type"
+                                        >
+                                            <i class="ph ph-trash"></i>
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td colspan="7" class="bt-empty">
+
+                                <i class="ph ph-buildings"></i>
+
+                                <div class="bt-empty-title">
+                                    No Building Types found
+                                </div>
+
+                                <div class="bt-empty-text">
+                                    No building types match your search criteria.
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- PAGINATION -->
+
+        {% if page_obj.paginator.num_pages > 1 %}
+
+            <div class="bt-pagination">
+
+                <span>
+                    Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                    of {{ page_obj.paginator.count }}
+                </span>
+
+                <div class="bt-pagination-links">
+
+                    {% if page_obj.has_previous %}
+
+                        <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}">
+
+                            <i class="ph ph-caret-left"></i>
+                            Previous
+
+                        </a>
+
+                    {% endif %}
+
+                    <span>
+                        Page
+                        <span class="bt-page-number">{{ page_obj.number }}</span>
+                        of {{ page_obj.paginator.num_pages }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+
+                        <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}">
+
+                            Next
+                            <i class="ph ph-caret-right"></i>
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

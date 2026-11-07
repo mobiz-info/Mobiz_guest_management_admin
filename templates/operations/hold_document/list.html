@@ -1,0 +1,664 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Hold Documents - Guest Management{% endblock %}
+{% block page_title %}Hold Documents{% endblock %}
+{% block page_subtitle %}Documents and items received from guests, tenants, staff or other persons{% endblock %}
+
+{% block content %}
+
+<style>
+.hold-list-page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 auto;
+}
+
+.hold-list-card {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    background: #fff;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, .05);
+}
+
+.hold-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.hold-search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 650px;
+    min-width: 0;
+}
+
+.hold-search-input,
+.hold-status-select {
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.hold-search-input {
+    flex: 1;
+    min-width: 100px;
+}
+
+.hold-status-select {
+    width: 145px;
+    flex-shrink: 0;
+}
+
+.hold-search-input:focus,
+.hold-status-select:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .10);
+}
+
+.hold-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.hold-search-btn,
+.hold-clear-btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.hold-search-btn:hover,
+.hold-clear-btn:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.hold-create-btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 16px;
+    border: 1px solid #1e9724;
+    border-radius: 8px;
+    background: #1e9724;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    transition: .18s ease;
+    flex-shrink: 0;
+}
+
+.hold-create-btn:hover {
+    background: #1e9724;
+    border-color: #1e9724;
+    color: #fff;
+}
+
+.hold-topnote {
+    padding: 12px 18px 0;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.hold-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.hold-table {
+    width: 100%;
+    min-width: 1050px;
+    border-collapse: collapse;
+    table-layout: auto;
+    text-align: left;
+}
+
+.hold-table thead th {
+    padding: 12px 10px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: left;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.hold-table tbody td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #edf1f7;
+    color: #334155;
+    font-size: 12px;
+    vertical-align: middle;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.hold-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.hold-table tbody tr:hover td {
+    background: #f8fafc;
+}
+
+.hold-serial {
+    color: #64748b !important;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.hold-person {
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.hold-muted {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.hold-visit-details {
+    display: block;
+    margin-top: 4px;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+.hold-item-name {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.hold-item-description {
+    display: block;
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 11px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.hold-description-cell {
+    min-width: 160px;
+    max-width: 300px;
+    color: #475569;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.hold-status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 5px 8px;
+    border: 1px solid #fed7aa;
+    border-radius: 6px;
+    background: #fff7ed;
+    color: #c2410c;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.hold-status-badge.collected {
+    border-color: #bbf7d0;
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.hold-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.hold-collect-btn {
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 9px;
+    border: 1px solid #ddd6fe;
+    border-radius: 6px;
+    background: #f5f3ff;
+    color: #5b21b6;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.hold-collect-btn:hover {
+    background: #ede9fe;
+    color: #4c1d95;
+}
+
+.hold-collected-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #15803d;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.hold-empty {
+    padding: 45px 12px !important;
+    text-align: center !important;
+}
+
+.hold-empty-icon {
+    display: block;
+    margin-bottom: 12px;
+    color: #94a3b8;
+    font-size: 34px;
+}
+
+.hold-empty-title {
+    margin-bottom: 6px;
+    color: #334155;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.hold-empty-text {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.hold-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.hold-pagination-info {
+    color: #64748b;
+    font-size: 13px;
+}
+
+.hold-pagination-info strong {
+    color: #0f172a;
+}
+
+.hold-pagination-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.hold-page-btn,
+.hold-page-current {
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #475569;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.hold-page-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+.hold-page-current {
+    border-color: #4f46e5;
+    background: #4f46e5;
+    color: #fff;
+}
+
+@media (max-width: 700px) {
+    .hold-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .hold-search-form {
+        max-width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .hold-search-input {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+    .hold-status-select {
+        flex: 1;
+        width: auto;
+    }
+
+    .hold-toolbar .hold-create-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .hold-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .hold-pagination-links {
+        justify-content: flex-start;
+    }
+}
+</style>
+
+<div class="hold-list-page">
+    <div class="hold-list-card">
+
+        <!-- SEARCH AND FILTER TOOLBAR -->
+        <div class="hold-toolbar">
+
+            <form method="get"
+                  action="{% url 'hold_document_list' %}"
+                  class="hold-search-form">
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search|default:'' }}"
+                    placeholder="Search guest, tenant, document or description..."
+                    class="hold-search-input"
+                >
+
+                <select name="status" class="hold-status-select">
+                    <option value="">All statuses</option>
+
+                    {% for key, label in status_choices %}
+                    <option value="{{ key }}" {% if status == key %}selected{% endif %}>
+                        {{ label }}
+                    </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="hold-search-btn">
+                    <i class="ph ph-funnel"></i>
+                    Filter
+                </button>
+
+                {% if search or status %}
+                <a href="{% url 'hold_document_list' %}" class="hold-clear-btn">
+                    <i class="ph ph-x"></i>
+                    Clear
+                </a>
+                {% endif %}
+
+            </form>
+
+            <a href="{% url 'hold_document_create' %}" class="hold-create-btn">
+                <i class="ph-bold ph-plus"></i>
+                Add Hold Record
+            </a>
+
+        </div>
+
+        <div class="hold-topnote">
+            <i class="ph ph-info"></i>
+            Hold records are linked to a guest visit. Track the document or item until it is collected.
+        </div>
+
+        <!-- HOLD DOCUMENTS TABLE -->
+        <div class="hold-table-wrapper">
+            <table class="hold-table">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Guest Visit</th>
+                        <th>Document / Item</th>
+                        <th>Description</th>
+                        <th>Received</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in page_obj %}
+                    <tr>
+
+                        <!-- SERIAL NUMBER -->
+                        <td class="hold-serial">
+                            {% if page_obj.start_index %}
+                                {{ page_obj.start_index|add:forloop.counter0 }}
+                            {% else %}
+                                {{ forloop.counter }}
+                            {% endif %}
+                        </td>
+
+                        <!-- GUEST VISIT -->
+                        <td>
+                            {% if item.visit %}
+                                <div class="hold-person">
+                                    {{ item.visit.guest_name|default:"Guest" }}
+                                </div>
+
+                                <span class="hold-visit-details">
+                                    <strong>Visit ID:</strong> #{{ item.visit.pk }}
+
+                                    {% if item.visit.tenant %}
+                                        <br>
+                                        <strong>Tenant:</strong>
+                                        {{ item.visit.tenant.full_name }}
+                                    {% endif %}
+
+                                    {% if item.visit.visit_date %}
+                                        <br>
+                                        <strong>Date:</strong>
+                                        {{ item.visit.visit_date|date:'d-m-Y' }}
+                                    {% endif %}
+
+                                    {% if item.visit.visit_time %}
+                                        <br>
+                                        <strong>Time:</strong>
+                                        {{ item.visit.visit_time|time:'h:i A' }}
+                                    {% endif %}
+                                </span>
+                            {% else %}
+                                <span class="hold-muted">No guest visit linked</span>
+                            {% endif %}
+                        </td>
+
+                        <!-- DOCUMENT / ITEM -->
+                        <td>
+                            <span class="hold-item-name">
+                                {{ item.item_name }}
+                            </span>
+                        </td>
+
+                        <!-- DESCRIPTION -->
+                        <td class="hold-description-cell">
+                            {{ item.description|default:"-"|linebreaksbr }}
+                        </td>
+
+                        <!-- RECEIVED DATE AND USER -->
+                        <td>
+                            {{ item.received_at|date:'d-m-Y h:i A'|default:"—" }}
+
+                            {% if item.received_by %}
+                                <span class="hold-item-description">
+                                    <i class="ph ph-user"></i>
+                                    {{ item.received_by.username }}
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <!-- STATUS -->
+                        <td>
+                            <span class="hold-status-badge {% if item.status == 'collected' %}collected{% endif %}">
+                                {% if item.status == 'collected' %}
+                                    <i class="ph ph-check-circle"></i>
+                                {% else %}
+                                    <i class="ph ph-clock"></i>
+                                {% endif %}
+
+                                {{ item.get_status_display }}
+                            </span>
+                        </td>
+
+                        <!-- ACTION -->
+                        <td>
+                            <div class="hold-actions">
+                                {% if item.status == 'held' %}
+                                    <form method="post"
+                                          action="{% url 'hold_document_collect' item.pk %}">
+                                        {% csrf_token %}
+
+                                        <button type="submit" class="hold-collect-btn">
+                                            <i class="ph ph-check"></i>
+                                            Mark Collected
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <span class="hold-collected-label">
+                                        <i class="ph ph-check-circle"></i>
+                                        Completed
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="hold-empty">
+                            <i class="ph ph-files hold-empty-icon"></i>
+
+                            <div class="hold-empty-title">
+                                No hold records found
+                            </div>
+
+                            <div class="hold-empty-text">
+                                {% if search or status %}
+                                    No records match your search or selected status.
+                                    Try changing the filters.
+                                {% else %}
+                                    No hold document records are available yet.
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+
+            </table>
+        </div>
+
+        <!-- PAGINATION -->
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="hold-pagination">
+
+            <div class="hold-pagination-info">
+                Page <strong>{{ page_obj.number }}</strong>
+                of <strong>{{ page_obj.paginator.num_pages }}</strong>
+                · Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}
+            </div>
+
+            <div class="hold-pagination-links">
+
+                {% if page_obj.has_previous %}
+                    <a href="?page=1{% if search %}&search={{ search|urlencode }}{% endif %}{% if status %}&status={{ status|urlencode }}{% endif %}"
+                       class="hold-page-btn">
+                        <i class="ph ph-caret-double-left"></i>
+                        First
+                    </a>
+
+                    <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if status %}&status={{ status|urlencode }}{% endif %}"
+                       class="hold-page-btn">
+                        <i class="ph ph-caret-left"></i>
+                        Previous
+                    </a>
+                {% endif %}
+
+                <span class="hold-page-current">
+                    {{ page_obj.number }}
+                </span>
+
+                {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if status %}&status={{ status|urlencode }}{% endif %}"
+                       class="hold-page-btn">
+                        Next
+                        <i class="ph ph-caret-right"></i>
+                    </a>
+
+                    <a href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search|urlencode }}{% endif %}{% if status %}&status={{ status|urlencode }}{% endif %}"
+                       class="hold-page-btn">
+                        Last
+                        <i class="ph ph-caret-double-right"></i>
+                    </a>
+                {% endif %}
+
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

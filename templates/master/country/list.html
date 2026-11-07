@@ -1,0 +1,974 @@
+{% extends 'base.html' %}
+
+{% block title %}Country Master - Guest Management{% endblock %}
+
+{% block page_title %}
+    Country Master
+{% endblock %}
+
+{% block page_subtitle %}
+    Manage country, currency and international dial code information
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* ============================================================
+   COUNTRY LIST PAGE
+============================================================ */
+
+.country-list-page {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   MAIN CARD
+============================================================ */
+
+.country-list-card {
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow:
+        0 10px 28px rgba(15, 23, 42, 0.06),
+        0 2px 6px rgba(15, 23, 42, 0.03);
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.country-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 17px;
+    background: linear-gradient(
+        135deg,
+        #eff6ff 0%,
+        #ffffff 75%
+    );
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+.country-search {
+    position: relative;
+    width: 290px;
+}
+
+.country-search .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 15px;
+    pointer-events: none;
+}
+
+.country-search-input {
+    width: 100%;
+    height: 36px;
+    box-sizing: border-box;
+    padding: 0 11px 0 33px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 12px;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.country-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.country-search-input:hover {
+    border-color: #94a3b8;
+}
+
+.country-search-input:focus {
+    border-color: #2563eb;
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+/* ============================================================
+   ADD COUNTRY BUTTON
+============================================================ */
+
+.country-add-btn {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 13px;
+    border-radius: 8px;
+    background: #28A745;
+    border: 1px solid #28A745;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow:
+        0 4px 10px rgba(40, 167, 69, 0.16);
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.country-add-btn:hover {
+    background: #218838;
+    border-color: #218838;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow:
+        0 6px 13px rgba(40, 167, 69, 0.23);
+}
+
+.country-add-btn i {
+    font-size: 14px;
+}
+
+/* ============================================================
+   TABLE WRAPPER
+============================================================ */
+
+.country-table-wrapper {
+    padding: 15px 17px 4px;
+    overflow-x: auto;
+}
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+.country-table {
+    width: 100%;
+    min-width: 850px;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* ============================================================
+   TABLE HEADER
+============================================================ */
+
+.country-table thead {
+    background: linear-gradient(
+        180deg,
+        #f8fafc,
+        #f1f5f9
+    );
+}
+
+.country-table th {
+    height: 42px;
+    padding: 0 12px;
+    text-align: left;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.country-table th:first-child {
+    width: 75px;
+    text-align: center;
+}
+
+.country-table th:last-child {
+    width: 200px;
+    text-align: center;
+}
+
+/* ============================================================
+   TABLE BODY
+============================================================ */
+
+.country-table td {
+    height: 52px;
+    padding: 6px 12px;
+    color: #334155;
+    font-size: 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.country-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.country-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.country-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ============================================================
+   SERIAL
+============================================================ */
+
+.country-serial {
+    text-align: center;
+    color: #94a3b8 !important;
+    font-size: 11px !important;
+    font-weight: 700;
+}
+
+/* ============================================================
+   COUNTRY NAME
+============================================================ */
+
+.country-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* ============================================================
+   COUNTRY ICON / EMBLEM
+============================================================ */
+
+.country-emblem {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    border-radius: 50%;
+
+    background: linear-gradient(
+        135deg,
+        #eff6ff 0%,
+        #dbeafe 100%
+    );
+
+    border: 1px solid #bfdbfe;
+
+    color: #2563eb;
+    font-size: 16px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 2px 5px rgba(37, 99, 235, 0.08);
+}
+
+.country-emblem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.country-emblem i {
+    line-height: 1;
+}
+
+/* ============================================================
+   COUNTRY NAME
+============================================================ */
+
+.country-name {
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+/* ============================================================
+   CURRENCY
+============================================================ */
+
+.currency-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.currency-badge i {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.currency-code {
+    color: #1e293b;
+    font-weight: 800;
+}
+
+/* ============================================================
+   DIAL CODE
+============================================================ */
+
+.dial-code-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 9px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    border-radius: 6px;
+    color: #1d4ed8;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.dial-code-badge i {
+    font-size: 11px;
+}
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 9px;
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: 750;
+}
+
+.status-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.status-active {
+    background: #ecfdf5;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+}
+
+.status-inactive {
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #dc2626;
+}
+
+/* ============================================================
+   CREATED AT
+============================================================ */
+
+.created-at {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ============================================================
+   EMPTY VALUE
+============================================================ */
+
+.empty-value {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.country-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.country-action-btn {
+    min-height: 29px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 9px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 750;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.country-action-btn:hover {
+    transform: translateY(-1px);
+}
+
+.country-action-btn i {
+    font-size: 12px;
+}
+
+/* ============================================================
+   EDIT BUTTON
+============================================================ */
+
+.country-edit-btn {
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    color: #1d4ed8;
+}
+
+.country-edit-btn:hover {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* ============================================================
+   DELETE BUTTON
+============================================================ */
+
+.country-delete-btn {
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #dc2626;
+}
+
+.country-delete-btn:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.country-empty {
+    padding: 42px 20px !important;
+    text-align: center !important;
+}
+
+.country-empty-icon {
+    display: block;
+    margin-bottom: 10px;
+    color: #cbd5e1;
+    font-size: 38px;
+}
+
+.country-empty-title {
+    margin-bottom: 5px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.country-empty-text {
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+/* ============================================================
+   PAGINATION
+============================================================ */
+
+.country-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 17px 16px;
+}
+
+.country-page-link {
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 11px;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    color: #475569;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 750;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.country-page-link:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+.country-page-info {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.country-page-number {
+    color: #1e293b;
+    font-weight: 800;
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .country-list-page {
+        max-width: 100%;
+    }
+
+    .country-list-card {
+        border-radius: 13px;
+    }
+
+    .country-list-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px;
+    }
+
+    .country-search {
+        width: 100%;
+    }
+
+    .country-add-btn {
+        width: 100%;
+    }
+
+    .country-table-wrapper {
+        padding: 10px 10px 3px;
+    }
+
+    .country-table {
+        min-width: 820px;
+    }
+
+    .country-table th {
+        height: 38px;
+        padding: 0 9px;
+        font-size: 9px;
+    }
+
+    .country-table td {
+        height: 48px;
+        padding: 5px 9px;
+        font-size: 11px;
+    }
+
+    .country-emblem {
+        width: 29px;
+        height: 29px;
+        font-size: 14px;
+    }
+
+    .country-name {
+        font-size: 11px;
+    }
+
+    .currency-badge,
+    .dial-code-badge,
+    .status-badge {
+        font-size: 9px;
+    }
+
+    .country-pagination {
+        padding: 11px 10px 13px;
+    }
+}
+
+</style>
+
+
+<div class="country-list-page">
+
+    <div class="country-list-card">
+
+        <!-- ==================================================
+             HEADER
+        ================================================== -->
+
+        <div class="country-list-header">
+
+            <!-- SEARCH -->
+
+            <form
+                method="GET"
+                action="{% url 'country_list' %}"
+                class="country-search"
+            >
+
+                <i class="ph ph-magnifying-glass search-icon"></i>
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search|default:'' }}"
+                    placeholder="Search countries..."
+                    class="country-search-input"
+                    autocomplete="off"
+                >
+
+                <button
+                    type="submit"
+                    style="display:none;"
+                ></button>
+
+            </form>
+
+
+            <!-- ADD COUNTRY -->
+
+            <a
+                href="{% url 'country_create' %}"
+                class="country-add-btn"
+            >
+                <i class="ph-bold ph-plus"></i>
+                Add Country
+            </a>
+
+        </div>
+
+
+        <!-- ==================================================
+             TABLE
+        ================================================== -->
+
+        <div class="country-table-wrapper">
+
+            <table class="country-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            Country
+                        </th>
+
+                        <th>
+                            Currency
+                        </th>
+
+                        <th>
+                            Dial Code
+                        </th>
+
+                        <th>
+                            Created At
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for country in page_obj %}
+
+                    <tr>
+
+                        <!-- SERIAL NUMBER -->
+
+                        <td class="country-serial">
+                            {{ page_obj.start_index|add:forloop.counter0 }}
+                        </td>
+<!-- COUNTRY -->
+
+<td>
+
+    <div class="country-name-wrapper">
+
+        <div class="country-emblem">
+
+            {% if country.emblem %}
+
+                <div class="country-emblem">
+    <i class="ph-fill ph-globe-hemisphere-west"></i>
+</div>
+
+            {% else %}
+
+                <i class="ph-fill ph-globe-hemisphere-west"></i>
+
+            {% endif %}
+
+        </div>
+
+        <span class="country-name">
+            {{ country.name }}
+        </span>
+
+    </div>
+
+</td>
+
+                        <!-- CURRENCY -->
+
+                        <td>
+
+                            {% if country.currency_code %}
+
+                                <span class="currency-badge">
+
+                                    <i class="ph ph-currency-circle-dollar"></i>
+
+                                    <span class="currency-code">
+                                        {{ country.currency_code }}
+                                    </span>
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="empty-value">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- DIAL CODE -->
+
+                        <td>
+
+                            {% if country.dial_code %}
+
+                                <span class="dial-code-badge">
+
+                                    <i class="ph ph-phone"></i>
+
+                                    {{ country.dial_code }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="empty-value">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- CREATED AT -->
+
+                        <td>
+
+                            {% if country.created_at %}
+
+                                <span class="created-at">
+                                    {{ country.created_at|date:"d M Y" }}
+                                </span>
+
+                            {% else %}
+
+                                <span class="empty-value">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACTIONS -->
+
+                        <td>
+
+                            <div class="country-actions">
+
+                                <!-- EDIT -->
+
+                                <a
+                                    href="{% url 'country_edit' country.pk %}"
+                                    class="country-action-btn country-edit-btn"
+                                    title="Edit Country"
+                                >
+                                    <i class="ph ph-pencil-simple"></i>
+                                    Edit
+                                </a>
+
+
+                                <!-- DELETE -->
+
+                                <form
+                                    method="post"
+                                    action="{% url 'country_delete' country.pk %}"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete {{ country.name|escapejs }}?');"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="country-action-btn country-delete-btn"
+                                        title="Delete Country"
+                                    >
+                                        <i class="ph ph-trash"></i>
+                                        Delete
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <!-- EMPTY STATE -->
+
+                    <tr>
+
+                        <td
+                            colspan="6"
+                            class="country-empty"
+                        >
+
+                            <i
+                                class="ph ph-globe-hemisphere-west country-empty-icon"
+                            ></i>
+
+                            <div class="country-empty-title">
+                                No countries found
+                            </div>
+
+                            <div class="country-empty-text">
+                                No countries match your search criteria.
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ==================================================
+             PAGINATION
+        ================================================== -->
+
+        {% if page_obj.paginator.num_pages > 1 %}
+
+        <div class="country-pagination">
+
+            <!-- PREVIOUS -->
+
+            {% if page_obj.has_previous %}
+
+                <a
+                    href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                    class="country-page-link"
+                >
+                    <i class="ph ph-caret-left"></i>
+                    Previous
+                </a>
+
+            {% endif %}
+
+
+            <!-- PAGE INFO -->
+
+            <span class="country-page-info">
+
+                Page
+
+                <span class="country-page-number">
+                    {{ page_obj.number }}
+                </span>
+
+                of
+
+                {{ page_obj.paginator.num_pages }}
+
+            </span>
+
+
+            <!-- NEXT -->
+
+            {% if page_obj.has_next %}
+
+                <a
+                    href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                    class="country-page-link"
+                >
+                    Next
+                    <i class="ph ph-caret-right"></i>
+                </a>
+
+            {% endif %}
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

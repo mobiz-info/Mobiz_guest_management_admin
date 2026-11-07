@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_subtitle %}Create or update an individual unit{% endblock %}
+{% block content %}
+<style>
+.op-form-wrap{max-width:760px;margin:0 auto}.op-form-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px #0f172a0f}.op-form-title{padding:17px 20px;background:linear-gradient(135deg,#eff6ff,#fff);border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;font-weight:800;color:#1e293b}.op-form-title i{color:#2563eb;font-size:20px}.op-form-body{padding:22px}.op-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 18px}.op-field{margin-bottom:17px;min-width:0}.op-field.full{grid-column:1/-1}.op-field label{display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:7px}.op-field input:not([type="checkbox"]),.op-field select{width:100%;box-sizing:border-box;min-height:41px;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#0f172a;font-family:inherit;font-size:13px}.op-field input:focus,.op-field select:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px #3b82f61a}.op-check input{width:16px;min-width:16px;min-height:16px;padding:0;accent-color:#2563eb}.op-error{color:#dc2626;font-size:11px;margin-top:5px}.op-error-box{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 12px;border-radius:8px;margin-bottom:16px;font-size:12px}.op-check{display:flex!important;align-items:center;gap:9px;background:#f8fafc;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px!important}.op-actions{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #e2e8f0;padding-top:18px;margin-top:20px}.op-actions a,.op-actions button{min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 15px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:800;cursor:pointer}.op-cancel{background:#fff;border:1px solid #cbd5e1;color:#475569}.op-save{background:#2563eb;border:1px solid #2563eb;color:#fff}.op-note{font-size:11px;color:#64748b;margin:-6px 0 16px}@media(max-width:600px){.op-form-body{padding:15px}.op-grid{grid-template-columns:1fr}.op-actions{flex-direction:column-reverse}.op-actions a,.op-actions button{width:100%}}
+
+
+/* Shared compact premium form sizing for Operations templates */
+.content-area [class*="-form-wrap"] { width:100%; max-width:720px !important; min-width:0; margin-left:auto !important; margin-right:auto !important; }
+.content-area [class*="-form-card"] { border-radius:12px !important; box-shadow:0 6px 22px rgba(15,23,42,.06) !important; }
+.content-area [class*="-form-title"] { padding:13px 17px !important; font-size:14px !important; }
+.content-area [class*="-form-body"] { padding:17px !important; }
+.content-area [class*="-field"] { margin-bottom:12px !important; }
+.content-area [class*="-field"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.content-area [class*="-field"] select,
+.content-area [class*="-field"] textarea,
+.content-area .tenant-field input:not([type="checkbox"]),
+.content-area .tenant-field select,
+.content-area .tenant-field textarea {
+    min-height:37px; padding:8px 10px; border-radius:8px; font-size:12px;
+}
+.content-area [class*="-field"] textarea { min-height:62px; }
+.content-area [class*="-actions"] { margin-top:15px !important; padding-top:13px !important; gap:8px !important; }
+.content-area [class*="-actions"] a,
+.content-area [class*="-actions"] button { min-height:36px !important; padding:0 13px !important; border-radius:8px !important; font-size:11px !important; }
+.content-area [class*="-save"] { background:linear-gradient(135deg,#6366f1,#4f46e5) !important; border-color:#4f46e5 !important; color:#fff !important; }
+.content-area [class*="-save"]:hover { background:#4338ca !important; }
+.content-area .tenant-form-wrap { max-width:760px !important; }
+.content-area .tenant-grid { gap:11px 14px !important; }
+.content-area .unit-check-grid { gap:7px !important; }
+.content-area .unit-option { padding:9px !important; border-radius:8px !important; }
+@media(max-width:600px) {
+    .content-area [class*="-form-body"] { padding:13px !important; }
+    .content-area [class*="-form-wrap"] { max-width:100% !important; }
+}
+
+</style>
+<div class="op-form-wrap" data-company-id="{{ company.pk|default:'' }}"><div class="op-form-card"><div class="op-form-title"><i class="ph ph-door"></i>{{ title }}</div><div class="op-form-body"><form method="post">{% csrf_token %}{% if non_field_errors %}<div class="op-error-box">{% for error in non_field_errors %}{{ error }}{% endfor %}</div>{% endif %}
+<div class="op-grid">
+{% if request.user.is_superuser %}<div class="op-field"><label for="id_company">Company / Client *</label><select name="company" id="id_company" required><option value="">Select Company</option>{% for item in companies %}<option value="{{ item.pk }}" {% if values.company == item.pk|stringformat:"s" %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select>{% for error in errors.company %}<div class="op-error">{{ error }}</div>{% endfor %}</div>{% else %}<div class="op-field"><label>Company / Client</label><input value="{{ company.name }}" disabled></div>{% endif %}
+<div class="op-field"><label for="id_work_site">Work Site *</label><select name="work_site" id="id_work_site" required><option value="">Select Work Site</option>{% for site in work_sites %}<option value="{{ site.pk }}" data-company="{{ site.company_id }}" {% if values.work_site == site.pk|stringformat:"s" %}selected{% endif %}>{{ site.name }}</option>{% endfor %}</select>{% for error in errors.work_site %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field"><label for="id_building">Building / Property *</label><select name="building" id="id_building" required><option value="">Select Building</option>{% for building in buildings %}<option value="{{ building.pk }}" data-company="{{ building.company_id }}" data-site="{{ building.work_site_id }}" data-type="{{ building.building_type }}" data-floors="{{ building.number_of_floors }}" {% if values.building == building.pk|stringformat:"s" %}selected{% endif %}>{{ building.name }}</option>{% endfor %}</select>{% for error in errors.building %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field"><label for="id_floor">Floor <span style="font-weight:400;color:#64748b">(optional for villas)</span></label><select name="floor" id="id_floor"><option value="">No Floor / Select Floor</option>{% for floor in floors %}<option value="{{ floor.pk }}" data-building="{{ floor.building_id }}" {% if values.floor == floor.pk|stringformat:"s" %}selected{% endif %}>{{ floor.name }}</option>{% endfor %}</select>{% for error in errors.floor %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field"><label for="id_name">Unit Name / Number *</label><input type="text" name="name" id="id_name" maxlength="100" value="{{ values.name|default:'' }}" placeholder="101, Villa 1, Office 102" required>{% for error in errors.name %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field"><label for="id_email">Unit Email / Username *</label><input type="email" name="email" id="id_email" value="{{ values.email|default:'' }}" {% if is_edit %}readonly{% else %}required{% endif %} placeholder="unit@example.com">{% for error in errors.email %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field"><label for="id_mobile_number">Mobile Number / Initial Password *</label><input type="text" name="mobile_number" id="id_mobile_number" value="{{ values.mobile_number|default:'' }}" {% if is_edit %}readonly{% else %}required{% endif %} placeholder="Enter mobile number">{% for error in errors.mobile_number %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field"><label for="id_establishment_type">Establishment Type *</label><select name="establishment_type" id="id_establishment_type" required><option value="">Select Establishment Type</option>{% for item in establishment_types %}<option value="{{ item.pk }}" {% if values.establishment_type == item.pk|stringformat:"s" %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select>{% for error in errors.establishment_type %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field"><label for="id_unit_type">Unit Type *</label><select name="unit_type" id="id_unit_type" required>{% for key,label in unit_types %}<option value="{{ key }}" {% if values.unit_type == key %}selected{% endif %}>{{ label }}</option>{% endfor %}</select>{% for error in errors.unit_type %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+</div><p class="op-note">The selected work site and building must belong to the selected company. A unit must match the building type and configured capacity; select a floor when the building has floors.</p>
+<div class="op-field"><label class="op-check"><input type="checkbox" name="status" {% if values.status == 'True' or values.status == 'on' %}checked{% endif %}> Active Status</label></div>
+<div class="op-actions"><a class="op-cancel" href="{% url 'unit_list' %}"><i class="ph ph-x"></i> Cancel</a><button class="op-save" type="submit"><i class="ph ph-check"></i>{% if is_edit %}Update Unit{% else %}Save Unit{% endif %}</button></div>
+</form></div></div></div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+ const wrap=document.querySelector('.op-form-wrap'), company=document.getElementById('id_company'), site=document.getElementById('id_work_site'), building=document.getElementById('id_building'), floor=document.getElementById('id_floor'), unitType=document.getElementById('id_unit_type');
+ let companyId=company?company.value:wrap.dataset.companyId;
+ function reset(select,placeholder){select.innerHTML='';const o=document.createElement('option');o.value='';o.textContent=placeholder;select.appendChild(o);}
+ function addOptions(select,items,selected,extra){items.forEach(item=>{const o=document.createElement('option');o.value=item.id;o.textContent=item.name;o.selected=String(item.id)===String(selected);if(extra)Object.keys(extra(item)).forEach(k=>o.dataset[k]=extra(item)[k]);select.appendChild(o);});}
+ async function loadSites(selected=''){reset(site,'Select Work Site');reset(building,'Select Building');reset(floor,'No Floor / Select Floor');companyId=company?company.value:wrap.dataset.companyId;if(!companyId)return;try{const r=await fetch('/work-site-options/?company='+encodeURIComponent(companyId));addOptions(site,await r.json(),selected);if(selected)await loadBuildings(selectedBuilding,selectedFloor);}catch(e){console.error(e);}}
+ const selectedBuilding='{{ values.building|default:""|escapejs }}', selectedFloor='{{ values.floor|default:""|escapejs }}';
+ async function loadBuildings(siteId,selected=''){reset(building,'Select Building');reset(floor,'No Floor / Select Floor');if(!siteId)return;companyId=company?company.value:wrap.dataset.companyId;try{const url='/building-options/?company='+encodeURIComponent(companyId)+'&work_site='+encodeURIComponent(siteId);const r=await fetch(url);addOptions(building,await r.json(),selected,item=>({'company':companyId,'site':siteId,'type':item.type,'floors':item.number_of_floors}));if(selected)await loadFloors(selected,selectedFloor);}catch(e){console.error(e);}}
+ function syncUnitType(){const type=building.options[building.selectedIndex]?.dataset.type;const allowed=type==='villa'?['villa']:type==='office'?['office']:type==='other'?['other']:['flat','office','other'];let currentAllowed=false;Array.from(unitType.options).forEach(o=>{if(!o.value)return;o.disabled=!allowed.includes(o.value);o.hidden=o.disabled;if(o.value===unitType.value&&!o.disabled)currentAllowed=true;});if(!currentAllowed){const first=Array.from(unitType.options).find(o=>o.value&& !o.disabled);if(first)unitType.value=first.value;}}
+ async function loadFloors(buildingId,selected=''){reset(floor,'No Floor / Select Floor');if(!buildingId){floor.disabled=false;floor.required=false;syncUnitType();return;}try{const r=await fetch('/floor-options/?building='+encodeURIComponent(buildingId));addOptions(floor,await r.json(),selected);const opt=building.options[building.selectedIndex];const type=opt?.dataset.type;const floorCount=parseInt(opt?.dataset.floors||'0',10);if(type==='villa'){floor.disabled=true;floor.required=false;floor.value='';}else{floor.disabled=false;floor.required=floorCount>0;}syncUnitType();}catch(e){console.error(e);}}
+ if(company)company.addEventListener('change',()=>loadSites());
+ site.addEventListener('change',()=>loadBuildings(site.value));
+ building.addEventListener('change',()=>loadFloors(building.value));
+ if(site.value){loadBuildings(site.value,selectedBuilding);} else if(companyId){loadSites();}
+});
+</script>
+{% endblock %}

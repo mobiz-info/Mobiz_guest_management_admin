@@ -1,0 +1,281 @@
+```html
+{% extends 'base.html' %}
+
+{% block title %}
+    Staff Details - {{ company.name }}
+{% endblock %}
+
+{% block page_title %}
+    Concerned Staff Details
+{% endblock %}
+
+{% block page_subtitle %}
+    Staff contact information for {{ company.name }}
+{% endblock %}
+
+{% block content %}
+
+<style>
+.staff-details-card {
+    width: 100%;
+    max-width: 760px;
+    margin: 20px auto;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 8px 26px rgba(15, 23, 42, .06);
+}
+
+.staff-details-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 22px;
+    background: linear-gradient(135deg, #eff6ff, #fff);
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.staff-details-icon {
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #dbeafe;
+    color: #2563eb;
+    font-size: 24px;
+}
+
+.staff-details-title {
+    color: #0f172a;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.staff-details-subtitle {
+    margin-top: 5px;
+    color: #64748b;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.staff-details-body {
+    padding: 24px;
+}
+
+.staff-company-name {
+    margin-bottom: 18px;
+    padding: 15px;
+    border: 1px solid #dbeafe;
+    border-radius: 10px;
+    background: #f8fbff;
+}
+
+.staff-company-name small {
+    display: block;
+    margin-bottom: 5px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.staff-company-name strong {
+    color: #1e293b;
+    font-size: 15px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+.staff-detail-row {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    gap: 14px;
+    padding: 15px 5px;
+    border-bottom: 1px solid #edf1f7;
+}
+
+.staff-detail-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.staff-detail-label i {
+    color: #64748b;
+    font-size: 16px;
+}
+
+.staff-detail-value {
+    color: #0f172a;
+    font-size: 13px;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+}
+
+.staff-detail-value a {
+    color: #2563eb;
+    text-decoration: none;
+}
+
+.staff-detail-value a:hover {
+    text-decoration: underline;
+}
+
+.staff-details-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.staff-back-btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    transition: .2s;
+}
+
+.staff-back-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+@media (max-width: 600px) {
+    .staff-details-card {
+        margin: 10px auto;
+        border-radius: 10px;
+    }
+
+    .staff-details-header {
+        padding: 17px;
+    }
+
+    .staff-details-body {
+        padding: 15px;
+    }
+
+    .staff-detail-row {
+        grid-template-columns: 1fr;
+        gap: 7px;
+        padding: 13px 2px;
+    }
+
+    .staff-details-actions {
+        justify-content: stretch;
+    }
+
+    .staff-back-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+</style>
+
+<div class="staff-details-card">
+
+    <div class="staff-details-header">
+        <div class="staff-details-icon">
+            <i class="ph-fill ph-user-list"></i>
+        </div>
+
+        <div>
+            <div class="staff-details-title">
+                Concerned Staff Information
+            </div>
+
+            <div class="staff-details-subtitle">
+                Staff account and contact information assigned to this company
+            </div>
+        </div>
+    </div>
+
+    <div class="staff-details-body">
+
+        <div class="staff-company-name">
+            <small>Company / Client</small>
+            <strong>{{ company.name }}</strong>
+        </div>
+
+        <!-- STAFF USERNAME -->
+        <div class="staff-detail-row">
+            <div class="staff-detail-label">
+                <i class="ph ph-at"></i>
+                Staff Username
+            </div>
+
+            <div class="staff-detail-value">
+                {{ staff_account.user.username|default:"Not provided" }}
+            </div>
+        </div>
+
+        <!-- STAFF NAME -->
+        <div class="staff-detail-row">
+            <div class="staff-detail-label">
+                <i class="ph ph-user"></i>
+                Staff Name
+            </div>
+
+            <div class="staff-detail-value">
+                {{ company.concerned_staff_name|default:"Not provided" }}
+            </div>
+        </div>
+
+        <!-- DESIGNATION -->
+        <div class="staff-detail-row">
+            <div class="staff-detail-label">
+                <i class="ph ph-identification-card"></i>
+                Designation
+            </div>
+
+            <div class="staff-detail-value">
+                {{ company.concerned_staff_designation|default:"Not provided" }}
+            </div>
+        </div>
+
+        <!-- MOBILE -->
+        <div class="staff-detail-row">
+            <div class="staff-detail-label">
+                <i class="ph ph-phone"></i>
+                Mobile Number
+            </div>
+
+            <div class="staff-detail-value">
+                {% if company.concerned_staff_mobile %}
+                    <a href="tel:{% if company.country and company.country.dial_code %}{{ company.country.dial_code }}{% endif %}{{ company.concerned_staff_mobile }}">
+                        {% if company.country and company.country.dial_code %}{{ company.country.dial_code }} {% endif %}{{ company.concerned_staff_mobile }}
+                    </a>
+                {% else %}
+                    Not provided
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="staff-details-actions">
+            <a href="{% url 'company_list' %}" class="staff-back-btn">
+                <i class="ph ph-arrow-left"></i>
+                Back to Companies
+            </a>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+```

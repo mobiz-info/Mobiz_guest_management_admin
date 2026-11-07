@@ -1,0 +1,390 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ title }} - Purpose of Visit
+{% endblock %}
+
+{% block page_title %}
+    {{ title }}
+{% endblock %}
+
+{% block page_subtitle %}
+    Create or update purpose of visit master data
+{% endblock %}
+
+{% block content %}
+
+<div class="premium-form-container">
+
+    <!-- ==================================================
+         FORM TITLE
+    ================================================== -->
+
+    <div class="premium-form-title">
+
+        <i class="ph-fill ph-notebook"></i>
+
+        <span>
+            {% if is_edit %}
+                Edit Purpose of Visit
+            {% else %}
+                Add Purpose of Visit
+            {% endif %}
+        </span>
+
+    </div>
+
+
+    <!-- ==================================================
+         FORM BODY
+    ================================================== -->
+
+    <form method="post">
+
+        {% csrf_token %}
+
+
+        <!-- FORM ERRORS -->
+
+        {% if non_field_errors %}
+
+            <div class="form-error-box">
+
+                {% for error in non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- PURPOSE OF VISIT -->
+
+        <div class="form-group">
+
+            <label for="id_name">
+
+                Purpose of Visit
+
+                <span class="required">*</span>
+
+            </label>
+
+            <input type="text" name="name" id="id_name" class="form-control" maxlength="150" value="{{ values.name|default:'' }}" placeholder="Enter purpose of visit" required>
+
+            {% if errors.name %}
+
+                <div class="error-text">
+
+                    {% for error in errors.name %}
+                        {{ error }}
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <!-- SEPARATOR -->
+
+        <div class="form-separator"></div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="form-actions">
+
+            <a
+                href="{% url 'purpose_of_visit_list' %}"
+                class="btn-secondary"
+            >
+                <i class="ph ph-x"></i>
+                Cancel
+            </a>
+
+
+            <button
+                type="submit"
+                class="btn-primary"
+            >
+
+                <i class="ph ph-check"></i>
+
+                {% if is_edit %}
+                    Update Purpose of Visit
+                {% else %}
+                    Save Purpose of Visit
+                {% endif %}
+
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_css %}
+
+<style>
+
+/* ============================================================
+   PURPOSE OF VISIT FORM
+============================================================ */
+
+.premium-form-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.06),
+        0 2px 6px rgba(15, 23, 42, 0.03);
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+
+/* ============================================================
+   FORM TITLE
+============================================================ */
+
+.premium-form-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #1e293b;
+    padding-bottom: 18px;
+    border-bottom: 1px solid #e2e8f0;
+    margin-bottom: 22px;
+}
+
+.premium-form-title i {
+    font-size: 22px;
+    color: #3b82f6;
+}
+
+
+/* ============================================================
+   FORM GROUP
+============================================================ */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #334155;
+}
+
+.form-group label .required {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+
+/* ============================================================
+   INPUT
+============================================================ */
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.form-group textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #94a3b8;
+}
+
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+    border-color: #94a3b8;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    border-color: #3b82f6;
+    box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.10);
+}
+
+
+/* ============================================================
+   ERROR
+============================================================ */
+
+.error-text {
+    margin-top: 6px;
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.form-error-box {
+    margin-bottom: 18px;
+    padding: 10px 12px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+/* ============================================================
+   SEPARATOR
+============================================================ */
+
+.form-separator {
+    height: 1px;
+    background: #e2e8f0;
+    margin: 10px 0 20px;
+}
+
+
+/* ============================================================
+   FORM ACTIONS
+============================================================ */
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
+.btn-secondary,
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+/* ============================================================
+   SECONDARY BUTTON
+============================================================ */
+
+.btn-secondary {
+    background: #ffffff;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #1e293b;
+}
+
+
+/* ============================================================
+   PRIMARY BUTTON
+============================================================ */
+
+.btn-primary {
+    background: #3b82f6;
+    color: #ffffff;
+    border: 1px solid #3b82f6;
+    box-shadow:
+        0 4px 10px rgba(59, 130, 246, 0.16);
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow:
+        0 6px 13px rgba(37, 99, 235, 0.22);
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 600px) {
+
+    .premium-form-container {
+        max-width: 100%;
+        margin: 15px;
+        padding: 20px;
+    }
+
+    .premium-form-title {
+        font-size: 16px;
+        padding-bottom: 15px;
+        margin-bottom: 18px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .btn-secondary,
+    .btn-primary {
+        width: 100%;
+    }
+
+}
+
+</style>
+
+{% endblock %}

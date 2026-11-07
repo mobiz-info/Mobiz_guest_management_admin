@@ -1,0 +1,914 @@
+{% extends 'base.html' %}
+
+{% block title %}Area Master - Guest Management{% endblock %}
+
+{% block page_title %}
+    Area Master
+{% endblock %}
+
+{% block page_subtitle %}
+    Manage area master data
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* ============================================================
+   AREA LIST PAGE
+============================================================ */
+
+.area-list-page {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+/* ============================================================
+   MAIN CARD
+============================================================ */
+
+.area-list-card {
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow:
+        0 10px 28px rgba(15, 23, 42, 0.06),
+        0 2px 6px rgba(15, 23, 42, 0.03);
+}
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.area-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 17px;
+    background: linear-gradient(
+        135deg,
+        #eff6ff 0%,
+        #ffffff 75%
+    );
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+.area-search {
+    position: relative;
+    width: 290px;
+}
+
+.area-search .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 15px;
+    pointer-events: none;
+}
+
+.area-search-input {
+    width: 100%;
+    height: 36px;
+    box-sizing: border-box;
+    padding: 0 11px 0 33px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 12px;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.area-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.area-search-input:hover {
+    border-color: #94a3b8;
+}
+
+.area-search-input:focus {
+    border-color: #2563eb;
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+/* ============================================================
+   ADD AREA BUTTON
+============================================================ */
+
+.area-add-btn {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 13px;
+    border-radius: 8px;
+    background: #28A745;
+    border: 1px solid #28A745;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow:
+        0 4px 10px rgba(40, 167, 69, 0.16);
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.area-add-btn:hover {
+    background: #218838;
+    border-color: #218838;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow:
+        0 6px 13px rgba(40, 167, 69, 0.23);
+}
+
+.area-add-btn i {
+    font-size: 14px;
+}
+
+/* ============================================================
+   TABLE WRAPPER
+============================================================ */
+
+.area-table-wrapper {
+    padding: 15px 17px 4px;
+    overflow-x: auto;
+}
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+.area-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+/* ============================================================
+   TABLE HEADER
+============================================================ */
+
+.area-table thead {
+    background: linear-gradient(
+        180deg,
+        #f8fafc,
+        #f1f5f9
+    );
+}
+
+.area-table th {
+    height: 42px;
+    padding: 0 12px;
+    text-align: left;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.area-table th:first-child {
+    width: 70px;
+    text-align: center;
+}
+
+.area-table th:last-child {
+    width: 200px;
+    text-align: center;
+}
+
+/* ============================================================
+   TABLE BODY
+============================================================ */
+
+.area-table td {
+    height: 52px;
+    padding: 6px 12px;
+    color: #334155;
+    font-size: 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.area-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.area-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.area-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* ============================================================
+   SERIAL
+============================================================ */
+
+.area-serial {
+    text-align: center;
+    color: #94a3b8 !important;
+    font-size: 11px !important;
+    font-weight: 700;
+}
+
+/* ============================================================
+   AREA NAME
+============================================================ */
+
+.area-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.area-icon {
+    width: 31px;
+    height: 31px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    color: #2563eb;
+    font-size: 15px;
+}
+
+.area-name {
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+/* ============================================================
+   LOCATION BADGES
+============================================================ */
+
+.location-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+/* ============================================================
+   CREATED AT
+============================================================ */
+
+.created-at {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* ============================================================
+   EMPTY VALUE
+============================================================ */
+
+.empty-value {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.area-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.area-action-btn {
+    min-height: 29px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 9px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 750;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.area-action-btn:hover {
+    transform: translateY(-1px);
+}
+
+.area-action-btn i {
+    font-size: 12px;
+}
+
+/* ============================================================
+   EDIT BUTTON
+============================================================ */
+
+.area-edit-btn {
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    color: #1d4ed8;
+}
+
+.area-edit-btn:hover {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* ============================================================
+   DELETE BUTTON
+============================================================ */
+
+.area-delete-btn {
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #dc2626;
+}
+
+.area-delete-btn:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.area-empty {
+    padding: 42px 20px !important;
+    text-align: center !important;
+}
+
+.area-empty-icon {
+    display: block;
+    margin-bottom: 10px;
+    color: #cbd5e1;
+    font-size: 38px;
+}
+
+.area-empty-title {
+    margin-bottom: 5px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.area-empty-text {
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+/* ============================================================
+   PAGINATION
+============================================================ */
+
+.area-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 17px 16px;
+}
+
+.area-page-link {
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 11px;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    color: #475569;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 750;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.area-page-link:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+.area-page-info {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.area-page-number {
+    color: #1e293b;
+    font-weight: 800;
+}
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .area-list-page {
+        max-width: 100%;
+    }
+
+    .area-list-card {
+        border-radius: 13px;
+    }
+
+    .area-list-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px;
+    }
+
+    .area-search {
+        width: 100%;
+    }
+
+    .area-add-btn {
+        width: 100%;
+    }
+
+    .area-table-wrapper {
+        padding: 10px 10px 3px;
+    }
+
+    .area-table {
+        min-width: 900px;
+    }
+
+    .area-table th {
+        height: 38px;
+        padding: 0 9px;
+        font-size: 9px;
+    }
+
+    .area-table td {
+        height: 48px;
+        padding: 5px 9px;
+        font-size: 11px;
+    }
+
+    .area-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+
+    .area-name {
+        font-size: 11px;
+    }
+
+    .location-badge {
+        font-size: 9px;
+    }
+
+    .area-pagination {
+        padding: 11px 10px 13px;
+    }
+}
+
+</style>
+
+
+<div class="area-list-page">
+
+    <div class="area-list-card">
+
+        <!-- ==================================================
+             HEADER
+        ================================================== -->
+
+        <div class="area-list-header">
+
+            <!-- SEARCH -->
+
+            <form
+                method="GET"
+                class="area-search"
+            >
+
+                <i class="ph ph-magnifying-glass search-icon"></i>
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="Search areas..."
+                    class="area-search-input"
+                >
+
+                <button
+                    type="submit"
+                    style="display:none;"
+                >
+                </button>
+
+            </form>
+
+
+            <!-- ADD AREA -->
+
+            <a
+                href="{% url 'area_create' %}"
+                class="area-add-btn"
+            >
+
+                <i class="ph-bold ph-plus"></i>
+
+                Add Area
+
+            </a>
+
+        </div>
+
+
+        <!-- ==================================================
+             TABLE
+        ================================================== -->
+
+        <div class="area-table-wrapper">
+
+            <table class="area-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            #
+                        </th>
+
+                        <th>
+                            Area
+                        </th>
+
+                        <th>
+                            District
+                        </th>
+
+                        <th>
+                            State / Province
+                        </th>
+
+                        <th>
+                            Country
+                        </th>
+
+                        <th>
+                            Created At
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for obj in page_obj %}
+
+                    <tr>
+
+                        <!-- SERIAL NUMBER -->
+
+                        <td class="area-serial">
+
+                            {{ page_obj.start_index|add:forloop.counter0 }}
+
+                        </td>
+
+
+                        <!-- AREA NAME -->
+
+                        <td>
+
+                            <div class="area-name-wrapper">
+
+                                <div class="area-icon">
+
+                                    <i class="ph-fill ph-map-pin"></i>
+
+                                </div>
+
+                                <span class="area-name">
+
+                                    {{ obj.name }}
+
+                                </span>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- DISTRICT -->
+
+                        <td>
+
+                            {% if obj.district %}
+
+                                <span class="location-badge">
+
+                                    {{ obj.district.name }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="empty-value">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- STATE / PROVINCE -->
+
+                        <td>
+
+                            {% if obj.district.state %}
+
+                                <span class="location-badge">
+
+                                    {{ obj.district.state.name }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="empty-value">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- COUNTRY -->
+
+                        <td>
+
+                            {% if obj.district.state.country %}
+
+                                <span class="location-badge">
+
+                                    {{ obj.district.state.country.name }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="empty-value">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- CREATED AT -->
+
+                        <td>
+
+                            {% if obj.created_at %}
+
+                                <span class="created-at">
+
+                                    {{ obj.created_at|date:"d M Y" }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="empty-value">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACTIONS -->
+
+                        <td>
+
+                            <div class="area-actions">
+
+                                <!-- EDIT -->
+
+                                <a
+                                    href="{% url 'area_edit' obj.pk %}"
+                                    class="area-action-btn area-edit-btn"
+                                    title="Edit Area"
+                                >
+
+                                    <i class="ph ph-pencil-simple"></i>
+
+                                    Edit
+
+                                </a>
+
+
+                                <!-- DELETE -->
+
+                                <form
+                                    method="post"
+                                    action="{% url 'area_delete' obj.pk %}"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete this area?');"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="area-action-btn area-delete-btn"
+                                        title="Delete Area"
+                                    >
+
+                                        <i class="ph ph-trash"></i>
+
+                                        Delete
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <!-- EMPTY STATE -->
+
+                    <tr>
+
+                        <td
+                            colspan="7"
+                            class="area-empty"
+                        >
+
+                            <i
+                                class="ph ph-map-pin area-empty-icon"
+                            >
+                            </i>
+
+                            <div class="area-empty-title">
+
+                                No areas found
+
+                            </div>
+
+                            <div class="area-empty-text">
+
+                                No areas match your search criteria.
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ==================================================
+             PAGINATION
+        ================================================== -->
+
+        {% if page_obj.paginator.num_pages > 1 %}
+
+        <div class="area-pagination">
+
+
+            <!-- PREVIOUS -->
+
+            {% if page_obj.has_previous %}
+
+                <a
+                    href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                    class="area-page-link"
+                >
+
+                    <i class="ph ph-caret-left"></i>
+
+                    Previous
+
+                </a>
+
+            {% endif %}
+
+
+            <!-- PAGE INFO -->
+
+            <span class="area-page-info">
+
+                Page
+
+                <span class="area-page-number">
+
+                    {{ page_obj.number }}
+
+                </span>
+
+                of
+
+                {{ page_obj.paginator.num_pages }}
+
+            </span>
+
+
+            <!-- NEXT -->
+
+            {% if page_obj.has_next %}
+
+                <a
+                    href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                    class="area-page-link"
+                >
+
+                    Next
+
+                    <i class="ph ph-caret-right"></i>
+
+                </a>
+
+            {% endif %}
+
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

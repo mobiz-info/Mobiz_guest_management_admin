@@ -1,0 +1,1442 @@
+{% extends 'base.html' %}
+
+{% block title %}Guest Visits{% endblock %}
+
+{% block page_title %}Guest Visits{% endblock %}
+
+{% block page_subtitle %}
+Visitor requests, tenant approval and Gate Pass management
+{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   GUEST VISITS
+   Clean Professional / Ordinary Premium
+   ========================================================= */
+
+.gv-page {
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    color: #1e293b;
+    font-family: inherit;
+}
+
+/* Main card */
+.gv-card {
+    width: 100%;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
+}
+
+/* =========================================================
+   TOOLBAR
+   ========================================================= */
+
+.gv-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 15px 18px;
+    background: #ffffff;
+    border-bottom: 1px solid #e8edf3;
+}
+
+.gv-search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 570px;
+    min-width: 0;
+    margin: 0;
+}
+
+.gv-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    padding: 0 13px;
+    box-sizing: border-box;
+
+    border: 1px solid #d7dee8;
+    border-radius: 8px;
+    outline: none;
+
+    background: #ffffff;
+    color: #1e293b;
+
+    font-family: inherit;
+    font-size: 12px;
+
+    transition:
+        border-color .18s ease,
+        box-shadow .18s ease;
+}
+
+.gv-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.gv-search-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .08);
+}
+
+.gv-search-btn,
+.gv-clear-btn {
+    min-height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    padding: 0 14px;
+
+    border: 1px solid #d7dee8;
+    border-radius: 8px;
+
+    background: #ffffff;
+    color: #475569;
+
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    transition: all .16s ease;
+}
+
+.gv-search-btn:hover,
+.gv-clear-btn:hover {
+    background: #f8fafc;
+    border-color: #c4ceda;
+    color: #1e293b;
+}
+
+/* Create button */
+
+.gv-create-btn {
+    min-height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 0 16px;
+
+    border: 1px solid #1e9724;
+    border-radius: 8px;
+
+    background: #1e9724;
+    color: #ffffff;
+
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 750;
+
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    box-shadow: 0 3px 9px rgba(79, 70, 229, .14);
+
+    transition: all .16s ease;
+}
+
+.gv-create-btn:hover {
+    background: #1e9724;
+    border-color: #1e9724;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   TABLE
+   ========================================================= */
+
+.gv-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f8fafc;
+}
+
+.gv-table {
+    width: 100%;
+    min-width: 1220px;
+
+    border-collapse: separate;
+    border-spacing: 0;
+
+    table-layout: auto;
+    text-align: left;
+}
+
+.gv-table thead th {
+    padding: 12px 11px;
+
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+
+    color: #64748b;
+
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: .045em;
+
+    text-align: left;
+    text-transform: uppercase;
+    vertical-align: middle;
+
+    white-space: nowrap;
+}
+
+.gv-table tbody td {
+    padding: 13px 11px;
+
+    border-bottom: 1px solid #edf1f5;
+
+    color: #334155;
+
+    font-size: 11px;
+    line-height: 1.55;
+
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.gv-table tbody tr {
+    background: #ffffff;
+    transition: background .15s ease;
+}
+
+.gv-table tbody tr:hover {
+    background: #fafbff;
+}
+
+.gv-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* =========================================================
+   TEXT
+   ========================================================= */
+
+.gv-name {
+    display: block;
+
+    color: #172033;
+
+    font-size: 11.5px;
+    font-weight: 800;
+    line-height: 1.45;
+}
+
+.gv-muted {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #718096;
+
+    font-size: 9.5px;
+    line-height: 1.55;
+}
+
+.gv-id-number {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #334155;
+
+    font-size: 10.5px;
+    font-weight: 700;
+
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.gv-table td strong {
+    color: #1e293b;
+    font-weight: 750;
+}
+
+/* =========================================================
+   BADGES
+   ========================================================= */
+
+.gv-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    padding: 4px 8px;
+
+    border: 1px solid transparent;
+    border-radius: 6px;
+
+    font-size: 9px;
+    font-weight: 800;
+    line-height: 1.4;
+
+    white-space: nowrap;
+}
+
+.gv-badge.pending {
+    background: #fff8e6;
+    border-color: #f5d98b;
+    color: #8a5a00;
+}
+
+.gv-badge.approved {
+    background: #ecfdf5;
+    border-color: #a7e9cc;
+    color: #087443;
+}
+
+.gv-badge.denied {
+    background: #fff1f2;
+    border-color: #f4c4cb;
+    color: #b42346;
+}
+
+/* =========================================================
+   ACTION BUTTONS
+   ========================================================= */
+
+.gv-actions {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.gv-actions form,
+.gv-table td form {
+    margin: 0;
+}
+
+.gv-actions button,
+.gv-actions a,
+.gv-table td form button {
+    min-height: 30px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    padding: 5px 9px;
+    box-sizing: border-box;
+
+    border: 1px solid #dfe5ec;
+    border-radius: 7px;
+
+    font-family: inherit;
+    font-size: 9.5px;
+    font-weight: 750;
+
+    line-height: 1.35;
+    text-align: center;
+    text-decoration: none;
+
+    white-space: nowrap;
+    cursor: pointer;
+
+    transition: all .15s ease;
+}
+
+/* Green */
+.gv-approve {
+    background: #effaf5;
+    color: #087443;
+    border-color: #b6e7d0 !important;
+}
+
+.gv-approve:hover {
+    background: #dcf7e9;
+    color: #065f3a;
+}
+
+/* Red */
+.gv-deny {
+    background: #fff3f4;
+    color: #b42346;
+    border-color: #f3c5cc !important;
+}
+
+.gv-deny:hover {
+    background: #ffe7ea;
+    color: #971b3c;
+}
+
+/* Gate pass */
+.gv-pass {
+    background: #f1f3ff;
+    color: #4338ca;
+    border-color: #cbd2ff !important;
+}
+
+.gv-pass:hover {
+    background: #e5e8ff;
+    color: #3730a3;
+}
+
+/* =========================================================
+   CHECK-IN FORM
+   ========================================================= */
+
+.gv-id-checkin-form {
+    min-width: 140px;
+}
+
+.gv-id-checkin-form select,
+.gv-id-checkin-form input {
+    display: block;
+
+    width: 140px;
+    max-width: 100%;
+
+    box-sizing: border-box;
+
+    padding: 7px 8px;
+    margin-bottom: 6px;
+
+    border: 1px solid #d7dee8;
+    border-radius: 7px;
+
+    outline: none;
+
+    background: #ffffff;
+    color: #334155;
+
+    font-family: inherit;
+    font-size: 10px;
+
+    transition:
+        border-color .16s ease,
+        box-shadow .16s ease;
+}
+
+.gv-id-checkin-form select:focus,
+.gv-id-checkin-form input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, .08);
+}
+
+.gv-id-checkin-form button {
+    max-width: 150px;
+    white-space: normal !important;
+}
+
+/* =========================================================
+   CHECKOUT
+   ========================================================= */
+
+.gv-checkout-time {
+    display: block;
+
+    color: #166534;
+
+    font-size: 10.5px;
+    font-weight: 800;
+}
+
+.gv-checkout-user {
+    display: block;
+
+    margin-top: 3px;
+
+    color: #64748b;
+    font-size: 9px;
+}
+
+/* =========================================================
+   EMPTY STATE
+   ========================================================= */
+
+.gv-empty {
+    padding: 55px 16px !important;
+
+    text-align: center !important;
+
+    color: #94a3b8 !important;
+
+    font-size: 11px !important;
+    line-height: 1.8 !important;
+}
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+
+.gv-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+    flex-wrap: wrap;
+
+    padding: 14px 18px;
+
+    border-top: 1px solid #e8edf3;
+
+    background: #ffffff;
+}
+
+.gv-pagination-info {
+    color: #64748b;
+
+    font-size: 10.5px;
+    line-height: 1.6;
+}
+
+.gv-pagination-info strong {
+    color: #1e293b;
+    font-weight: 800;
+}
+
+.gv-pagination-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.gv-page-btn,
+.gv-page-current {
+    min-height: 32px;
+    min-width: 32px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    padding: 0 9px;
+
+    border: 1px solid #dbe2ea;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #475569;
+
+    text-decoration: none;
+
+    font-size: 10px;
+    font-weight: 750;
+
+    transition: all .15s ease;
+}
+
+.gv-page-btn:hover {
+    background: #f8fafc;
+    border-color: #a5b4fc;
+    color: #4338ca;
+}
+
+.gv-page-current {
+    border-color: #4f46e5;
+    background: #4f46e5;
+    color: #ffffff;
+
+    box-shadow: 0 2px 6px rgba(79, 70, 229, .14);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .gv-toolbar {
+        align-items: stretch;
+    }
+
+    .gv-search-form {
+        max-width: 100%;
+    }
+
+    .gv-create-btn {
+        align-self: flex-start;
+    }
+}
+
+@media (max-width: 600px) {
+
+    .gv-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 12px;
+    }
+
+    .gv-search-form {
+        max-width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .gv-search-input {
+        flex-basis: 100%;
+        width: 100%;
+    }
+
+    .gv-search-btn,
+    .gv-clear-btn {
+        flex: 1;
+    }
+
+    .gv-create-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .gv-table thead th {
+        padding: 11px 9px;
+    }
+
+    .gv-table tbody td {
+        padding: 11px 9px;
+    }
+
+    .gv-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px;
+    }
+
+    .gv-pagination-links {
+        justify-content: flex-start;
+    }
+}
+</style>
+
+
+<div class="gv-page">
+
+    <div class="gv-card">
+
+        <!-- =====================================================
+             SEARCH TOOLBAR
+             ===================================================== -->
+
+        <div class="gv-toolbar">
+
+            <form
+                method="get"
+                action="{% url 'guest_visit_list' %}"
+                class="gv-search-form"
+            >
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search|default:'' }}"
+                    placeholder="Search guest, tenant, purpose or Gate Pass..."
+                    class="gv-search-input"
+                    aria-label="Search guest visits"
+                >
+
+                <button type="submit" class="gv-search-btn">
+                    <i class="ph ph-magnifying-glass"></i>
+                    Search
+                </button>
+
+                {% if search %}
+                    <a
+                        href="{% url 'guest_visit_list' %}"
+                        class="gv-clear-btn"
+                    >
+                        <i class="ph ph-x"></i>
+                        Clear
+                    </a>
+                {% endif %}
+
+            </form>
+
+
+            <a
+                href="{% url 'guest_visit_create' %}"
+                class="gv-create-btn"
+            >
+                <i class="ph-bold ph-plus"></i>
+
+                {% if is_tenant_self_service %}
+                    Plan Guest Visit
+                {% else %}
+                    Register Guest Visit
+                {% endif %}
+
+            </a>
+
+        </div>
+
+
+        <!-- =====================================================
+             GUEST VISITS TABLE
+             ===================================================== -->
+
+        <div class="gv-table-wrapper">
+
+            <table class="gv-table">
+
+                <thead>
+                    <tr>
+
+                        <th>
+                            Guest / Accompanying Persons
+                        </th>
+
+                     
+
+                        <th>
+                            Purpose / Vehicle
+                        </th>
+
+                        <th>
+                            Visit Date
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Gate Pass
+                        </th>
+
+                        <th>
+                            Check-in
+                        </th>
+
+                        <th>
+                            Guest ID / Return
+                        </th>
+
+                        <th>
+                            Check-out
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+                </thead>
+
+
+                <tbody>
+
+                    {% for visit in page_obj %}
+
+                        <tr>
+
+                            <!-- =================================================
+                                 GUEST
+                                 ================================================= -->
+
+                            <td>
+
+                                {% if visit.guest_photo %}
+
+                                    <img
+                                        src="{{ visit.guest_photo.url }}"
+                                        alt="Guest photo"
+                                        loading="lazy"
+                                        style="
+                                            width:42px;
+                                            height:42px;
+                                            object-fit:cover;
+                                            border-radius:8px;
+                                            display:block;
+                                            margin-bottom:6px;
+                                            border:1px solid #e2e8f0;
+                                        "
+                                    >
+
+                                {% endif %}
+
+
+                                <span class="gv-name">
+                                    {{ visit.guest_name }}
+                                </span>
+
+
+                                <span class="gv-muted">
+                                    {% if visit.unit.company.country.dial_code %}{{ visit.unit.company.country.dial_code }} {% endif %}{{ visit.guest_mobile_number|default:"No mobile number" }}
+                                    ·
+                                    {{ visit.get_visit_type_display }}
+                                    ·
+                                    Request #{{ visit.pk }}
+                                </span>
+
+
+                                {% if visit.accompanying_people.all %}
+
+                                    <span class="gv-muted">
+
+                                        With:
+
+                                        {% for person in visit.accompanying_people.all %}
+
+                                            {{ person.name }}
+                                            ({{ person.mobile_number }})
+
+                                            {% if not forloop.last %}
+                                                ,
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================================
+                                 TENANT
+                                 ================================================= -->
+
+                            <td>
+
+                                <span class="gv-name">
+                                    {{ visit.tenant.full_name }}
+                                </span>
+
+                                <span class="gv-muted">
+                                    {{ visit.unit.building.name }}
+                                    ·
+                                    {{ visit.unit.name }}
+                                </span>
+
+                            </td>
+
+
+                            <!-- =================================================
+                                 PURPOSE / VEHICLE
+                                 ================================================= -->
+
+                            <td>
+
+                                {{ visit.purpose_of_visit.name }}
+
+                                {% if visit.vehicle_details %}
+
+                                    <span class="gv-muted">
+                                        Vehicle: {{ visit.vehicle_details }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================================
+                                 VISIT DATE
+                                 ================================================= -->
+
+                            <td>
+
+                                <strong>
+                                    {{ visit.visit_date|date:'d-m-Y' }}
+                                </strong>
+
+                                {% if visit.visit_time %}
+
+                                    <span class="gv-muted">
+                                        {{ visit.visit_time|time:'h:i A' }}
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================================
+                                 STATUS
+                                 ================================================= -->
+
+                            <td>
+
+                                {% if visit.checked_out_at %}
+
+                                    <span class="gv-badge approved">
+                                        Checked Out
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="gv-badge {{ visit.status }}">
+
+                                        {% if visit.status == 'pending' %}
+
+                                            Pending Approval
+
+                                        {% elif visit.status == 'approved' %}
+
+                                            Approved
+
+                                        {% else %}
+
+                                            Rejected
+
+                                        {% endif %}
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================================
+                                 GATE PASS
+                                 ================================================= -->
+
+                            <td>
+
+                                {% if visit.gate_pass_code %}
+
+                                    <strong>
+                                        {{ visit.gate_pass_code }}
+                                    </strong>
+
+                                {% else %}
+
+                                    <span class="gv-muted">
+                                        Not generated
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================================
+                                 CHECK-IN
+                                 ================================================= -->
+
+                            <td>
+
+                                {% if visit.checked_in_at %}
+
+                                    <strong>
+                                        {{ visit.checked_in_at|date:'d-m-Y h:i A' }}
+                                    </strong>
+
+
+
+                                {% elif visit.status == 'approved' and can_manage_checkin %}
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'guest_visit_check_in' visit.pk %}"
+                                        class="gv-id-checkin-form"
+                                    >
+
+                                        {% csrf_token %}
+
+
+                                        <select
+                                            name="id_type"
+                                            required
+                                            aria-label="Guest ID type"
+                                        >
+
+                                            <option value="">
+                                                ID type *
+                                            </option>
+
+                                            <option value="national_id">
+                                                National ID
+                                            </option>
+
+                                            <option value="passport">
+                                                Passport
+                                            </option>
+
+                                            <option value="driving_license">
+                                                Driving Licence
+                                            </option>
+
+                                            <option value="other">
+                                                Other ID
+                                            </option>
+
+                                        </select>
+
+
+                                        <input
+                                            name="id_number"
+                                            required
+                                            maxlength="100"
+                                            placeholder="ID number *"
+                                            aria-label="Guest ID number"
+                                        >
+
+
+                                        <button
+                                            class="gv-approve"
+                                            type="submit"
+                                        >
+                                            Check in &amp; Receive ID
+                                        </button>
+
+                                    </form>
+
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================================
+                                 GUEST ID TRACKING
+                                 ================================================= -->
+
+                            <td>
+
+                                {% if visit.id_number %}
+
+                                    <strong>
+                                        {{ visit.get_id_type_display }}
+                                    </strong>
+
+
+                                    <span class="gv-id-number">
+                                        ID:
+                                        {{ visit.id_number|default:"Not available" }}
+                                    </span>
+
+
+                                    {% if visit.id_received_at %}
+
+                                        <span class="gv-muted">
+
+                                            Received:
+                                            {{ visit.id_received_at|date:'d-m-Y h:i A' }}
+
+
+                                        </span>
+
+                                    {% endif %}
+
+
+                                    {% if visit.id_returned_at %}
+
+                                        <span class="gv-badge approved">
+                                            ID Returned
+                                        </span>
+
+                                        <span class="gv-muted">
+
+                                            {{ visit.id_returned_at|date:'d-m-Y h:i A' }}
+
+                                            {% if visit.id_returned_by %}
+                                                · {{ visit.id_returned_by.username }}
+                                            {% endif %}
+
+                                        </span>
+
+
+                                    {% elif visit.id_received_at %}
+
+                                        <span class="gv-badge pending">
+                                            With Security
+                                        </span>
+
+                                        <span class="gv-muted">
+                                            Original ID must be returned before checkout.
+                                        </span>
+
+
+                                        {% if is_tenant_self_service %}
+
+                                            <form
+                                                method="post"
+                                                action="{% url 'guest_visit_id_return' visit.pk %}"
+                                                onsubmit="return confirm('Record original ID return?');"
+                                                style="margin-top:7px;"
+                                            >
+
+                                                {% csrf_token %}
+
+                                                <button
+                                                    class="gv-approve"
+                                                    type="submit"
+                                                >
+                                                    Return Original ID
+                                                </button>
+
+                                            </form>
+
+                                        {% endif %}
+
+                                    {% endif %}
+
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================================
+                                 CHECK-OUT
+                                 ================================================= -->
+
+                            <td>
+
+                                {% if visit.checked_out_at %}
+
+                                    <span class="gv-checkout-time">
+                                        {{ visit.checked_out_at|date:'d-m-Y h:i A' }}
+                                    </span>
+
+                                    <span class="gv-checkout-user">
+                                        {{ visit.checked_out_by.username|default:"User" }}
+                                    </span>
+
+
+                                {% elif visit.checked_in_at and can_manage_checkin %}
+
+                                    {% if visit.id_received_at and not visit.id_returned_at %}
+
+                                        <span class="gv-muted">
+                                            Return original ID first.
+                                        </span>
+
+                                    {% endif %}
+
+
+                                    {% if is_tenant_self_service %}
+
+                                        {% for issue in visit.active_tag_issues %}
+
+                                            {% if issue.status == 'issued' %}
+
+                                                <form
+                                                    method="post"
+                                                    action="{% url 'id_tag_return' issue.pk %}"
+                                                    onsubmit="return confirm('Return ID tag {{ issue.tag.tag_number }}?');"
+                                                    style="margin-top:6px;"
+                                                >
+
+                                                    {% csrf_token %}
+
+                                                    <button
+                                                        class="gv-approve"
+                                                        type="submit"
+                                                    >
+                                                        Return Tag {{ issue.tag.tag_number }}
+                                                    </button>
+
+                                                </form>
+
+                                            {% endif %}
+
+                                        {% endfor %}
+
+                                    {% endif %}
+
+
+                                    {% if visit.id_returned_at or not visit.id_received_at %}
+
+                                        {% if not visit.active_tag_issues %}
+
+                                            <form
+                                                method="post"
+                                                action="{% url 'guest_visit_check_out' visit.pk %}"
+                                                onsubmit="return confirm('Record guest check-out?');"
+                                                style="margin-top:7px;"
+                                            >
+
+                                                {% csrf_token %}
+
+                                                <button
+                                                    class="gv-deny"
+                                                    type="submit"
+                                                >
+                                                    Check Out
+                                                </button>
+
+                                            </form>
+
+                                        {% else %}
+
+                                            <span class="gv-muted">
+                                                Return all issued tags first.
+                                            </span>
+
+                                        {% endif %}
+
+                                    {% endif %}
+
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <!-- =================================================
+                                 ACTIONS
+                                 ================================================= -->
+
+                            <td>
+
+                                <div class="gv-actions">
+
+                                    {% if visit.status == 'pending' and can_accept_unit_requests and visit.visit_type == 'walk_in' and visit.unit_approval_status == 'pending' %}
+                                        <form method="post" action="{% url 'guest_visit_unit_accept' visit.pk %}">{% csrf_token %}<button class="gv-approve" type="submit">Accept for Tenant Approval</button></form>
+                                    {% endif %}
+
+                                    {% if visit.status == 'pending' and can_approve_visits and visit.unit_approval_status == 'approved' %}
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'guest_visit_approve' visit.pk %}"
+                                        >
+
+                                            {% csrf_token %}
+
+                                            <button
+                                                class="gv-approve"
+                                                type="submit"
+                                            >
+                                                Approve
+                                            </button>
+
+                                        </form>
+
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'guest_visit_deny' visit.pk %}"
+                                            onsubmit="return confirm('Deny this guest visit?');"
+                                        >
+
+                                            {% csrf_token %}
+
+                                            <button
+                                                class="gv-deny"
+                                                type="submit"
+                                            >
+                                                Deny
+                                            </button>
+
+                                        </form>
+
+                                    {% endif %}
+
+
+                                    {% if visit.status == 'approved' and visit.gate_pass_code %}
+
+                                        <a
+                                            class="gv-pass"
+                                            href="{% url 'guest_visit_gate_pass' visit.pk %}"
+                                        >
+
+                                            <i class="ph ph-identification-card"></i>
+
+                                            View Gate Pass
+
+                                        </a>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+
+                    {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="10"
+                                class="gv-empty"
+                            >
+
+                                <i
+                                    class="ph ph-users"
+                                    style="
+                                        font-size:26px;
+                                        display:block;
+                                        margin-bottom:10px;
+                                    "
+                                ></i>
+
+
+                                {% if search %}
+
+                                    No guest visits match
+                                    "{{ search }}".
+
+                                    <br>
+
+                                    Try another search term.
+
+                                {% else %}
+
+                                    No guest visits found.
+
+                                {% endif %}
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- =====================================================
+             PAGINATION
+             ===================================================== -->
+
+        {% if page_obj.paginator.num_pages > 1 %}
+
+            <div class="gv-pagination">
+
+                <div class="gv-pagination-info">
+
+                    Page
+
+                    <strong>
+                        {{ page_obj.number }}
+                    </strong>
+
+                    of
+
+                    <strong>
+                        {{ page_obj.paginator.num_pages }}
+                    </strong>
+
+                    · Showing
+
+                    <strong>
+                        {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                    </strong>
+
+                    of
+
+                    <strong>
+                        {{ page_obj.paginator.count }}
+                    </strong>
+
+                </div>
+
+
+                <div class="gv-pagination-links">
+
+                    {% if page_obj.has_previous %}
+
+                        <a
+                            href="?page=1{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="gv-page-btn"
+                        >
+
+                            <i class="ph ph-caret-double-left"></i>
+                            First
+
+                        </a>
+
+
+                        <a
+                            href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="gv-page-btn"
+                        >
+
+                            <i class="ph ph-caret-left"></i>
+                            Previous
+
+                        </a>
+
+                    {% endif %}
+
+
+                    <span class="gv-page-current">
+                        {{ page_obj.number }}
+                    </span>
+
+
+                    {% if page_obj.has_next %}
+
+                        <a
+                            href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="gv-page-btn"
+                        >
+
+                            Next
+                            <i class="ph ph-caret-right"></i>
+
+                        </a>
+
+
+                        <a
+                            href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="gv-page-btn"
+                        >
+
+                            Last
+                            <i class="ph ph-caret-double-right"></i>
+
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}{{ dashboard_data.title }}{% endblock %}
+{% block page_subtitle %}{{ dashboard_data.subtitle }}{% endblock %}
+{% block content %}
+<style>
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin-bottom:22px}.dash-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:20px;box-shadow:0 4px 12px #0f172a08}.dash-label{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#64748b;font-weight:700}.dash-value{font-size:28px;color:#0f172a;font-weight:800;margin-top:10px}.dash-note{font-size:12px;color:#64748b;margin-top:6px}.dash-links{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}.dash-link{display:flex;align-items:center;gap:13px;padding:18px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;text-decoration:none;color:#0f172a}.dash-link i{font-size:23px;color:#4f46e5}.dash-link strong{display:block;font-size:13px}.dash-link small{display:block;color:#64748b;margin-top:4px;font-size:11px}@media(max-width:600px){.dash-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.dash-card{padding:15px}.dash-value{font-size:23px}}
+</style>
+<div class="dash-grid">
+{% if dashboard_data.role == 'superadmin' %}
+  <div class="dash-card"><div class="dash-label">Companies</div><div class="dash-value">{{ dashboard_data.total_companies }}</div><div class="dash-note">All clients</div></div>
+  <div class="dash-card"><div class="dash-label">Work Sites</div><div class="dash-value">{{ dashboard_data.total_work_sites }}</div><div class="dash-note">Across all companies</div></div>
+  <div class="dash-card"><div class="dash-label">Buildings</div><div class="dash-value">{{ dashboard_data.total_buildings }}</div><div class="dash-note">Properties</div></div>
+  <div class="dash-card"><div class="dash-label">Floors</div><div class="dash-value">{{ dashboard_data.total_floors }}</div><div class="dash-note">All buildings</div></div>
+  <div class="dash-card"><div class="dash-label">Units</div><div class="dash-value">{{ dashboard_data.total_units }}</div><div class="dash-note">Flats, villas and offices</div></div>
+  <div class="dash-card"><div class="dash-label">Tenants</div><div class="dash-value">{{ dashboard_data.total_tenants }}</div><div class="dash-note">Registered tenants</div></div>
+{% elif dashboard_data.role == 'tenant' %}
+  <div class="dash-card"><div class="dash-label">Tenant Type</div><div class="dash-value" style="font-size:19px">{{ dashboard_data.tenant_type }}</div><div class="dash-note">{{ dashboard_data.unit_name }}</div></div>
+  <div class="dash-card"><div class="dash-label">Mobile Number</div><div class="dash-value" style="font-size:19px">{% if dashboard_data.tenant_dial_code %}{{ dashboard_data.tenant_dial_code }} {% endif %}{{ dashboard_data.tenant_mobile_number|default:'—' }}</div><div class="dash-note">Registered tenant contact</div></div>
+  <div class="dash-card"><div class="dash-label">Building</div><div class="dash-value" style="font-size:19px">{{ dashboard_data.building_name }}</div><div class="dash-note">{{ dashboard_data.company_name }}</div></div>
+  <div class="dash-card"><div class="dash-label">Allocated Units</div><div class="dash-value">{{ dashboard_data.total_allocated_units }}</div><div class="dash-note">{{ dashboard_data.allocated_unit_labels|default:'No active units allocated' }}</div></div>
+  <div class="dash-card"><div class="dash-label">Family Members</div><div class="dash-value">{{ dashboard_data.total_family_members }}</div><div class="dash-note">Members linked to your account</div></div>
+  <div class="dash-card"><div class="dash-label">Staff Members</div><div class="dash-value">{{ dashboard_data.total_staff_members }}</div><div class="dash-note">Active household staff records</div></div>
+{% elif dashboard_data.role == 'unit' %}
+  <div class="dash-card"><div class="dash-label">Unit</div><div class="dash-value" style="font-size:19px">{{ dashboard_data.unit_name }}</div><div class="dash-note">{{ dashboard_data.building_name }}</div></div>
+  <div class="dash-card"><div class="dash-label">Guest Requests</div><div class="dash-value">{{ dashboard_data.total_guests }}</div><div class="dash-note">Requests for this unit</div></div>
+  <div class="dash-card"><div class="dash-label">Pending Walk-in Requests</div><div class="dash-value">{{ dashboard_data.pending_guest_requests }}</div><div class="dash-note">Awaiting Unit acceptance</div></div>
+  <div class="dash-card"><div class="dash-label">Gate Passes</div><div class="dash-value">{{ dashboard_data.approved_guest_passes }}</div><div class="dash-note">Tenant-approved visits</div></div>
+{% else %}
+  <div class="dash-card"><div class="dash-label">Company</div><div class="dash-value" style="font-size:19px">{{ dashboard_data.company_name }}</div><div class="dash-note">Company administration</div></div>
+  <div class="dash-card"><div class="dash-label">Work Sites</div><div class="dash-value">{{ dashboard_data.total_work_sites }}</div><div class="dash-note">Your company</div></div>
+  <div class="dash-card"><div class="dash-label">Buildings</div><div class="dash-value">{{ dashboard_data.total_buildings }}</div><div class="dash-note">Your company</div></div>
+  <div class="dash-card"><div class="dash-label">Floors</div><div class="dash-value">{{ dashboard_data.total_floors }}</div><div class="dash-note">Your company</div></div>
+  <div class="dash-card"><div class="dash-label">Units</div><div class="dash-value">{{ dashboard_data.total_units }}</div><div class="dash-note">Your company</div></div>
+  <div class="dash-card"><div class="dash-label">Tenants</div><div class="dash-value">{{ dashboard_data.total_tenants }}</div><div class="dash-note">Your company</div></div>
+{% endif %}
+</div>
+<div class="dash-links">
+{% if dashboard_data.role == 'superadmin' %}
+  <a class="dash-link" href="{% url 'company_list' %}"><i class="ph ph-buildings"></i><span><strong>Companies / Clients</strong><small>Create and manage client accounts</small></span></a>
+  <a class="dash-link" href="{% url 'work_site_list' %}"><i class="ph ph-map-pin"></i><span><strong>Work Sites</strong><small>Manage company locations</small></span></a>
+  <a class="dash-link" href="{% url 'building_list' %}"><i class="ph ph-building"></i><span><strong>Buildings</strong><small>Manage properties</small></span></a>
+  <a class="dash-link" href="{% url 'tenant_list' %}"><i class="ph ph-user"></i><span><strong>Tenants</strong><small>Manage tenants and unit assignments</small></span></a>
+{% elif dashboard_data.role == 'tenant' %}
+  <a class="dash-link" href="{% url 'my_family_members' %}"><i class="ph ph-users-three"></i><span><strong>Family Members</strong><small>Manage family contact details and assigned unit</small></span></a>
+  <a class="dash-link" href="{% url 'my_staff_members' %}"><i class="ph ph-identification-card"></i><span><strong>Staff Members</strong><small>Manage staff contact details and assigned unit</small></span></a>{% elif dashboard_data.role == 'unit' %}
+  <a class="dash-link" href="{% url 'guest_visit_list' %}"><i class="ph ph-users"></i><span><strong>Guest Requests & Gate Passes</strong><small>View advance requests and accept walk-in requests</small></span></a>
+  <a class="dash-link" href="{% url 'guest_visit_create' %}"><i class="ph ph-user-plus"></i><span><strong>Create Advance Guest Request</strong><small>Send a guest request to the Tenant</small></span></a>
+{% else %}
+  <a class="dash-link" href="{% url 'company_detail' request.user.company_staff.company.pk %}"><i class="ph ph-buildings"></i><span><strong>My Company</strong><small>View company details</small></span></a>
+  <a class="dash-link" href="{% url 'work_site_list' %}"><i class="ph ph-map-pin"></i><span><strong>Work Sites</strong><small>Manage company sites</small></span></a>
+  <a class="dash-link" href="{% url 'building_list' %}"><i class="ph ph-building"></i><span><strong>Buildings</strong><small>Manage company buildings</small></span></a>
+  <a class="dash-link" href="{% url 'floor_list' %}"><i class="ph ph-stack"></i><span><strong>Floors</strong><small>Manage floors</small></span></a>
+  <a class="dash-link" href="{% url 'unit_list' %}"><i class="ph ph-door"></i><span><strong>Units</strong><small>Manage units</small></span></a>
+  <a class="dash-link" href="{% url 'tenant_list' %}"><i class="ph ph-user"></i><span><strong>Tenants</strong><small>Manage company tenants</small></span></a>{% endif %}
+</div>
+{% if dashboard_data.role == 'unit' %}
+<div class="dash-card" style="margin-top:18px"><div class="dash-label">Approved Guest Gate Passes</div><div style="margin-top:12px;overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr><th style="text-align:left;padding:9px;border-bottom:1px solid #e2e8f0">Guest</th><th style="text-align:left;padding:9px;border-bottom:1px solid #e2e8f0">Tenant</th><th style="text-align:left;padding:9px;border-bottom:1px solid #e2e8f0">Entry Number</th><th style="text-align:left;padding:9px;border-bottom:1px solid #e2e8f0">Visit Date</th><th style="padding:9px;border-bottom:1px solid #e2e8f0"></th></tr></thead><tbody>{% for visit in dashboard_data.unit_gate_passes %}<tr><td style="padding:9px;border-bottom:1px solid #f1f5f9">{{ visit.guest_name }}</td><td style="padding:9px;border-bottom:1px solid #f1f5f9">{{ visit.tenant.full_name }}</td><td style="padding:9px;border-bottom:1px solid #f1f5f9">{{ visit.gate_pass_code }}</td><td style="padding:9px;border-bottom:1px solid #f1f5f9">{{ visit.visit_date }}</td><td style="padding:9px;border-bottom:1px solid #f1f5f9"><a href="{% url 'guest_visit_gate_pass' visit.pk %}">View Pass</a></td></tr>{% empty %}<tr><td colspan="5" style="padding:14px;color:#64748b">No approved Gate Passes yet.</td></tr>{% endfor %}</tbody></table></div></div>
+{% endif %}
+{% endblock %}

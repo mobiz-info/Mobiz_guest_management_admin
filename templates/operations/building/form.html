@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_subtitle %}Configure property details based on the building type{% endblock %}
+{% block content %}
+<style>
+.op-form-wrap{max-width:780px;margin:0 auto}.op-form-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;box-shadow:0 8px 24px #0f172a0f}.op-form-title{padding:17px 20px;background:linear-gradient(135deg,#eff6ff,#fff);border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;font-weight:800;color:#1e293b}.op-form-title i{color:#2563eb;font-size:20px}.op-form-body{padding:22px}.op-section-title{display:flex;align-items:center;gap:8px;color:#1e293b;font-size:12px;font-weight:800;text-transform:uppercase;padding-bottom:9px;margin:5px 0 15px;border-bottom:1px solid #e2e8f0}.op-section-title i{color:#2563eb}.op-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 18px}.op-field{margin-bottom:16px;min-width:0}.op-field.full{grid-column:1/-1}.op-field label{display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:7px}.op-field input:not([type="checkbox"]),.op-field select,.op-field textarea{width:100%;box-sizing:border-box;min-height:41px;padding:9px 12px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:#0f172a;font-family:inherit;font-size:13px}.op-field textarea{min-height:75px;resize:vertical}.op-field input:focus,.op-field select:focus,.op-field textarea:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px #3b82f61a}.op-check input{width:16px;min-width:16px;min-height:16px;padding:0;accent-color:#2563eb}.op-error{color:#dc2626;font-size:11px;margin-top:5px}.op-error-box{background:#fef2f2;border:1px solid #fecaca;color:#b91c1c;padding:10px 12px;border-radius:8px;margin-bottom:16px;font-size:12px}.op-check{display:flex!important;align-items:center;gap:9px;background:#f8fafc;padding:12px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px!important}.op-actions{display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #e2e8f0;padding-top:18px;margin-top:20px}.op-actions a,.op-actions button{min-height:38px;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0 15px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:800;cursor:pointer}.op-cancel{background:#fff;border:1px solid #cbd5e1;color:#475569}.op-save{background:#2563eb;border:1px solid #2563eb;color:#fff}.type-note{font-size:11px;color:#64748b;margin:-3px 0 15px}.hidden-section{display:none!important} .op-phone-wrap{display:flex;width:100%}.op-dial-code{display:flex;align-items:center;justify-content:center;min-width:64px;padding:0 9px;border:1px solid #cbd5e1;border-right:0;border-radius:8px 0 0 8px;background:#f8fafc;color:#334155;font-size:12px;font-weight:800}.op-phone-wrap input{border-radius:0 8px 8px 0 !important;flex:1}.op-phone-wrap:focus-within .op-dial-code{border-color:#3b82f6;background:#eff6ff;color:#1d4ed8}@media(max-width:600px){.op-form-body{padding:15px}.op-grid{grid-template-columns:1fr;gap:0}.op-actions{flex-direction:column-reverse}.op-actions a,.op-actions button{width:100%}}
+
+
+/* Shared compact premium form sizing for Operations templates */
+.content-area [class*="-form-wrap"] { width:100%; max-width:720px !important; min-width:0; margin-left:auto !important; margin-right:auto !important; }
+.content-area [class*="-form-card"] { border-radius:12px !important; box-shadow:0 6px 22px rgba(15,23,42,.06) !important; }
+.content-area [class*="-form-title"] { padding:13px 17px !important; font-size:14px !important; }
+.content-area [class*="-form-body"] { padding:17px !important; }
+.content-area [class*="-field"] { margin-bottom:12px !important; }
+.content-area [class*="-field"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.content-area [class*="-field"] select,
+.content-area [class*="-field"] textarea,
+.content-area .tenant-field input:not([type="checkbox"]),
+.content-area .tenant-field select,
+.content-area .tenant-field textarea {
+    min-height:37px; padding:8px 10px; border-radius:8px; font-size:12px;
+}
+.content-area [class*="-field"] textarea { min-height:62px; }
+.content-area [class*="-actions"] { margin-top:15px !important; padding-top:13px !important; gap:8px !important; }
+.content-area [class*="-actions"] a,
+.content-area [class*="-actions"] button { min-height:36px !important; padding:0 13px !important; border-radius:8px !important; font-size:11px !important; }
+.content-area [class*="-save"] { background:linear-gradient(135deg,#6366f1,#4f46e5) !important; border-color:#4f46e5 !important; color:#fff !important; }
+.content-area [class*="-save"]:hover { background:#4338ca !important; }
+.content-area .tenant-form-wrap { max-width:760px !important; }
+.content-area .tenant-grid { gap:11px 14px !important; }
+.content-area .unit-check-grid { gap:7px !important; }
+.content-area .unit-option { padding:9px !important; border-radius:8px !important; }
+@media(max-width:600px) {
+    .content-area [class*="-form-body"] { padding:13px !important; }
+    .content-area [class*="-form-wrap"] { max-width:100% !important; }
+}
+
+</style>
+<div class="op-form-wrap"><div class="op-form-card"><div class="op-form-title"><i class="ph ph-buildings"></i>{{ title }}</div><div class="op-form-body"><form method="post">{% csrf_token %}
+{% if non_field_errors %}<div class="op-error-box">{% for error in non_field_errors %}{{ error }}{% endfor %}</div>{% endif %}
+<div class="op-section-title"><i class="ph ph-buildings"></i>Property Information</div><div class="op-grid">
+{% if request.user.is_superuser %}<div class="op-field"><label for="id_company">Company / Client *</label><select name="company" id="id_company" required><option value="">Select Company</option>{% for item in companies %}<option value="{{ item.pk }}" data-dial-code="{{ item.country.dial_code|default:'' }}" {% if values.company == item.pk|stringformat:"s" %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select>{% for error in errors.company %}<div class="op-error">{{ error }}</div>{% endfor %}</div>{% else %}<div class="op-field"><label>Company / Client</label><input value="{{ company.name }}" disabled></div>{% endif %}
+<div class="op-field"><label for="id_work_site">Work Site *</label><select name="work_site" id="id_work_site" required><option value="">Select Work Site</option>{% for site in work_sites %}<option value="{{ site.pk }}" data-company="{{ site.company_id }}" {% if values.work_site == site.pk|stringformat:"s" %}selected{% endif %}>{{ site.name }}</option>{% endfor %}</select>{% for error in errors.work_site %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field"><label for="id_name">Building / Property Name *</label><input type="text" name="name" id="id_name" maxlength="200" value="{{ values.name|default:'' }}" placeholder="Tower 1, Indigo A, Villa Group" required>{% for error in errors.name %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field"><label for="id_building_type_master">Building Type *</label><select name="building_type_master" id="id_building_type_master" required><option value="">Select Building Type</option>{% for item in building_types %}<option value="{{ item.pk }}" data-code="{{ item.code }}" {% if values.building_type_master == item.pk|stringformat:"s" or not values.building_type_master and item.name == 'Apartment' %}selected{% endif %}>{{ item.name }}</option>{% endfor %}</select>{% for error in errors.building_type_master %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field full"><label for="id_address">Building Address <span style="color:#dc2626">*</span></label><textarea name="address" id="id_address" placeholder="Building address" required>{{ values.address|default:'' }}</textarea>{% for error in errors.address %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field full"><label for="id_location">Location <span style="color:#dc2626">*</span></label><input name="location" id="id_location" maxlength="255" value="{{ values.location|default:'' }}" placeholder="City, area or location details" required>{% for error in errors.location %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+</div>
+<div class="op-section-title"><i class="ph ph-list-numbers"></i>Building Type Details</div><p class="type-note">Enter the expected floor and unit counts. Unit records will be limited to these configured counts.</p>
+<div class="op-grid">
+<div class="op-field" id="floors-field"><label for="id_number_of_floors">Number of Floors</label><input type="number" min="0" name="number_of_floors" id="id_number_of_floors" value="{{ values.number_of_floors|default:'0' }}">{% for error in errors.number_of_floors %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field type-apartment"><label for="id_number_of_flats">Number of Flats / Units</label><input type="number" min="0" name="number_of_flats" id="id_number_of_flats" value="{{ values.number_of_flats|default:'0' }}">{% for error in errors.number_of_flats %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field type-villa"><label for="id_number_of_villas">Number of Villas</label><input type="number" min="0" name="number_of_villas" id="id_number_of_villas" value="{{ values.number_of_villas|default:'0' }}">{% for error in errors.number_of_villas %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field office-count-field"><label id="office-count-label" for="id_number_of_office_units">Number of Office Units</label><input type="number" min="0" name="number_of_office_units" id="id_number_of_office_units" value="{{ values.number_of_office_units|default:'0' }}">{% for error in errors.number_of_office_units %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field other-count-field"><label for="id_number_of_other_units">Number of Other Units</label><input type="number" min="0" name="number_of_other_units" id="id_number_of_other_units" value="{{ values.number_of_other_units|default:'0' }}">{% for error in errors.number_of_other_units %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+<div class="op-field type-other"><label for="id_other_type_name">Other Building Type / Name *</label><input type="text" name="other_type_name" id="id_other_type_name" maxlength="100" value="{{ values.other_type_name|default:'' }}" placeholder="Specify property type">{% for error in errors.other_type_name %}<div class="op-error">{{ error }}</div>{% endfor %}</div>
+
+</div>
+<div class="op-field" style="margin-top:8px"><label class="op-check"><input type="checkbox" name="status" {% if values.status == 'True' or values.status == 'on' %}checked{% endif %}> Active Status</label></div>
+<div class="op-actions"><a class="op-cancel" href="{% url 'building_list' %}"><i class="ph ph-x"></i> Cancel</a><button class="op-save" type="submit"><i class="ph ph-check"></i>{% if is_edit %}Update Building{% else %}Save Building{% endif %}</button></div>
+</form></div></div></div>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+ const type=document.getElementById('id_building_type_master'), otherName=document.getElementById('id_other_type_name');
+ function showType(){const t=type.options[type.selectedIndex]?.dataset.code || 'apartment';otherName.required=t==='other';document.querySelectorAll('.type-apartment,.type-villa,.type-office,.type-other').forEach(el=>el.classList.add('hidden-section'));document.querySelectorAll('.type-'+t).forEach(el=>el.classList.remove('hidden-section'));document.querySelector('.office-count-field').classList.toggle('hidden-section',!(t==='office'||t==='apartment'));document.querySelector('.other-count-field').classList.toggle('hidden-section',!(t==='other'||t==='apartment'));document.getElementById('office-count-label').textContent=t==='apartment'?'Number of Offices (if applicable)':'Number of Office Units';document.getElementById('floors-field').classList.toggle('hidden-section',t==='villa');}
+ type.addEventListener('change',showType);showType();
+ const company=document.getElementById('id_company'),site=document.getElementById('id_work_site');
+ if(company&&site){company.addEventListener('change',async function(){site.innerHTML='<option value="">Select Work Site</option>';if(!this.value)return;try{const r=await fetch('/work-site-options/?company='+encodeURIComponent(this.value));const items=await r.json();items.forEach(x=>{const o=document.createElement('option');o.value=x.id;o.textContent=x.name;site.appendChild(o);});}catch(e){console.error(e);}});}
+});
+</script>
+{% endblock %}

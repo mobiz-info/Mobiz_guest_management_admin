@@ -1,0 +1,891 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Buildings - Guest Management{% endblock %}
+{% block page_title %}Buildings / Properties{% endblock %}
+{% block page_subtitle %}Manage buildings and building-type-specific details{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   BUILDINGS LIST - MATCHES WORK SITES DESIGN
+========================================================= */
+
+.building-page {
+    width: 1230px;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.building-card {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    background: #fff;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+}
+
+/* TOOLBAR */
+
+.building-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.building-search-form {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 620px;
+    min-width: 0;
+}
+
+.building-search-input {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 13px;
+    box-sizing: border-box;
+}
+
+.building-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.building-search-input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+/* SEARCH AND CLEAR BUTTONS */
+
+.building-search-btn,
+.building-clear-btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.building-search-btn:hover,
+.building-clear-btn:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+/* ADD BUILDING / MY BUILDING BUTTON */
+
+.building-create-btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 16px;
+    border: 1px solid #16a34a !important;
+    border-radius: 8px;
+    background: #16a34a !important;
+    color: #fff !important;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.18s ease, border-color 0.18s ease;
+}
+
+.building-create-btn:hover,
+.building-create-btn:focus-visible {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #fff !important;
+}
+
+.building-create-btn:focus-visible {
+    outline: 3px solid rgba(22, 163, 74, 0.2);
+    outline-offset: 2px;
+}
+
+/* TABLE WRAPPER */
+
+.building-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.building-table {
+    width: 100%;
+    min-width: 1050px;
+    table-layout: fixed;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+/* TABLE COLUMN WIDTHS */
+
+.building-table th:nth-child(1),
+.building-table td:nth-child(1) {
+    width: 4%;
+}
+
+.building-table th:nth-child(2),
+.building-table td:nth-child(2) {
+    width: 13%;
+}
+
+.building-table th:nth-child(3),
+.building-table td:nth-child(3) {
+    width: 10%;
+}
+
+.building-table th:nth-child(4),
+.building-table td:nth-child(4) {
+    width: 11%;
+}
+
+.building-table th:nth-child(5),
+.building-table td:nth-child(5) {
+    width: 11%;
+}
+
+.building-table th:nth-child(6),
+.building-table td:nth-child(6) {
+    width: 13%;
+}
+
+.building-table th:nth-child(7),
+.building-table td:nth-child(7) {
+    width: 12%;
+}
+
+.building-table th:nth-child(8),
+.building-table td:nth-child(8) {
+    width: 6%;
+}
+
+.building-table th:nth-child(9),
+.building-table td:nth-child(9) {
+    width: 10%;
+}
+
+.building-table th:nth-child(10),
+.building-table td:nth-child(10) {
+    width: 5%;
+}
+
+.building-table th:nth-child(11),
+.building-table td:nth-child(11) {
+    width: 15%;
+}
+
+/* TABLE HEADINGS */
+
+.building-table thead th {
+    padding: 12px 6px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+    text-align: center;
+    text-transform: uppercase;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+/* TABLE CONTENT */
+
+.building-table tbody td {
+    padding: 13px 6px;
+    border-bottom: 1px solid #edf1f7;
+    color: #334155;
+    font-size: 12px;
+    text-align: center;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+    line-height: 1.6;
+}
+
+.building-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.building-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* SERIAL NUMBER */
+
+.building-serial {
+    color: #64748b !important;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+/* BUILDING NAME AND ICON */
+
+.building-name-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+    min-width: 0;
+    text-align: left;
+}
+
+.building-name-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 17px;
+}
+
+.building-name {
+    flex: 1;
+    min-width: 0;
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+    text-align: left;
+}
+
+/* COMPANY AND WORK SITE */
+
+.building-company,
+.building-worksite {
+    color: #334155;
+    font-size: 12px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.building-muted {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+/* ADDRESS AND LOCATION */
+
+.building-address,
+.building-location {
+    width: 100%;
+    min-width: 0;
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.7;
+    overflow-wrap: anywhere;
+}
+
+/* STATUS */
+
+.building-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 5px 8px;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.building-status-inactive {
+    border-color: #fecaca;
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+/* ACTION BUTTONS */
+
+.building-actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: nowrap;
+    width: 100%;
+    min-width: 0;
+    white-space: nowrap;
+}
+
+.building-actions form {
+    margin: 0;
+}
+
+.building-action-btn {
+    min-height: 30px;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 7px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.building-edit-btn {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.building-edit-btn:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.building-delete-btn {
+    border-color: #fecdd3;
+    background: #fff1f2;
+    color: #be123c;
+}
+
+.building-delete-btn:hover {
+    background: #ffe4e6;
+    color: #9f1239;
+}
+
+/* EMPTY STATE */
+
+.building-empty {
+    padding: 45px 12px !important;
+    text-align: center !important;
+}
+
+.building-empty-icon {
+    display: block;
+    margin-bottom: 12px;
+    color: #94a3b8;
+    font-size: 34px;
+}
+
+.building-empty-title {
+    margin-bottom: 6px;
+    color: #334155;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.building-empty-text {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+/* PAGINATION */
+
+.building-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.building-pagination-info {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.building-pagination-info strong {
+    color: #0f172a;
+}
+
+.building-pagination-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.building-page-btn,
+.building-page-current {
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #475569;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.building-page-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+.building-page-current {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 1200px) {
+    .building-table thead th {
+        padding: 10px 4px;
+        font-size: 10px;
+    }
+
+    .building-table tbody td {
+        padding: 10px 4px;
+        font-size: 11px;
+    }
+
+    .building-action-btn {
+        min-height: 28px;
+        padding: 0 5px;
+        font-size: 10px;
+    }
+
+    .building-actions {
+        gap: 3px;
+    }
+}
+
+@media (max-width: 700px) {
+    .building-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .building-search-form {
+        max-width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .building-search-input {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+    .building-search-btn,
+    .building-clear-btn {
+        flex: 1;
+    }
+
+    .building-create-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .building-pagination {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .building-pagination-links {
+        justify-content: flex-start;
+    }
+
+    .building-actions {
+        flex-wrap: wrap;
+    }
+}
+</style>
+
+<div class="building-page">
+    <div class="building-card">
+
+        <!-- SEARCH TOOLBAR -->
+        <div class="building-toolbar">
+
+            <form
+                method="get"
+                action="{% url 'building_list' %}"
+                class="building-search-form"
+            >
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search|default:'' }}"
+                    placeholder="Search building, address, location, company or work site..."
+                    class="building-search-input"
+                    aria-label="Search buildings"
+                >
+
+                <button type="submit" class="building-search-btn">
+                    <i class="ph ph-magnifying-glass"></i>
+                    Search
+                </button>
+
+                {% if search %}
+                    <a
+                        href="{% url 'building_list' %}"
+                        class="building-clear-btn"
+                    >
+                        <i class="ph ph-x"></i>
+                        Clear
+                    </a>
+                {% endif %}
+            </form>
+
+            {% if not is_building_staff %}
+                <a
+                    href="{% url 'building_create' %}"
+                    class="building-create-btn"
+                >
+                    <i class="ph-bold ph-plus"></i>
+                    Add Building
+                </a>
+            {% else %}
+                <a
+                    href="{% url 'my_building' %}"
+                    class="building-create-btn"
+                >
+                    <i class="ph ph-eye"></i>
+                    My Building
+                </a>
+            {% endif %}
+
+        </div>
+
+        <!-- BUILDINGS TABLE -->
+        <div class="building-table-wrapper">
+
+            <table class="building-table">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Building</th>
+                        <th>Type</th>
+                        <th>Company</th>
+                        <th>Work Site</th>
+                        <th>Address</th>
+                        <th>Location</th>
+                        <th>Floors</th>
+                        <th>Units</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in page_obj %}
+                        <tr>
+
+                            <td class="building-serial">
+                                {{ page_obj.start_index|add:forloop.counter0 }}
+                            </td>
+
+                            <td>
+                                <div class="building-name-wrapper">
+                                    <div class="building-name-icon">
+                                        <i class="ph ph-buildings"></i>
+                                    </div>
+
+                                    <div class="building-name">
+                                        {{ item.name }}
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                {% if item.building_type_master %}
+                                    {{ item.building_type_master.name }}
+                                {% else %}
+                                    {{ item.get_building_type_display|default:"—" }}
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="building-company">
+                                    {% if item.company %}
+                                        {{ item.company.name }}
+                                    {% else %}
+                                        <span class="building-muted">—</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="building-worksite">
+                                    {% if item.work_site %}
+                                        {{ item.work_site.name }}
+                                    {% else %}
+                                        <span class="building-muted">—</span>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <td>
+                                {% if item.address %}
+                                    <div
+                                        class="building-address"
+                                        title="{{ item.address }}"
+                                    >
+                                        {{ item.address|truncatechars:100 }}
+                                    </div>
+                                {% else %}
+                                    <span class="building-muted">
+                                        Address not provided
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if item.location %}
+                                    <div class="building-location">
+                                        {{ item.location }}
+                                    </div>
+                                {% else %}
+                                    <span class="building-muted">—</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {{ item.number_of_floors }}
+                            </td>
+
+                            <td>
+                                {% if item.building_type == 'apartment' %}
+                                    {{ item.number_of_flats }} flats /
+                                    {{ item.number_of_office_units }} offices /
+                                    {{ item.number_of_other_units }} other
+
+                                {% elif item.building_type == 'villa' %}
+                                    {{ item.number_of_villas }} villas
+
+                                {% elif item.building_type == 'office' %}
+                                    {{ item.number_of_office_units }} offices
+
+                                {% else %}
+                                    {{ item.number_of_other_units }} units
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if item.status %}
+                                    <span class="building-status">
+                                        <i class="ph-fill ph-check-circle"></i>
+                                        Active
+                                    </span>
+                                {% else %}
+                                    <span class="building-status building-status-inactive">
+                                        <i class="ph-fill ph-x-circle"></i>
+                                        Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <div class="building-actions">
+
+                                    {% if not is_building_staff %}
+
+                                        <a
+                                            href="{% url 'building_edit' item.pk %}"
+                                            class="building-action-btn building-edit-btn"
+                                            title="Edit Building"
+                                        >
+                                            <i class="ph ph-pencil-simple"></i>
+                                            Edit
+                                        </a>
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'building_delete' item.pk %}"
+                                            onsubmit="return confirm('Delete this building and its floors and units?');"
+                                        >
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="building-action-btn building-delete-btn"
+                                                title="Delete Building"
+                                            >
+                                                <i class="ph ph-trash"></i>
+                                                Delete
+                                            </button>
+                                        </form>
+
+                                    {% else %}
+
+                                        <a
+                                            href="{% url 'my_building' %}"
+                                            class="building-action-btn building-edit-btn"
+                                            title="View Building"
+                                        >
+                                            <i class="ph ph-eye"></i>
+                                            View
+                                        </a>
+
+                                    {% endif %}
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+                            <td colspan="11" class="building-empty">
+
+                                <i class="ph ph-buildings building-empty-icon"></i>
+
+                                <div class="building-empty-title">
+                                    No buildings found
+                                </div>
+
+                                <div class="building-empty-text">
+                                    {% if search %}
+                                        No buildings match "{{ search }}".
+                                        Try another search term.
+                                    {% else %}
+                                        No building records are available.
+                                    {% endif %}
+                                </div>
+
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+        <!-- PAGINATION -->
+        {% if page_obj.paginator.num_pages > 1 %}
+
+            <div class="building-pagination">
+
+                <div class="building-pagination-info">
+                    Page
+                    <strong>{{ page_obj.number }}</strong>
+                    of
+                    <strong>{{ page_obj.paginator.num_pages }}</strong>
+                    · Showing
+                    {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                    of
+                    {{ page_obj.paginator.count }}
+                </div>
+
+                <div class="building-pagination-links">
+
+                    {% if page_obj.has_previous %}
+
+                        <a
+                            href="?page=1{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="building-page-btn"
+                        >
+                            <i class="ph ph-caret-double-left"></i>
+                            First
+                        </a>
+
+                        <a
+                            href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="building-page-btn"
+                        >
+                            <i class="ph ph-caret-left"></i>
+                            Previous
+                        </a>
+
+                    {% endif %}
+
+                    <span class="building-page-current">
+                        {{ page_obj.number }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+
+                        <a
+                            href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="building-page-btn"
+                        >
+                            Next
+                            <i class="ph ph-caret-right"></i>
+                        </a>
+
+                        <a
+                            href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="building-page-btn"
+                        >
+                            Last
+                            <i class="ph ph-caret-double-right"></i>
+                        </a>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block title %}ID Card / NFC Tag Master - Guest Management{% endblock %}
+
+{% block page_title %}ID Card / NFC Tag Master{% endblock %}
+
+{% block page_subtitle %}Manage Dynamic ID Cards and Predefined NFC / ID Tags{% endblock %}
+
+{% block content %}
+<style>
+.id-master-page{width:100%;max-width:1100px;margin:0 auto}.id-master-card{background:#fff;border:1px solid #dbe3ef;border-radius:15px;overflow:hidden;box-shadow:0 10px 28px rgba(15,23,42,.06),0 2px 6px rgba(15,23,42,.03)}
+.id-master-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 17px;background:linear-gradient(135deg,#eff6ff 0%,#fff 75%);border-bottom:1px solid #e2e8f0}.id-master-filters{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.id-input,.id-select{height:36px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;padding:0 10px;color:#0f172a;font-size:12px;outline:none}.id-input{width:230px}.id-select{min-width:145px}.id-input:focus,.id-select:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.08)}.id-btn{height:36px;border-radius:8px;padding:0 13px;display:inline-flex;align-items:center;gap:7px;text-decoration:none;font-size:12px;font-weight:800;border:1px solid #28a745;background:#28a745;color:#fff}.id-btn:hover{background:#218838;color:#fff}.id-filter{border:1px solid #cbd5e1;background:#fff;color:#475569}.id-filter:hover{background:#f8fafc;color:#1e293b}
+.id-table-wrap{padding:15px 17px 5px;overflow-x:auto}.id-table{width:100%;min-width:900px;border-collapse:separate;border-spacing:0;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}.id-table thead{background:linear-gradient(180deg,#f8fafc,#f1f5f9)}.id-table th{height:42px;padding:0 12px;text-align:left;color:#475569;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid #e2e8f0;white-space:nowrap}.id-table td{height:50px;padding:7px 12px;border-bottom:1px solid #eef2f7;color:#334155;font-size:12px;vertical-align:middle}.id-table tbody tr:last-child td{border-bottom:0}.id-table tbody tr:hover{background:#f8fafc}.badge{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;font-size:10px;font-weight:800;white-space:nowrap}.type-dynamic{background:#ede9fe;color:#6d28d9}.type-predefined{background:#dbeafe;color:#1d4ed8}.s-available{background:#dcfce7;color:#166534}.s-issued{background:#fef3c7;color:#92400e}.s-returned{background:#e0f2fe;color:#075985}.s-lost{background:#fee2e2;color:#991b1b}.s-damaged{background:#f1f5f9;color:#475569}.id-actions{display:flex;gap:6px}.act{display:inline-flex;align-items:center;justify-content:center;width:31px;height:31px;border-radius:7px;border:1px solid #dbe3ef;text-decoration:none;color:#475569;background:#fff}.act:hover{background:#f8fafc;color:#2563eb}.act.delete:hover{color:#dc2626}.empty{text-align:center;padding:35px!important;color:#94a3b8!important}.master-note{padding:10px 17px 15px;color:#64748b;font-size:11px}.master-note strong{color:#334155}
+@media(max-width:760px){.id-master-header{align-items:stretch;flex-direction:column}.id-input{width:100%}.id-select{flex:1}}
+</style>
+
+<div class="id-master-page">
+    <div class="id-master-card">
+        <div class="id-master-header">
+            <form method="get" class="id-master-filters">
+                <input class="id-input" type="search" name="q" value="{{ query }}" placeholder="Search card, tag, NFC, building...">
+                <select class="id-select" name="tag_type">
+                    <option value="">All Card Types</option>
+                    {% for value,label in type_choices %}<option value="{{ value }}" {% if tag_type == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+                <select class="id-select" name="status">
+                    <option value="">All Status</option>
+                    {% for value,label in status_choices %}<option value="{{ value }}" {% if status == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+                <button class="id-btn id-filter" type="submit"><i class="ph ph-magnifying-glass"></i> Filter</button>
+                {% if query or tag_type or status %}<a class="id-btn id-filter" href="{% url 'id_tag_master_list' %}"><i class="ph ph-x"></i> Clear</a>{% endif %}
+            </form>
+            <a class="id-btn" href="{% url 'id_tag_master_create' %}"><i class="ph ph-plus"></i> Add Card / Tag</a>
+        </div>
+
+        <div class="id-table-wrap">
+            <table class="id-table">
+                <thead><tr><th>#</th><th>Card / Tag Number</th><th>NFC Number</th><th>Type</th><th>Building</th><th>Status</th><th>Notes</th><th>Actions</th></tr></thead>
+                <tbody>
+                {% for tag in tags %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td><strong>{{ tag.tag_number }}</strong></td>
+                        <td>{{ tag.nfc_number|default:'—' }}</td>
+                        <td><span class="badge {% if tag.tag_type == 'dynamic' %}type-dynamic{% else %}type-predefined{% endif %}">{{ tag.get_tag_type_display }}</span></td>
+                        <td>{% if tag.building %}{{ tag.building.name }}{% else %}—{% endif %}</td>
+                        <td><span class="badge s-{{ tag.status }}">{{ tag.get_status_display }}</span></td>
+                        <td>{{ tag.notes|default:'—' }}</td>
+                        <td><div class="id-actions"><a class="act" href="{% url 'id_tag_master_edit' tag.pk %}" title="Edit"><i class="ph ph-pencil-simple"></i></a><form method="post" action="{% url 'id_tag_master_delete' tag.pk %}" onsubmit="return confirm('Delete this card/tag?');">{% csrf_token %}<button class="act delete" type="submit" title="Delete"><i class="ph ph-trash"></i></button></form></div></td>
+                    </tr>
+                {% empty %}
+                    <tr><td class="empty" colspan="8">No ID cards or NFC / ID tags found.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="master-note"><strong>Workflow:</strong> Dynamic ID Cards are generated by the system when required. Predefined NFC / ID Tags are registered here and allocated to a building. Issuing and returning are handled from the Guest Visit workflow.</div>
+    </div>
+</div>
+{% endblock %}

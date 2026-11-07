@@ -1,0 +1,687 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Tenant Staff Members{% endblock %}
+
+{% block page_title %}
+    {% if self_service %}Staff Members{% else %}Tenant Staff Members{% endif %}
+{% endblock %}
+
+{% block page_subtitle %}
+    {% if self_service %}
+        Manage household or domestic staff linked to your tenancy
+    {% else %}
+        Manage staff records for {{ tenant.full_name }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+/* ==========================================
+   TENANT STAFF MEMBERS
+   COMPANY LIST TOOLBAR STYLE
+========================================== */
+
+.staff-page {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0 auto;
+}
+
+.staff-card {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    background: #fff;
+    border: 1px solid #dbe3ef;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+}
+
+/* TOOLBAR */
+
+.staff-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* SEARCH */
+
+.staff-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 500px;
+    min-width: 0;
+    margin: 0;
+}
+
+.staff-search input {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #fff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.staff-search input::placeholder {
+    color: #94a3b8;
+}
+
+.staff-search input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.10);
+}
+
+/* SEARCH / CLEAR BUTTONS */
+
+.staff-search-btn,
+.staff-clear-btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.staff-search-btn:hover,
+.staff-clear-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+/* ADD STAFF BUTTON */
+
+.staff-create-btn {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 16px;
+    border: 1px solid #16a34a;
+    border-radius: 8px;
+    background: #16a34a;
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+    white-space: nowrap;
+    transition: background 0.18s ease;
+    flex-shrink: 0;
+}
+
+.staff-create-btn:hover {
+    background: #15803d;
+    border-color: #15803d;
+    color: #fff;
+}
+
+/* TABLE */
+
+.staff-table-wrapper {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+.staff-table {
+    width: 100%;
+    min-width: 1050px;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.staff-table thead th {
+    padding: 12px 12px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: left;
+    text-transform: uppercase;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.staff-table tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #edf1f7;
+    color: #334155;
+    font-size: 12px;
+    line-height: 1.5;
+    vertical-align: middle;
+    overflow-wrap: anywhere;
+}
+
+.staff-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.staff-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* STAFF NAME */
+
+.staff-name {
+    color: #0f172a !important;
+    font-weight: 800;
+}
+
+/* STATUS */
+
+.staff-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 5px 8px;
+    border: 1px solid #bbf7d0;
+    border-radius: 6px;
+    background: #dcfce7;
+    color: #166534;
+    font-size: 10px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.staff-status.inactive {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+/* ACTIONS */
+
+.staff-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+}
+
+.staff-actions form {
+    margin: 0;
+}
+
+.staff-actions a,
+.staff-actions button {
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 9px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.staff-edit {
+    background: #eff6ff;
+    border-color: #bfdbfe !important;
+    color: #2563eb;
+}
+
+.staff-edit:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.staff-delete {
+    background: #fff1f2;
+    border-color: #fecdd3 !important;
+    color: #be123c;
+}
+
+.staff-delete:hover {
+    background: #ffe4e6;
+    color: #9f1239;
+}
+
+/* EMPTY STATE */
+
+.staff-empty {
+    padding: 45px 12px !important;
+    text-align: center !important;
+    color: #94a3b8 !important;
+}
+
+/* PAGINATION */
+
+.staff-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.staff-pagination-info {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.staff-pagination-info strong {
+    color: #0f172a;
+}
+
+.staff-pagination-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.staff-page-btn,
+.staff-page-current {
+    min-height: 32px;
+    min-width: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 0 9px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #475569;
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.staff-page-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
+}
+
+.staff-page-current {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 700px) {
+    .staff-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 12px;
+    }
+
+    .staff-search {
+        max-width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .staff-search input {
+        width: 100%;
+        flex-basis: 100%;
+    }
+
+    .staff-search-btn,
+    .staff-clear-btn {
+        flex: 1;
+    }
+
+    .staff-create-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .staff-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px;
+    }
+
+    .staff-pagination-links {
+        justify-content: flex-start;
+    }
+}
+</style>
+
+
+<div class="staff-page">
+    <div class="staff-card">
+
+        <!-- SEARCH TOOLBAR -->
+
+        <div class="staff-toolbar">
+
+            <form
+                method="get"
+                action="{% if self_service %}{% url 'my_staff_members' %}{% else %}{% url 'tenant_staff_member_list' tenant.pk %}{% endif %}"
+                class="staff-search"
+            >
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search|default:'' }}"
+                    placeholder="Search name, designation, mobile or email..."
+                    aria-label="Search staff members"
+                >
+
+                {% if search %}
+                    <a
+                        href="{% if self_service %}{% url 'my_staff_members' %}{% else %}{% url 'tenant_staff_member_list' tenant.pk %}{% endif %}"
+                        class="staff-clear-btn"
+                    >
+                        <i class="ph ph-x"></i>
+                        Clear
+                    </a>
+                {% endif %}
+            </form>
+
+            {% if self_service %}
+                <a
+                    class="staff-create-btn"
+                    href="{% url 'my_staff_member_create' %}"
+                >
+                    <i class="ph-bold ph-plus"></i>
+                    Add Staff Member
+                </a>
+            {% else %}
+                <a
+                    class="staff-create-btn"
+                    href="{% url 'tenant_staff_member_create' tenant.pk %}"
+                >
+                    <i class="ph-bold ph-plus"></i>
+                    Add Staff Member
+                </a>
+            {% endif %}
+
+        </div>
+
+
+        <!-- STAFF TABLE -->
+
+        <div class="staff-table-wrapper">
+            <table class="staff-table">
+
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Designation</th>
+                        <th>Mobile</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Building / Floor / Unit</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for member in page_obj %}
+                        <tr>
+
+                            <!-- SERIAL NUMBER -->
+
+                            <td>
+                                {{ forloop.counter0|add:page_obj.start_index }}
+                            </td>
+
+                            <!-- NAME -->
+
+                            <td class="staff-name">
+                                {{ member.name }}
+                            </td>
+
+                            <!-- DESIGNATION -->
+
+                            <td>
+                                {{ member.designation|default:'—' }}
+                            </td>
+
+                            <!-- MOBILE -->
+
+                            <td>
+                                {% if member.unit and member.unit.company.country.dial_code %}{{ member.unit.company.country.dial_code }} {% endif %}{{ member.mobile_number|default:'—' }}
+                            </td>
+
+                            <!-- EMAIL -->
+
+                            <td>
+                                {{ member.email|default:'—' }}
+                            </td>
+
+                            <!-- ADDRESS -->
+
+                            <td>
+                                {{ member.address|default:'—' }}
+                            </td>
+
+                            <!-- BUILDING / FLOOR / UNIT -->
+
+                            <td>
+                                {% if member.unit %}
+
+                                    {{ member.unit.building.name }}
+
+                                    {% if member.unit.floor %}
+                                        · {{ member.unit.floor.name }}
+                                    {% endif %}
+
+                                    · {{ member.unit.name }}
+
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+
+                            <!-- STATUS -->
+
+                            <td>
+                                {% if member.status %}
+                                    <span class="staff-status">
+                                        <i class="ph-fill ph-check-circle"></i>
+                                        Active
+                                    </span>
+                                {% else %}
+                                    <span class="staff-status inactive">
+                                        <i class="ph-fill ph-x-circle"></i>
+                                        Inactive
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <!-- ACTIONS -->
+
+                            <td>
+                                <div class="staff-actions">
+
+                                    {% if self_service %}
+
+                                        <a
+                                            class="staff-edit"
+                                            href="{% url 'my_staff_member_edit' member.pk %}"
+                                        >
+                                            <i class="ph ph-pencil-simple"></i>
+                                            Edit
+                                        </a>
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'my_staff_member_delete' member.pk %}"
+                                            onsubmit="return confirm('Delete this staff member record?');"
+                                        >
+                                            {% csrf_token %}
+                                            <button
+                                                class="staff-delete"
+                                                type="submit"
+                                            >
+                                                <i class="ph ph-trash"></i>
+                                                Delete
+                                            </button>
+                                        </form>
+
+                                    {% else %}
+
+                                        <a
+                                            class="staff-edit"
+                                            href="{% url 'tenant_staff_member_edit' tenant.pk member.pk %}"
+                                        >
+                                            <i class="ph ph-pencil-simple"></i>
+                                            Edit
+                                        </a>
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'tenant_staff_member_delete' tenant.pk member.pk %}"
+                                            onsubmit="return confirm('Delete this staff member record?');"
+                                        >
+                                            {% csrf_token %}
+                                            <button
+                                                class="staff-delete"
+                                                type="submit"
+                                            >
+                                                <i class="ph ph-trash"></i>
+                                                Delete
+                                            </button>
+                                        </form>
+
+                                    {% endif %}
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+                    {% empty %}
+
+                        <tr>
+                            <td colspan="9" class="staff-empty">
+                                {% if search %}
+                                    No staff members match "{{ search }}".
+                                    Try another search term.
+                                {% else %}
+                                    No staff records added yet.
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <!-- PAGINATION -->
+
+        {% if page_obj.paginator.num_pages > 1 %}
+
+            <div class="staff-footer">
+
+                <div class="staff-pagination-info">
+                    Page
+                    <strong>{{ page_obj.number }}</strong>
+                    of
+                    <strong>{{ page_obj.paginator.num_pages }}</strong>
+                    · Showing
+                    {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                    of {{ page_obj.paginator.count }}
+                </div>
+
+                <div class="staff-pagination-links">
+
+                    {% if page_obj.has_previous %}
+
+                        <a
+                            class="staff-page-btn"
+                            href="?page=1{% if search %}&search={{ search|urlencode }}{% endif %}"
+                        >
+                            <i class="ph ph-caret-double-left"></i>
+                            First
+                        </a>
+
+                        <a
+                            class="staff-page-btn"
+                            href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                        >
+                            <i class="ph ph-caret-left"></i>
+                            Previous
+                        </a>
+
+                    {% endif %}
+
+                    <span class="staff-page-current">
+                        {{ page_obj.number }}
+                    </span>
+
+                    {% if page_obj.has_next %}
+
+                        <a
+                            class="staff-page-btn"
+                            href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                        >
+                            Next
+                            <i class="ph ph-caret-right"></i>
+                        </a>
+
+                        <a
+                            class="staff-page-btn"
+                            href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                        >
+                            Last
+                            <i class="ph ph-caret-double-right"></i>
+                        </a>
+
+                    {% endif %}
+
+                </div>
+            </div>
+
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}

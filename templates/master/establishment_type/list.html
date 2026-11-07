@@ -1,0 +1,827 @@
+{% extends 'base.html' %}
+
+{% block title %}Establishment Type Master - Guest Management{% endblock %}
+
+{% block page_title %}
+    Establishment Type Master
+{% endblock %}
+
+{% block page_subtitle %}
+    Manage establishment type master data
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+/* ============================================================
+   ESTABLISHMENT TYPE LIST PAGE
+============================================================ */
+
+.establishment-list-page {
+    width: 100%;
+    max-width: 950px;
+    margin: 0 auto;
+}
+
+
+/* ============================================================
+   MAIN CARD
+============================================================ */
+
+.establishment-list-card {
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow:
+        0 10px 28px rgba(15, 23, 42, 0.06),
+        0 2px 6px rgba(15, 23, 42, 0.03);
+}
+
+
+/* ============================================================
+   HEADER
+============================================================ */
+
+.establishment-list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 17px;
+    background: linear-gradient(
+        135deg,
+        #eff6ff 0%,
+        #ffffff 75%
+    );
+    border-bottom: 1px solid #e2e8f0;
+}
+
+
+/* ============================================================
+   SEARCH
+============================================================ */
+
+.establishment-search {
+    position: relative;
+    width: 290px;
+}
+
+.establishment-search .search-icon {
+    position: absolute;
+    left: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 15px;
+    pointer-events: none;
+}
+
+.establishment-search-input {
+    width: 100%;
+    height: 36px;
+    box-sizing: border-box;
+    padding: 0 11px 0 33px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #ffffff;
+    color: #0f172a;
+    font-size: 12px;
+    transition:
+        border-color 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.establishment-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.establishment-search-input:hover {
+    border-color: #94a3b8;
+}
+
+.establishment-search-input:focus {
+    border-color: #2563eb;
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.08);
+}
+
+
+/* ============================================================
+   ADD BUTTON
+============================================================ */
+
+.establishment-add-btn {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 13px;
+    border-radius: 8px;
+    background: #28A745;
+    border: 1px solid #28A745;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+    box-shadow:
+        0 4px 10px rgba(40, 167, 69, 0.16);
+    transition:
+        transform 0.18s ease,
+        background 0.18s ease,
+        box-shadow 0.18s ease;
+}
+
+.establishment-add-btn:hover {
+    background: #218838;
+    border-color: #218838;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow:
+        0 6px 13px rgba(40, 167, 69, 0.23);
+}
+
+.establishment-add-btn i {
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   TABLE WRAPPER
+============================================================ */
+
+.establishment-table-wrapper {
+    padding: 15px 17px 4px;
+    overflow-x: auto;
+}
+
+
+/* ============================================================
+   TABLE
+============================================================ */
+
+.establishment-table {
+    width: 100%;
+    min-width: 650px;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+
+/* ============================================================
+   TABLE HEADER
+============================================================ */
+
+.establishment-table thead {
+    background: linear-gradient(
+        180deg,
+        #f8fafc,
+        #f1f5f9
+    );
+}
+
+.establishment-table th {
+    height: 42px;
+    padding: 0 12px;
+    text-align: left;
+    color: #475569;
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.establishment-table th:first-child {
+    width: 48px;
+    text-align: center;
+}
+
+.establishment-table th:last-child {
+    width: 150px;
+    text-align: center;
+}
+
+
+/* ============================================================
+   TABLE BODY
+============================================================ */
+
+.establishment-table td {
+    height: 52px;
+    padding: 6px 12px;
+    color: #334155;
+    font-size: 12px;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.establishment-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.establishment-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.establishment-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* ============================================================
+   SERIAL
+============================================================ */
+
+.establishment-serial {
+    text-align: center;
+    color: #94a3b8 !important;
+    font-size: 11px !important;
+    font-weight: 700;
+}
+
+
+/* ============================================================
+   NAME
+============================================================ */
+
+.establishment-name-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.establishment-icon {
+    width: 31px;
+    height: 31px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-radius: 8px;
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    color: #2563eb;
+    font-size: 15px;
+}
+
+.establishment-name {
+    color: #0f172a;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+
+/* ============================================================
+   CREATED AT
+============================================================ */
+
+.created-at {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.empty-value {
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+
+/* ============================================================
+   ACTIONS
+============================================================ */
+
+.establishment-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+.establishment-action-btn {
+    min-height: 29px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 9px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 750;
+    transition:
+        background 0.15s ease,
+        color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.establishment-action-btn:hover {
+    transform: translateY(-1px);
+}
+
+.establishment-action-btn i {
+    font-size: 12px;
+}
+
+
+/* ============================================================
+   EDIT
+============================================================ */
+
+.establishment-edit-btn {
+    background: #eff6ff;
+    border: 1px solid #dbeafe;
+    color: #1d4ed8;
+}
+
+.establishment-edit-btn:hover {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+
+/* ============================================================
+   DELETE
+============================================================ */
+
+.establishment-delete-btn {
+    background: #fef2f2;
+    border: 1px solid #fee2e2;
+    color: #dc2626;
+}
+
+.establishment-delete-btn:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
+.establishment-empty {
+    padding: 42px 20px !important;
+    text-align: center !important;
+}
+
+.establishment-empty-icon {
+    display: block;
+    margin-bottom: 10px;
+    color: #cbd5e1;
+    font-size: 38px;
+}
+
+.establishment-empty-title {
+    margin-bottom: 5px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 750;
+}
+
+.establishment-empty-text {
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+
+/* ============================================================
+   PAGINATION
+============================================================ */
+
+.establishment-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px 17px 16px;
+}
+
+.establishment-page-link {
+    min-height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 11px;
+    border-radius: 6px;
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    color: #475569;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 750;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        color 0.15s ease;
+}
+
+.establishment-page-link:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+.establishment-page-info {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.establishment-page-number {
+    color: #1e293b;
+    font-weight: 800;
+}
+
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
+@media (max-width: 700px) {
+
+    .establishment-list-page {
+        max-width: 100%;
+    }
+
+    .establishment-list-card {
+        border-radius: 13px;
+    }
+
+    .establishment-list-header {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 12px;
+    }
+
+    .establishment-search {
+        width: 100%;
+    }
+
+    .establishment-add-btn {
+        width: 100%;
+    }
+
+    .establishment-table-wrapper {
+        padding: 10px 10px 3px;
+    }
+
+    .establishment-table {
+        min-width: 650px;
+    }
+
+    .establishment-table th {
+        height: 38px;
+        padding: 0 9px;
+        font-size: 9px;
+    }
+
+    .establishment-table td {
+        height: 48px;
+        padding: 5px 9px;
+        font-size: 11px;
+    }
+
+    .establishment-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 13px;
+    }
+
+    .establishment-name {
+        font-size: 11px;
+    }
+
+    .establishment-pagination {
+        padding: 11px 10px 13px;
+    }
+}
+
+</style>
+
+
+<div class="establishment-list-page">
+
+    <div class="establishment-list-card">
+
+
+        <!-- ==================================================
+             HEADER
+        ================================================== -->
+
+        <div class="establishment-list-header">
+
+
+            <!-- SEARCH -->
+
+            <form
+                method="GET"
+                class="establishment-search"
+            >
+
+                <i class="ph ph-magnifying-glass search-icon"></i>
+
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search }}"
+                    placeholder="Search establishment types..."
+                    class="establishment-search-input"
+                >
+
+                <button
+                    type="submit"
+                    style="display:none;"
+                >
+                </button>
+
+            </form>
+
+
+            <!-- ADD -->
+
+            <a
+                href="{% url 'establishment_type_create' %}"
+                class="establishment-add-btn"
+            >
+
+                <i class="ph-bold ph-plus"></i>
+
+                Add Establishment Type
+
+            </a>
+
+
+        </div>
+
+
+        <!-- ==================================================
+             TABLE
+        ================================================== -->
+
+        <div class="establishment-table-wrapper">
+
+            <table class="establishment-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>#</th>
+
+                        <th>
+                            Establishment Type
+                        </th>
+
+                        <th>
+                            Created At
+                        </th>
+
+                        <th>
+                            Actions
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for obj in page_obj %}
+
+                    <tr>
+
+
+                        <!-- SERIAL -->
+
+                        <td class="establishment-serial">
+
+                            {{ page_obj.start_index|add:forloop.counter0 }}
+
+                        </td>
+
+
+                        <!-- NAME -->
+
+                        <td>
+
+                            <div class="establishment-name-wrapper">
+
+                                <div class="establishment-icon">
+
+                                    <i class="ph-fill ph-buildings"></i>
+
+                                </div>
+
+                                <span class="establishment-name">
+
+                                    {{ obj.name }}
+
+                                </span>
+
+                            </div>
+
+                        </td>
+
+
+                        <!-- CREATED AT -->
+
+                        <td>
+
+                            {% if obj.created_at %}
+
+                                <span class="created-at">
+
+                                    {{ obj.created_at|date:"d M Y" }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="empty-value">
+                                    —
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- ACTIONS -->
+
+                        <td>
+
+                            <div class="establishment-actions">
+
+
+                                <!-- EDIT -->
+
+                                <a
+                                    href="{% url 'establishment_type_edit' obj.pk %}"
+                                    class="establishment-action-btn establishment-edit-btn"
+                                    title="Edit Establishment Type"
+                                >
+
+                                    <i class="ph ph-pencil-simple"></i>
+
+                                    Edit
+
+                                </a>
+
+
+                                <!-- DELETE -->
+
+                                <form
+                                    method="post"
+                                    action="{% url 'establishment_type_delete' obj.pk %}"
+                                    style="display:inline;"
+                                    onsubmit="return confirm('Are you sure you want to delete this establishment type?');"
+                                >
+
+                                    {% csrf_token %}
+
+                                    <button
+                                        type="submit"
+                                        class="establishment-action-btn establishment-delete-btn"
+                                        title="Delete Establishment Type"
+                                    >
+
+                                        <i class="ph ph-trash"></i>
+
+                                        Delete
+
+                                    </button>
+
+                                </form>
+
+
+                            </div>
+
+                        </td>
+
+
+                    </tr>
+
+
+                    {% empty %}
+
+                    <!-- EMPTY STATE -->
+
+                    <tr>
+
+                        <td
+                            colspan="4"
+                            class="establishment-empty"
+                        >
+
+                            <i
+                                class="ph ph-buildings establishment-empty-icon"
+                            >
+                            </i>
+
+                            <div class="establishment-empty-title">
+
+                                No establishment types found
+
+                            </div>
+
+                            <div class="establishment-empty-text">
+
+                                No establishment types match your search criteria.
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        <!-- ==================================================
+             PAGINATION
+        ================================================== -->
+
+        {% if page_obj.paginator.num_pages > 1 %}
+
+        <div class="establishment-pagination">
+
+
+            {% if page_obj.has_previous %}
+
+                <a
+                    href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                    class="establishment-page-link"
+                >
+
+                    <i class="ph ph-caret-left"></i>
+
+                    Previous
+
+                </a>
+
+            {% endif %}
+
+
+            <span class="establishment-page-info">
+
+                Page
+
+                <span class="establishment-page-number">
+
+                    {{ page_obj.number }}
+
+                </span>
+
+                of
+
+                {{ page_obj.paginator.num_pages }}
+
+            </span>
+
+
+            {% if page_obj.has_next %}
+
+                <a
+                    href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                    class="establishment-page-link"
+                >
+
+                    Next
+
+                    <i class="ph ph-caret-right"></i>
+
+                </a>
+
+            {% endif %}
+
+
+        </div>
+
+        {% endif %}
+
+
+    </div>
+
+</div>
+
+{% endblock %}

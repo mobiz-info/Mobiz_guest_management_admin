@@ -1,0 +1,344 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {{ title }} - Designation
+{% endblock %}
+
+{% block page_title %}
+    {{ title }}
+{% endblock %}
+
+{% block page_subtitle %}
+    Create or update global designation master data
+{% endblock %}
+
+{% block content %}
+
+<style>
+
+.premium-form-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, 0.06),
+        0 2px 6px rgba(15, 23, 42, 0.03);
+    overflow: hidden;
+}
+
+.premium-form-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 16px 18px;
+    background: linear-gradient(
+        135deg,
+        #eff6ff 0%,
+        #ffffff 80%
+    );
+    border-bottom: 1px solid #e2e8f0;
+    color: #1e293b;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.premium-form-title i {
+    color: #2563eb;
+    font-size: 20px;
+}
+
+.premium-form-body {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.required {
+    color: #dc2626;
+    margin-left: 2px;
+}
+
+.form-group input {
+    width: 100%;
+    box-sizing: border-box;
+    min-height: 42px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    background: #ffffff;
+    color: #0f172a;
+    font-family: inherit;
+    font-size: 13px;
+}
+
+.form-group input:focus {
+    border-color: #3b82f6;
+    box-shadow:
+        0 0 0 3px rgba(59, 130, 246, 0.10);
+}
+
+.error-text {
+    margin-top: 5px;
+    color: #dc2626;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.form-error-box {
+    margin-bottom: 16px;
+    padding: 10px 12px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 12px;
+}
+
+.form-separator {
+    height: 1px;
+    margin: 20px 0;
+    background: #e2e8f0;
+}
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.btn-secondary,
+.btn-primary {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 0 15px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+}
+
+.btn-primary {
+    border: 1px solid #3b82f6;
+    background: #3b82f6;
+    color: #ffffff;
+}
+
+.btn-primary:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+}
+
+@media (max-width: 600px) {
+
+    .premium-form-container {
+        max-width: 100%;
+        margin: 10px auto;
+    }
+
+    .premium-form-body {
+        padding: 15px;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .btn-secondary,
+    .btn-primary {
+        width: 100%;
+    }
+
+}
+
+
+
+/* Shared compact premium form sizing for Operations templates */
+.content-area [class*="-form-wrap"] { width:100%; max-width:720px !important; min-width:0; margin-left:auto !important; margin-right:auto !important; }
+.content-area [class*="-form-card"] { border-radius:12px !important; box-shadow:0 6px 22px rgba(15,23,42,.06) !important; }
+.content-area [class*="-form-title"] { padding:13px 17px !important; font-size:14px !important; }
+.content-area [class*="-form-body"] { padding:17px !important; }
+.content-area [class*="-field"] { margin-bottom:12px !important; }
+.content-area [class*="-field"] input:not([type="checkbox"]):not([type="radio"]):not([type="hidden"]),
+.content-area [class*="-field"] select,
+.content-area [class*="-field"] textarea,
+.content-area .tenant-field input:not([type="checkbox"]),
+.content-area .tenant-field select,
+.content-area .tenant-field textarea {
+    min-height:37px; padding:8px 10px; border-radius:8px; font-size:12px;
+}
+.content-area [class*="-field"] textarea { min-height:62px; }
+.content-area [class*="-actions"] { margin-top:15px !important; padding-top:13px !important; gap:8px !important; }
+.content-area [class*="-actions"] a,
+.content-area [class*="-actions"] button { min-height:36px !important; padding:0 13px !important; border-radius:8px !important; font-size:11px !important; }
+.content-area [class*="-save"] { background:linear-gradient(135deg,#6366f1,#4f46e5) !important; border-color:#4f46e5 !important; color:#fff !important; }
+.content-area [class*="-save"]:hover { background:#4338ca !important; }
+.content-area .tenant-form-wrap { max-width:760px !important; }
+.content-area .tenant-grid { gap:11px 14px !important; }
+.content-area .unit-check-grid { gap:7px !important; }
+.content-area .unit-option { padding:9px !important; border-radius:8px !important; }
+@media(max-width:600px) {
+    .content-area [class*="-form-body"] { padding:13px !important; }
+    .content-area [class*="-form-wrap"] { max-width:100% !important; }
+}
+
+</style>
+
+
+<div class="premium-form-container">
+
+
+    <div class="premium-form-title">
+
+        <i class="ph-fill ph-identification-card"></i>
+
+        {% if is_edit %}
+            Edit Global Designation
+        {% else %}
+            Add Global Designation
+        {% endif %}
+
+    </div>
+
+
+    <div class="premium-form-body">
+
+        <form method="post">
+
+            {% csrf_token %}
+
+
+            {% if non_field_errors %}
+
+                <div class="form-error-box">
+
+                    {% for error in non_field_errors %}
+
+                        {{ error }}
+
+                    {% endfor %}
+
+                </div>
+
+            {% endif %}
+
+
+            {% if request.user.is_superuser %}
+            <div class="form-group">
+                <label for="id_company">Company <span class="required">*</span></label>
+                <select name="company" id="id_company" class="form-control" required>
+                    <option value="">Select Company</option>
+                    {% for item in companies %}
+                    <option value="{{ item.pk }}" {% if values.company == item.pk|stringformat:"s" %}selected{% endif %}>{{ item.name }}</option>
+                    {% endfor %}
+                </select>
+                {% for error in errors.company %}<div class="error-text">{{ error }}</div>{% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+
+                <label for="id_name">
+
+                    Designation
+
+                    <span class="required">*</span>
+
+                </label>
+
+
+                <input type="text" name="name" id="id_name" class="form-control" maxlength="100" value="{{ values.name|default:'' }}" placeholder="Enter company-specific designation" required>
+
+
+                {% for error in errors.name %}
+
+                    <div class="error-text">
+
+                        {{ error }}
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+
+            <div class="form-group">
+                <label style="display:flex;align-items:center;gap:8px;">
+                    <input type="checkbox" name="status" id="id_status" {% if values.status %}checked{% endif %}>
+                    Active Status
+                </label>
+            </div>
+
+            <div class="form-separator"></div>
+
+
+            <div class="form-actions">
+
+                <a
+                    href="{% url 'company_designation_list' %}"
+                    class="btn-secondary"
+                >
+
+                    <i class="ph ph-x"></i>
+
+                    Cancel
+
+                </a>
+
+
+                <button
+                    type="submit"
+                    class="btn-primary"
+                >
+
+                    <i class="ph ph-check"></i>
+
+                    {% if is_edit %}
+                        Update Designation
+                    {% else %}
+                        Save Designation
+                    {% endif %}
+
+                </button>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+
+{% endblock %}

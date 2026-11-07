@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Company / Client{% endblock %}
+{% block page_title %}Delete Company / Client{% endblock %}
+{% block page_subtitle %}Confirm company deletion{% endblock %}
+
+{% block content %}
+<style>
+.company-delete-card{max-width:560px;margin:24px auto;background:#fff;border:1px solid #e2e8f0;border-radius:12px;box-shadow:0 8px 24px rgba(15,23,42,.06);overflow:hidden}
+.company-delete-head{padding:18px 22px;background:#fff7ed;border-bottom:1px solid #fed7aa;color:#9a3412;font-size:16px;font-weight:800;display:flex;align-items:center;gap:10px}
+.company-delete-body{padding:22px;color:#334155;font-size:13px;line-height:1.7}
+.company-delete-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:22px;padding-top:18px;border-top:1px solid #e2e8f0}
+.company-delete-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:38px;padding:0 15px;border-radius:8px;text-decoration:none;font-size:12px;font-weight:800;cursor:pointer}
+.company-delete-cancel{border:1px solid #cbd5e1;background:#fff;color:#475569}
+.company-delete-confirm{border:1px solid #dc2626;background:#dc2626;color:#fff}
+@media(max-width:600px){.company-delete-actions{flex-direction:column-reverse}.company-delete-btn{width:100%;box-sizing:border-box}}
+</style>
+<div class="company-delete-card">
+    <div class="company-delete-head"><i class="ph-fill ph-warning-circle"></i> Confirm Company Deletion</div>
+    <div class="company-delete-body">
+        <p>Are you sure you want to delete <strong>{{ company.name }}</strong>?</p>
+        <p>This action cannot be undone. Related company staff accounts and company-specific records may also be deleted according to the database relationships.</p>
+        <form method="post">
+            {% csrf_token %}
+            <div class="company-delete-actions">
+                <a href="{% url 'company_list' %}" class="company-delete-btn company-delete-cancel"><i class="ph ph-x"></i> Cancel</a>
+                <button type="submit" class="company-delete-btn company-delete-confirm"><i class="ph ph-trash"></i> Delete Company</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

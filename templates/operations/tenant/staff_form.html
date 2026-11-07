@@ -1,0 +1,1367 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block page_subtitle %}
+    {% if self_service %}
+        Manage your household or domestic staff contact details
+    {% else %}
+        Staff details for {{ tenant.full_name }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   PREMIUM COMPACT STAFF FORM
+   SAME WIDTH + SAME COMPACT HEIGHT
+   IMPROVED FONT SIZES
+========================================================= */
+
+.staff-page {
+    width: 100%;
+    padding: 2px 0 18px;
+}
+
+.staff-form-wrap {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+}
+
+.staff-form-card {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    overflow: hidden;
+
+    box-shadow:
+        0 8px 24px rgba(15, 23, 42, .055),
+        0 2px 6px rgba(15, 23, 42, .025);
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.staff-form-title {
+    position: relative;
+    min-height: 54px;
+    padding: 9px 15px;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f4f5ff 0%,
+            #ffffff 58%,
+            #fafaff 100%
+        );
+
+    border-bottom: 1px solid #e5e7eb;
+
+    color: #172033;
+}
+
+.staff-form-title::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #6366f1,
+            #8b5cf6,
+            #a855f7
+        );
+}
+
+.staff-form-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+
+    width: 70px;
+    height: 2px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #6366f1,
+            #8b5cf6
+        );
+}
+
+.staff-title-icon {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 8px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #4f46e5
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 4px 10px rgba(79, 70, 229, .18);
+}
+
+.staff-title-icon i {
+    font-size: 15px;
+}
+
+.staff-title-text {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    min-width: 0;
+}
+
+.staff-title-text strong {
+    color: #172033;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.staff-title-text span {
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 1.3;
+}
+
+/* =========================================================
+   BODY
+========================================================= */
+
+.staff-form-body {
+    padding: 15px;
+}
+
+/* =========================================================
+   ERROR BOX
+========================================================= */
+
+.staff-error-box {
+    background: #fff7f7;
+    border: 1px solid #fecaca;
+    border-left: 3px solid #ef4444;
+
+    color: #b91c1c;
+
+    padding: 7px 9px;
+    border-radius: 7px;
+
+    margin-bottom: 12px;
+
+    font-size: 10px;
+    line-height: 1.4;
+}
+
+/* =========================================================
+   SECTION
+========================================================= */
+
+.staff-section {
+    margin-bottom: 13px;
+}
+
+.staff-section:last-child {
+    margin-bottom: 0;
+}
+
+.staff-section-heading {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-bottom: 7px;
+
+    color: #334155;
+
+    font-size: 10.5px;
+    font-weight: 800;
+
+    text-transform: uppercase;
+    letter-spacing: .055em;
+}
+
+.staff-section-heading i {
+    color: #6366f1;
+    font-size: 13px;
+}
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.staff-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 10px 12px;
+}
+
+.staff-field {
+    min-width: 0;
+}
+
+.staff-field.full-width {
+    grid-column: 1 / -1;
+}
+
+/* =========================================================
+   LABEL
+========================================================= */
+
+.staff-field label.field-label {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #334155;
+
+    font-size: 10.5px;
+    font-weight: 750;
+
+    line-height: 1.3;
+}
+
+.required-mark {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+.staff-field input:not([type="checkbox"]),
+.staff-field select,
+.staff-field textarea {
+    width: 100%;
+    box-sizing: border-box;
+
+    min-height: 34px;
+
+    padding: 7px 9px;
+
+    border: 1px solid #d8dee8;
+    border-radius: 7px;
+
+    background: #ffffff;
+    color: #172033;
+
+    font-family: inherit;
+    font-size: 11.5px;
+
+    transition:
+        border-color .18s ease,
+        box-shadow .18s ease,
+        background .18s ease;
+}
+
+.staff-field select {
+    cursor: pointer;
+}
+
+.staff-field textarea {
+    min-height: 58px;
+    height: 58px;
+
+    resize: vertical;
+
+    line-height: 1.45;
+}
+
+.staff-field input::placeholder,
+.staff-field textarea::placeholder {
+    color: #9aa6b6;
+    font-size: 11px;
+}
+
+.staff-field input:not([type="checkbox"]):hover,
+.staff-field select:hover,
+.staff-field textarea:hover {
+    border-color: #b8c2d1;
+}
+
+.staff-field input:not([type="checkbox"]):focus,
+.staff-field select:focus,
+.staff-field textarea:focus {
+    outline: none;
+
+    border-color: #6366f1;
+
+    box-shadow:
+        0 0 0 2px rgba(99, 102, 241, .08);
+
+    background: #ffffff;
+}
+
+/* =========================================================
+   INPUT ICON
+========================================================= */
+
+.input-icon-wrap {
+    position: relative;
+}
+
+.input-icon-wrap > i {
+    position: absolute;
+
+    left: 9px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: #94a3b8;
+    font-size: 13px;
+
+    pointer-events: none;
+}
+
+.input-icon-wrap input {
+    padding-left: 28px !important;
+}
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.staff-error {
+    margin-top: 3px;
+
+    color: #dc2626;
+
+    font-size: 9.5px;
+    line-height: 1.3;
+}
+
+/* =========================================================
+   PHONE / DIAL CODE
+========================================================= */
+
+.staff-phone-input {
+    display: flex;
+
+    width: 100%;
+    height: 34px;
+}
+
+.staff-dial-code {
+    width: 58px;
+    min-width: 58px;
+
+    height: 34px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    background:
+        linear-gradient(
+            180deg,
+            #f8fafc,
+            #f1f5f9
+        );
+
+    border: 1px solid #d8dee8;
+    border-right: 0;
+
+    border-radius: 7px 0 0 7px;
+
+    color: #475569;
+
+    font-size: 10.5px;
+    font-weight: 800;
+
+    white-space: nowrap;
+    overflow: hidden;
+
+    transition: .18s ease;
+}
+
+.staff-dial-code.empty {
+    color: #94a3b8;
+}
+
+.staff-phone-input input {
+    flex: 1;
+    min-width: 0;
+
+    height: 34px;
+
+    box-sizing: border-box;
+
+    padding: 7px 9px;
+
+    border: 1px solid #d8dee8;
+    border-radius: 0 7px 7px 0;
+
+    background: #ffffff;
+    color: #172033;
+
+    font-family: inherit;
+    font-size: 11.5px;
+
+    outline: none;
+
+    transition: .18s ease;
+}
+
+.staff-phone-input input::placeholder {
+    color: #9aa6b6;
+    font-size: 11px;
+}
+
+.staff-phone-input:hover .staff-dial-code {
+    border-color: #b8c2d1;
+}
+
+.staff-phone-input:focus-within .staff-dial-code {
+    border-color: #6366f1;
+
+    background: #f5f3ff;
+    color: #4f46e5;
+}
+
+.staff-phone-input input:focus {
+    border-color: #6366f1;
+
+    box-shadow:
+        0 0 0 2px rgba(99, 102, 241, .08);
+}
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.staff-status-box {
+    margin-top: 13px;
+
+    min-height: 44px;
+
+    padding: 6px 9px;
+
+    box-sizing: border-box;
+
+    background:
+        linear-gradient(
+            135deg,
+            #f8fafc,
+            #ffffff
+        );
+
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+}
+
+.staff-status-info {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.staff-status-icon {
+    width: 25px;
+    height: 25px;
+
+    flex: 0 0 25px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 6px;
+
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.staff-status-icon i {
+    font-size: 13px;
+}
+
+.staff-status-text strong {
+    display: block;
+
+    color: #1e293b;
+
+    font-size: 10.5px;
+    font-weight: 800;
+}
+
+.staff-status-text span {
+    display: block;
+
+    margin-top: 1px;
+
+    color: #64748b;
+
+    font-size: 9px;
+}
+
+/* =========================================================
+   TOGGLE
+========================================================= */
+
+.staff-toggle {
+    position: relative;
+
+    width: 34px;
+    height: 19px;
+
+    flex: 0 0 34px;
+}
+
+.staff-toggle input {
+    opacity: 0;
+
+    width: 0;
+    height: 0;
+}
+
+.staff-toggle-slider {
+    position: absolute;
+
+    inset: 0;
+
+    background: #cbd5e1;
+
+    border-radius: 50px;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+.staff-toggle-slider::before {
+    content: "";
+
+    position: absolute;
+
+    width: 13px;
+    height: 13px;
+
+    left: 3px;
+    top: 3px;
+
+    background: #ffffff;
+
+    border-radius: 50%;
+
+    box-shadow:
+        0 1px 3px rgba(15,23,42,.2);
+
+    transition: .2s ease;
+}
+
+.staff-toggle input:checked + .staff-toggle-slider {
+    background: #4f46e5;
+}
+
+.staff-toggle input:checked + .staff-toggle-slider::before {
+    transform: translateX(15px);
+}
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.staff-form-actions {
+    display: flex;
+
+    align-items: center;
+    justify-content: flex-end;
+
+    gap: 7px;
+
+    margin-top: 13px;
+    padding-top: 11px;
+
+    border-top: 1px solid #e5e7eb;
+}
+
+.staff-form-actions a,
+.staff-form-actions button {
+    min-height: 32px;
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 5px;
+
+    padding: 0 12px;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+
+    font-size: 10.5px;
+    font-weight: 800;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+/* =========================================================
+   CANCEL
+========================================================= */
+
+.staff-cancel {
+    background: #ffffff;
+
+    border: 1px solid #d7dee8;
+
+    color: #475569;
+}
+
+.staff-cancel:hover {
+    background: #f8fafc;
+
+    border-color: #cbd5e1;
+
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+.staff-save {
+    border: 1px solid #4f46e5;
+
+    background:
+        linear-gradient(
+            135deg,
+            #6366f1,
+            #4f46e5
+        );
+
+    color: #ffffff;
+
+    box-shadow:
+        0 3px 9px rgba(79,70,229,.16);
+}
+
+.staff-save:hover {
+    background:
+        linear-gradient(
+            135deg,
+            #5558e8,
+            #4338ca
+        );
+
+    box-shadow:
+        0 5px 12px rgba(79,70,229,.22);
+
+    transform: translateY(-1px);
+}
+
+.staff-save:active {
+    transform: translateY(0);
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .staff-form-wrap {
+        max-width: 100%;
+    }
+
+    .staff-form-grid {
+        grid-template-columns: 1fr;
+        gap: 9px;
+    }
+
+    .staff-field.full-width {
+        grid-column: auto;
+    }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .staff-page {
+        padding-top: 0;
+    }
+
+    .staff-form-body {
+        padding: 11px;
+    }
+
+    .staff-form-title {
+        min-height: 52px;
+        padding: 9px 11px;
+    }
+
+    .staff-title-icon {
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
+    }
+
+    .staff-title-icon i {
+        font-size: 14px;
+    }
+
+    .staff-title-text strong {
+        font-size: 13px;
+    }
+
+    .staff-title-text span {
+        font-size: 9.5px;
+    }
+
+    .staff-form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .staff-form-actions a,
+    .staff-form-actions button {
+        width: 100%;
+    }
+}
+</style>
+
+
+<div class="staff-page">
+
+    <div class="staff-form-wrap">
+
+        <div class="staff-form-card">
+
+            <!-- =====================================================
+                 HEADER
+            ====================================================== -->
+
+            <div class="staff-form-title">
+
+                <div class="staff-title-icon">
+                    <i class="ph ph-identification-card"></i>
+                </div>
+
+                <div class="staff-title-text">
+
+                    <strong>{{ title }}</strong>
+
+                    <span>
+                        {% if self_service %}
+                            Manage household or domestic staff details
+                        {% else %}
+                            Staff details for {{ tenant.full_name }}
+                        {% endif %}
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <!-- =====================================================
+                 BODY
+            ====================================================== -->
+
+            <div class="staff-form-body">
+
+                {% if non_field_errors %}
+
+                    <div class="staff-error-box">
+
+                        {% for error in non_field_errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+
+                    </div>
+
+                {% endif %}
+
+
+                <form method="post">
+
+                    {% csrf_token %}
+
+
+                    <!-- =================================================
+                         LOCATION
+                    ================================================== -->
+
+                    <div class="staff-section">
+
+                        <div class="staff-section-heading">
+
+                            <i class="ph ph-map-pin"></i>
+
+                            <span>Staff Allocation</span>
+
+                        </div>
+
+
+                        <div class="staff-form-grid">
+
+                            <div class="staff-field full-width">
+
+                                <label
+                                    class="field-label"
+                                    for="id_unit"
+                                >
+                                    Building / Floor / Unit
+                                    <span class="required-mark">*</span>
+                                </label>
+
+
+                                <select
+                                    id="id_unit"
+                                    name="unit"
+                                    required
+                                >
+
+                                    <option value="">
+                                        Select allocated unit
+                                    </option>
+
+
+                                    {% for unit in units %}
+
+                                        <option
+                                            value="{{ unit.pk }}"
+                                            data-dial-code="{{ unit.building.company.country.dial_code|default:'' }}"
+                                            {% if values.unit_id == unit.pk|stringformat:'s' %}
+                                                selected
+                                            {% endif %}
+                                        >
+
+                                            {{ unit.building.name }}
+
+                                            {% if unit.floor %}
+                                                · {{ unit.floor.name }}
+                                            {% endif %}
+
+                                            · {{ unit.name }}
+
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+
+                                {% for error in errors.unit %}
+
+                                    <div class="staff-error">
+                                        {{ error }}
+                                    </div>
+
+                                {% endfor %}
+
+
+                                {% if not units %}
+
+                                    <div class="staff-error">
+                                        No active unit allocation is available
+                                        for this tenant.
+                                    </div>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         PERSONAL DETAILS
+                    ================================================== -->
+
+                    <div class="staff-section">
+
+                        <div class="staff-section-heading">
+
+                            <i class="ph ph-user-circle"></i>
+
+                            <span>Personal Details</span>
+
+                        </div>
+
+
+                        <div class="staff-form-grid">
+
+                            <!-- STAFF NAME -->
+
+                            <div class="staff-field">
+
+                                <label
+                                    class="field-label"
+                                    for="id_name"
+                                >
+                                    Staff Member Name
+                                    <span class="required-mark">*</span>
+                                </label>
+
+
+                                <div class="input-icon-wrap">
+
+                                    <i class="ph ph-user"></i>
+
+                                    <input
+                                        id="id_name"
+                                        name="name"
+                                        value="{{ values.name|default:'' }}"
+                                        maxlength="150"
+                                        placeholder="Enter staff name"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                {% for error in errors.name %}
+
+                                    <div class="staff-error">
+                                        {{ error }}
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- DESIGNATION -->
+
+                            <div class="staff-field">
+
+                                <label
+                                    class="field-label"
+                                    for="id_designation"
+                                >
+                                    Designation / Role
+                                </label>
+
+
+                                <select
+                                    id="id_designation"
+                                    name="designation"
+                                >
+
+                                    <option value="">
+                                        Select designation
+                                    </option>
+
+
+                                    {% for designation in designations %}
+
+                                        <option
+                                            value="{{ designation }}"
+                                            {% if values.designation == designation %}
+                                                selected
+                                            {% endif %}
+                                        >
+                                            {{ designation }}
+                                        </option>
+
+                                    {% endfor %}
+
+                                </select>
+
+
+                                {% if not designations %}
+
+                                    <div class="staff-error">
+                                        No active designation is configured.
+                                        Ask the administrator to create or enable
+                                        a designation first.
+                                    </div>
+
+                                {% endif %}
+
+
+                                {% for error in errors.designation %}
+
+                                    <div class="staff-error">
+                                        {{ error }}
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- MOBILE -->
+
+                            <div class="staff-field">
+
+                                <label
+                                    class="field-label"
+                                    for="id_mobile_number"
+                                >
+                                    Mobile Number
+                                    <span class="required-mark">*</span>
+                                </label>
+
+
+                                <div class="staff-phone-input">
+
+                                    <!--
+                                        Country Master
+                                            ↓
+                                        Company
+                                            ↓
+                                        Country
+                                            ↓
+                                        Dial Code
+                                    -->
+
+
+
+                                    <input
+                                        id="id_mobile_number"
+                                        name="mobile_number"
+                                        value="{{ values.mobile_number|default:'' }}"
+                                        maxlength="30"
+                                        placeholder="Enter mobile number"
+                                        inputmode="tel"
+                                        autocomplete="tel"
+                                        required
+                                    >
+
+                                </div>
+
+
+                                {% for error in errors.mobile_number %}
+
+                                    <div class="staff-error">
+                                        {{ error }}
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- EMAIL -->
+
+                            <div class="staff-field">
+
+                                <label
+                                    class="field-label"
+                                    for="id_email"
+                                >
+                                    Email
+
+                                    <span
+                                        style="
+                                            font-weight:500;
+                                            color:#94a3b8;
+                                        "
+                                    >
+                                        (optional)
+                                    </span>
+
+                                </label>
+
+
+                                <div class="input-icon-wrap">
+
+                                    <i class="ph ph-envelope"></i>
+
+                                    <input
+                                        type="email"
+                                        id="id_email"
+                                        name="email"
+                                        value="{{ values.email|default:'' }}"
+                                        maxlength="254"
+                                        placeholder="Enter email"
+                                        autocomplete="email"
+                                    >
+
+                                </div>
+
+
+                                {% for error in errors.email %}
+
+                                    <div class="staff-error">
+                                        {{ error }}
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+
+                            <!-- ADDRESS -->
+
+                            <div class="staff-field full-width">
+
+                                <label
+                                    class="field-label"
+                                    for="id_address"
+                                >
+                                    Address
+                                    <span class="required-mark">*</span>
+                                </label>
+
+
+                                <textarea
+                                    id="id_address"
+                                    name="address"
+                                    rows="2"
+                                    required
+                                    placeholder="Enter complete address"
+                                >{{ values.address|default:'' }}</textarea>
+
+
+                                {% for error in errors.address %}
+
+                                    <div class="staff-error">
+                                        {{ error }}
+                                    </div>
+
+                                {% endfor %}
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         STATUS
+                    ================================================== -->
+
+                    <div class="staff-status-box">
+
+                        <div class="staff-status-info">
+
+                            <div class="staff-status-icon">
+                                <i class="ph ph-check-circle"></i>
+                            </div>
+
+
+                            <div class="staff-status-text">
+
+                                <strong>
+                                    Active Staff Record
+                                </strong>
+
+                                <span>
+                                    Enable this staff member for active use.
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <label class="staff-toggle">
+
+                            <input
+                                type="checkbox"
+                                name="status"
+                                {% if values.status %}
+                                    checked
+                                {% endif %}
+                            >
+
+                            <span class="staff-toggle-slider"></span>
+
+                        </label>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         ACTIONS
+                    ================================================== -->
+
+                    <div class="staff-form-actions">
+
+                        {% if self_service %}
+
+                            <a
+                                class="staff-cancel"
+                                href="{% url 'my_staff_members' %}"
+                            >
+                                <i class="ph ph-x"></i>
+                                Cancel
+                            </a>
+
+                        {% else %}
+
+                            <a
+                                class="staff-cancel"
+                                href="{% url 'tenant_staff_member_list' tenant.pk %}"
+                            >
+                                <i class="ph ph-x"></i>
+                                Cancel
+                            </a>
+
+                        {% endif %}
+
+
+                        <button
+                            class="staff-save"
+                            type="submit"
+                        >
+                            <i class="ph ph-check"></i>
+                            Save Staff Member
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   DYNAMIC DIAL CODE
+
+   Country Master
+        ↓
+   Company
+        ↓
+   Country
+        ↓
+   Dial Code
+========================================================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const unitSelect =
+        document.getElementById("id_unit");
+
+    const dialCode =
+        document.getElementById("dialCode");
+
+
+    if (!unitSelect || !dialCode) {
+        return;
+    }
+
+
+    function updateDialCode() {
+
+        const selectedOption =
+            unitSelect.options[
+                unitSelect.selectedIndex
+            ];
+
+
+        if (!selectedOption) {
+
+            dialCode.textContent = "+--";
+
+            dialCode.classList.add("empty");
+
+            return;
+        }
+
+
+        const unitDialCode =
+            selectedOption.getAttribute(
+                "data-dial-code"
+            );
+
+
+        const selectedCode =
+            unitDialCode
+                ? unitDialCode.trim()
+                : "";
+
+
+        const backendDialCode =
+            "{{ dial_code|default:''|escapejs }}".trim();
+
+
+        const finalCode =
+            selectedCode || backendDialCode;
+
+
+        if (finalCode !== "") {
+
+            dialCode.textContent =
+                finalCode.startsWith("+")
+                    ? finalCode
+                    : "+" + finalCode;
+
+            dialCode.classList.remove("empty");
+
+        } else {
+
+            dialCode.textContent = "+--";
+
+            dialCode.classList.add("empty");
+
+        }
+
+    }
+
+
+    unitSelect.addEventListener(
+        "change",
+        updateDialCode
+    );
+
+
+    updateDialCode();
+
+});
+
+</script>
+
+{% endblock %}

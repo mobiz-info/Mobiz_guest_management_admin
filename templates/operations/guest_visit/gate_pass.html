@@ -1,0 +1,322 @@
+{% extends 'base.html' %}
+
+{% block title %}Gate Pass{% endblock %}
+{% block page_title %}Guest Gate Pass{% endblock %}
+{% block page_subtitle %}Valid for the approved visit shown below{% endblock %}
+
+{% block content %}
+<style>
+.gp-wrap {
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.gp-card {
+    background: linear-gradient(145deg,#ffffff,#f8fbff);
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 14px 40px rgba(15,23,42,.10);
+}
+
+.gp-head {
+    background: linear-gradient(135deg,#1e293b,#3730a3,#4f46e5);
+    color: #fff;
+    padding: 22px;
+    text-align: center;
+}
+
+.gp-head h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.gp-head p {
+    margin: 6px 0 0;
+    color: #cbd5e1;
+    font-size: 12px;
+}
+
+.gp-body {
+    padding: 24px;
+}
+
+.gp-code {
+    margin: 4px 0 22px;
+    padding: 17px;
+    background: linear-gradient(135deg,#eef2ff,#f5f3ff);
+    border: 1px dashed #818cf8;
+    border-radius: 10px;
+    text-align: center;
+    color: #1d4ed8;
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 3px;
+}
+
+.gp-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+}
+
+.gp-row span:first-child {
+    color: #64748b;
+    flex-shrink: 0;
+}
+
+.gp-row strong {
+    text-align: right;
+    color: #0f172a;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.gp-security {
+    margin-top: 20px;
+    padding: 14px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.gp-security p {
+    margin: 7px 0;
+    color: #334155;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.gp-id-number {
+    font-weight: 800;
+    color: #0f172a;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    user-select: text;
+}
+
+.gp-warning {
+    margin-top: 12px;
+    padding: 12px;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 8px;
+    color: #9a3412;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.gp-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.gp-actions a {
+    padding: 10px 15px;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 12px;
+}
+
+@media (max-width: 480px) {
+    .gp-body {
+        padding: 16px;
+    }
+
+    .gp-row {
+        gap: 10px;
+    }
+
+    .gp-code {
+        font-size: 21px;
+    }
+}
+
+@media print {
+    .top-banner,
+    .sidebar,
+    .gp-actions {
+        display: none !important;
+    }
+
+    .main-wrapper {
+        margin: 0 !important;
+    }
+
+    .content-area {
+        padding: 0 !important;
+    }
+
+    .gp-wrap {
+        max-width: 100%;
+    }
+
+    .gp-card {
+        box-shadow: none;
+        border: 1px solid #cbd5e1;
+    }
+
+    body {
+        background: #fff !important;
+    }
+}
+</style>
+
+<div class="gp-wrap">
+    <div class="gp-card">
+
+        <div class="gp-head">
+            <h2>GUEST GATE PASS</h2>
+            <p>Guest Management System · Approved Visit</p>
+        </div>
+
+        <div class="gp-body">
+
+            <div class="gp-code">
+                <small style="display:block;font-size:10px;letter-spacing:1.5px;opacity:.8;margin-bottom:4px;">ENTRY / VISITOR NUMBER</small>
+                {{ visit.gate_pass_code }}
+            </div>
+
+            {% if qr_code_data %}
+            <div style="text-align:center;margin:0 0 18px;">
+                <img src="data:image/png;base64,{{ qr_code_data }}" alt="Gate Pass QR Code" style="width:150px;height:150px;object-fit:contain;border:1px solid #e2e8f0;border-radius:8px;padding:7px;background:#fff;">
+                <div style="font-size:11px;color:#64748b;margin-top:7px;">Scan to read the Entry / Visitor Number</div>
+            </div>
+            {% endif %}
+
+            {% if visit.guest_photo %}
+            <div style="text-align:center; margin:0 0 18px;">
+                <img
+                    src="{{ visit.guest_photo.url }}"
+                    alt="Guest photo"
+                    style="width:105px; height:125px; object-fit:cover; border:1px solid #cbd5e1; border-radius:8px;"
+                >
+            </div>
+            {% endif %}
+
+            <div class="gp-row">
+                <span>Guest Name</span>
+                <strong>{{ visit.guest_name }}</strong>
+            </div>
+            
+            <div class="gp-row">
+                <span>Entry / Visitor No.</span>
+                <strong>{{ visit.gate_pass_code }}</strong>
+            </div>
+
+            {% if visit.id_type %}
+            <div class="gp-row">
+                <span>ID Type</span>
+                <strong>{{ visit.get_id_type_display }}</strong>
+            </div>
+            {% endif %}
+
+            <div class="gp-row">
+                <span>Verification ID Number</span>
+                <strong class="gp-id-number">{{ masked_id_number|default:"Not available" }}</strong>
+            </div>
+
+            <div class="gp-row">
+                <span>Visiting Tenant</span>
+                <strong>{{ visit.tenant.full_name }}</strong>
+            </div>
+
+            <div class="gp-row">
+                <span>Building / Unit</span>
+                <strong>
+                    {% if visit.unit %}
+                        {{ visit.unit.building.name }} / {{ visit.unit.name }}
+                    {% else %}
+                        {{ visit.tenant.unit.building.name }} / {{ visit.tenant.unit.name }}
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="gp-row">
+                <span>Purpose</span>
+                <strong>{{ visit.purpose_of_visit.name }}</strong>
+            </div>
+
+            <div class="gp-row">
+                <span>Visit Type</span>
+                <strong>{{ visit.get_visit_type_display }}</strong>
+            </div>
+
+            {% if visit.vehicle_details %}
+            <div class="gp-row">
+                <span>Vehicle</span>
+                <strong>{{ visit.vehicle_details }}</strong>
+            </div>
+            {% endif %}
+
+            <div class="gp-row">
+                <span>Total Visitors</span>
+                <strong>{{ visit.additional_visitors|add:1 }}</strong>
+            </div>
+
+            <div class="gp-row">
+                <span>Visit Date</span>
+                <strong>{{ visit.visit_date|date:'d-m-Y' }}</strong>
+            </div>
+
+            {% if visit.visit_time %}
+            <div class="gp-row">
+                <span>Visit Time</span>
+                <strong>{{ visit.visit_time|time:'h:i A' }}</strong>
+            </div>
+            {% endif %}
+
+            <div class="gp-row">
+                <span>Approved At</span>
+                <strong>
+                    {% if visit.approved_at %}
+                        {{ visit.approved_at|date:'d-m-Y h:i A' }}
+                    {% else %}
+                        Not available
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="gp-row">
+                <span>Check-in</span>
+                <strong>
+                    {% if visit.checked_in_at %}
+                        {{ visit.checked_in_at|date:'d-m-Y h:i A' }}
+                    {% else %}
+                        Not checked in
+                    {% endif %}
+                </strong>
+            </div>
+
+            <div class="gp-row">
+                <span>Check-out</span>
+                <strong>
+                    {% if visit.checked_out_at %}
+                        {{ visit.checked_out_at|date:'d-m-Y h:i A' }}
+                    {% else %}
+                        Not checked out
+                    {% endif %}
+                </strong>
+            </div>
+
+            </div>
+
+            <div class="gp-actions">
+                <a href="#" onclick="window.print(); return false;">
+                    Print Gate Pass
+                </a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

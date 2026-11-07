@@ -1,0 +1,389 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - Guest Management{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_subtitle %}Manage country master data{% endblock %}
+
+{% block content %}
+
+<style>
+.country-form-page {
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.country-form-card {
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.045);
+}
+
+.country-form-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 16px 24px;
+    background: linear-gradient(120deg, #f1f5ff, #ffffff);
+    border-bottom: 1px solid #e8edf5;
+}
+
+.country-form-header i {
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #e8efff;
+    border: 1px solid #d8e4ff;
+    color: #315ee7;
+    font-size: 21px;
+    flex-shrink: 0;
+}
+
+.country-form-header-text h3 {
+    margin: 0;
+    color: #172033;
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.country-form-header-text p {
+    margin: 4px 0 0;
+    color: #8793a5;
+    font-size: 12px;
+}
+
+.country-form-body {
+    padding: 25px 28px 22px;
+}
+
+.country-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 25px;
+    row-gap: 19px;
+}
+
+.form-group {
+    margin: 0;
+    min-width: 0;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 7px;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 750;
+}
+
+.required-mark {
+    color: #ef4444;
+    margin-left: 2px;
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    height: 44px;
+    box-sizing: border-box;
+    padding: 0 14px;
+    border: 1px solid #d8e0eb;
+    border-radius: 8px;
+    outline: none;
+    background: #ffffff;
+    color: #1e293b;
+    font-family: inherit;
+    font-size: 13px;
+    transition: all 0.18s ease;
+}
+
+.form-control:hover {
+    border-color: #aab8cc;
+}
+
+.form-control:focus {
+    border-color: #4f6ff0;
+    box-shadow: 0 0 0 3px rgba(79, 111, 240, 0.09);
+}
+
+.form-control::placeholder {
+    color: #a0aaba;
+    font-size: 12px;
+}
+
+.form-help {
+    margin-top: 5px;
+    color: #94a3b8;
+    font-size: 11px;
+}
+
+.error-text {
+    margin-top: 5px;
+    color: #dc2626;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 13px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.status-row input {
+    width: 16px;
+    height: 16px;
+    accent-color: #315ee7;
+    cursor: pointer;
+}
+
+.status-row label {
+    margin: 0;
+    color: #475569;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 650;
+}
+
+.country-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 11px;
+    padding-top: 21px;
+    margin-top: 22px;
+    border-top: 1px solid #edf0f5;
+}
+
+.btn-secondary,
+.btn-primary {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 0 19px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 750;
+    cursor: pointer;
+    transition: all 0.18s ease;
+}
+
+.btn-secondary {
+    background: #ffffff;
+    border: 1px solid #dbe3ef;
+    color: #475569;
+}
+
+.btn-secondary:hover {
+    background: #f8fafc;
+    border-color: #b8c5d6;
+    color: #1e293b;
+}
+
+.btn-primary {
+    background: #315ee7;
+    border: 1px solid #315ee7;
+    color: #ffffff;
+    box-shadow: 0 2px 5px rgba(49, 94, 231, 0.15);
+}
+
+.btn-primary:hover {
+    background: #244bc5;
+    border-color: #244bc5;
+    box-shadow: 0 3px 8px rgba(49, 94, 231, 0.2);
+}
+
+.btn-secondary i,
+.btn-primary i {
+    font-size: 16px;
+}
+
+@media (max-width: 650px) {
+    .country-form-page {
+        max-width: 100%;
+    }
+
+    .country-form-body {
+        padding: 19px 16px;
+    }
+
+    .country-form-grid {
+        grid-template-columns: 1fr;
+        row-gap: 16px;
+    }
+
+    .country-form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .btn-secondary,
+    .btn-primary {
+        width: 100%;
+        box-sizing: border-box;
+    }
+}
+</style>
+
+<div class="country-form-page">
+
+    <div class="country-form-card">
+
+        <!-- HEADER -->
+        <div class="country-form-header">
+            <i class="ph ph-globe"></i>
+
+            <div class="country-form-header-text">
+                <h3>{{ title }}</h3>
+                <p>Add or update country information</p>
+            </div>
+        </div>
+
+        <!-- FORM -->
+        <div class="country-form-body">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="country-form-grid">
+
+                    <!-- COUNTRY NAME -->
+                    <div class="form-group">
+                        <label for="id_name">
+                            Country Name <span class="required-mark">*</span>
+                        </label>
+
+                        <input
+                            type="text"
+                            name="name"
+                            id="id_name"
+                            class="form-control"
+                            maxlength="100"
+                            value="{{ values.name|default:'' }}"
+                            placeholder="Enter country name"
+                            required
+                        >
+
+                        {% if errors.name %}
+                            <div class="error-text">
+                                {% for error in errors.name %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- CURRENCY CODE -->
+                    <div class="form-group">
+                        <label for="id_currency_code">Currency Code</label>
+
+                        <input
+                            type="text"
+                            name="currency_code"
+                            id="id_currency_code"
+                            class="form-control"
+                            maxlength="10"
+                            value="{{ values.currency_code|default:'' }}"
+                            placeholder="Example: INR, USD, AED"
+                        >
+
+                        {% if errors.currency_code %}
+                            <div class="error-text">
+                                {% for error in errors.currency_code %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- EMBLEM -->
+                    <div class="form-group">
+                        <label for="id_emblem">Emblem / Flag</label>
+
+                        <input
+                            type="text"
+                            name="emblem"
+                            id="id_emblem"
+                            class="form-control"
+                            maxlength="10"
+                            value="{{ values.emblem|default:'' }}"
+                            placeholder="Example: 🇮🇳"
+                        >
+
+                        {% if errors.emblem %}
+                            <div class="error-text">
+                                {% for error in errors.emblem %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- DIAL CODE -->
+                    <div class="form-group">
+                        <label for="id_dial_code">Dial Code</label>
+
+                        <input
+                            type="text"
+                            name="dial_code"
+                            id="id_dial_code"
+                            class="form-control"
+                            maxlength="10"
+                            value="{{ values.dial_code|default:'' }}"
+                            placeholder="Example: +91"
+                        >
+
+                        {% if errors.dial_code %}
+                            <div class="error-text">
+                                {% for error in errors.dial_code %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                </div>
+
+                <!-- ACTIONS -->
+                <div class="country-form-actions">
+
+                    <a href="{% url 'country_list' %}" class="btn-secondary">
+                        <i class="ph ph-x"></i>
+                        Cancel
+                    </a>
+
+                    <button type="submit" class="btn-primary">
+                        <i class="ph ph-check-circle"></i>
+
+                        {% if is_edit %}
+                            Update Country
+                        {% else %}
+                            Save Country
+                        {% endif %}
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

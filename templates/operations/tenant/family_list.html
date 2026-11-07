@@ -1,0 +1,542 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Family Members{% endblock %}
+{% block page_title %}Family Members{% endblock %}
+
+{% block page_subtitle %}
+    {% if self_service %}
+        Manage family members linked to your tenant account
+    {% else %}
+        Manage family members for {{ tenant.full_name }}
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<style>
+.family-page {
+    width: 100%;
+    min-width: 0;
+}
+
+.family-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+}
+
+.family-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.family-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    max-width: 520px;
+    min-width: 0;
+}
+
+.family-search input {
+    width: 100%;
+    min-width: 0;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #334155;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.family-search input:focus {
+    border-color: #16a34a;
+    box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.10);
+}
+
+.family-search input::placeholder {
+    color: #94a3b8;
+}
+
+.family-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 40px;
+    padding: 0 15px;
+    border: 1px solid #16a34a;
+    border-radius: 8px;
+    background: #16a34a;
+    color: #fff;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: background 0.2s ease;
+}
+
+.family-add-btn:hover {
+    background: #15803d;
+    border-color: #15803d;
+    color: #fff;
+}
+
+.family-clear-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #fff;
+    color: #475569;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.family-clear-btn:hover {
+    background: #f8fafc;
+    color: #0f172a;
+}
+
+.family-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 18px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.family-summary strong {
+    color: #0f172a;
+    font-weight: 800;
+}
+
+.family-groups {
+    padding: 16px;
+}
+
+.family-unit-group {
+    margin-bottom: 18px;
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #fff;
+}
+
+.family-unit-group:last-child {
+    margin-bottom: 0;
+}
+
+.family-group-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 15px;
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.family-group-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.family-group-header h3 i {
+    color: #16a34a;
+    font-size: 17px;
+}
+
+.family-group-count {
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: #dcfce7;
+    color: #15803d;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.family-table-wrap {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.family-table {
+    width: 100%;
+    min-width: 760px;
+    border-collapse: collapse;
+}
+
+.family-table th {
+    padding: 12px 15px;
+    background: #fff;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 800;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
+}
+
+.family-table td {
+    padding: 13px 15px;
+    border-top: 1px solid #f1f5f9;
+    color: #475569;
+    font-size: 12px;
+    vertical-align: middle;
+}
+
+.family-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.family-member-name {
+    color: #0f172a !important;
+    font-weight: 800;
+}
+
+.family-member-mobile {
+    white-space: nowrap;
+}
+
+.family-actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+}
+
+.family-actions form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.family-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 30px;
+    padding: 0 9px;
+    border: 0;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.family-edit-btn {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.family-edit-btn:hover {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.family-delete-btn {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.family-delete-btn:hover {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.family-empty {
+    padding: 38px 20px !important;
+    color: #94a3b8 !important;
+    text-align: center;
+}
+
+.family-empty i {
+    display: block;
+    margin-bottom: 9px;
+    font-size: 28px;
+}
+
+.family-empty strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #475569;
+    font-size: 13px;
+}
+
+.family-empty span {
+    font-size: 12px;
+}
+
+@media (max-width: 650px) {
+    .family-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 13px;
+    }
+
+    .family-search {
+        max-width: none;
+        width: 100%;
+    }
+
+    .family-add-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .family-summary {
+        padding: 12px 13px;
+    }
+
+    .family-groups {
+        padding: 10px;
+    }
+
+    .family-group-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .family-search input {
+        font-size: 12px;
+    }
+}
+</style>
+
+<div class="family-page">
+
+    <div class="family-card">
+
+        <!-- Search and Add toolbar -->
+        <div class="family-toolbar">
+
+            <form class="family-search" method="get">
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ search|default:'' }}"
+                    placeholder="Search name, mobile or email..."
+                    aria-label="Search family members"
+                >
+
+                {% if search %}
+                    <a
+                        class="family-clear-btn"
+                        href="{% if self_service %}{% url 'my_family_members' %}{% else %}{% url 'tenant_family_member_list' tenant.pk %}{% endif %}"
+                    >
+                        Clear
+                    </a>
+                {% endif %}
+            </form>
+
+            {% if self_service %}
+                <a
+                    class="family-add-btn"
+                    href="{% url 'my_family_member_create' %}"
+                >
+                    <i class="ph ph-plus"></i>
+                    Add Family Member
+                </a>
+            {% else %}
+                <a
+                    class="family-add-btn"
+                    href="{% url 'tenant_family_member_create' tenant.pk %}"
+                >
+                    <i class="ph ph-plus"></i>
+                    Add Family Member
+                </a>
+            {% endif %}
+
+        </div>
+
+        <!-- Summary -->
+        <div class="family-summary">
+            <span>
+                Total family members:
+                <strong>{{ family_member_count }}</strong>
+            </span>
+
+            {% if not self_service %}
+                <span>
+                    Tenant:
+                    <strong>{{ tenant.full_name }}</strong>
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- Family members grouped by unit -->
+        <div class="family-groups">
+
+            {% for group in unit_groups %}
+
+                <section class="family-unit-group">
+
+                    <div class="family-group-header">
+                        <h3>
+                            <i class="ph ph-house"></i>
+                            {{ group.label }}
+                        </h3>
+
+                        <span class="family-group-count">
+                            {{ group.members|length }}
+                            member{{ group.members|length|pluralize }}
+                        </span>
+                    </div>
+
+                    <div class="family-table-wrap">
+                        <table class="family-table">
+
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Mobile Number</th>
+                                    <th>Email</th>
+                                    <th>Address</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for member in group.members %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+
+                                        <td class="family-member-name">
+                                            {{ member.name }}
+                                        </td>
+
+                                        <td class="family-member-mobile">
+                                            {% if member.unit and member.unit.company.country.dial_code %}{{ member.unit.company.country.dial_code }} {% endif %}{{ member.mobile_number|default:"—" }}
+                                        </td>
+
+                                        <td>
+                                            {{ member.email|default:"—" }}
+                                        </td>
+
+                                        <td>
+                                            {{ member.address|default:"—" }}
+                                        </td>
+
+                                        <td>
+                                            <div class="family-actions">
+
+                                                {% if self_service %}
+
+                                                    <a
+                                                        class="family-action-btn family-edit-btn"
+                                                        href="{% url 'my_family_member_edit' member.pk %}"
+                                                    >
+                                                        <i class="ph ph-pencil-simple"></i>
+                                                        Edit
+                                                    </a>
+
+                                                    <form
+                                                        method="post"
+                                                        action="{% url 'my_family_member_delete' member.pk %}"
+                                                        onsubmit="return confirm('Delete this family member?');"
+                                                    >
+                                                        {% csrf_token %}
+                                                        <button
+                                                            class="family-action-btn family-delete-btn"
+                                                            type="submit"
+                                                        >
+                                                            <i class="ph ph-trash"></i>
+                                                            Delete
+                                                        </button>
+                                                    </form>
+
+                                                {% else %}
+
+                                                    <a
+                                                        class="family-action-btn family-edit-btn"
+                                                        href="{% url 'tenant_family_member_edit' tenant.pk member.pk %}"
+                                                    >
+                                                        <i class="ph ph-pencil-simple"></i>
+                                                        Edit
+                                                    </a>
+
+                                                    <form
+                                                        method="post"
+                                                        action="{% url 'tenant_family_member_delete' tenant.pk member.pk %}"
+                                                        onsubmit="return confirm('Delete this family member?');"
+                                                    >
+                                                        {% csrf_token %}
+                                                        <button
+                                                            class="family-action-btn family-delete-btn"
+                                                            type="submit"
+                                                        >
+                                                            <i class="ph ph-trash"></i>
+                                                            Delete
+                                                        </button>
+                                                    </form>
+
+                                                {% endif %}
+
+                                            </div>
+                                        </td>
+                                    </tr>
+
+                                {% endfor %}
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                </section>
+
+            {% empty %}
+
+                <section class="family-unit-group">
+                    <div class="family-empty">
+                        <i class="ph ph-users"></i>
+                        <strong>No family members found</strong>
+                        <span>
+                            {% if search %}
+                                Try another search term.
+                            {% else %}
+                                Add family members and assign each one to a unit.
+                            {% endif %}
+                        </span>
+                    </div>
+                </section>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

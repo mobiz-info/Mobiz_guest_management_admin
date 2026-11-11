@@ -1,14 +1,17 @@
 
 {% extends 'base.html' %}
 
-{% block title %}Floors{% endblock %}
+{% block title %}Floors - Guest Management{% endblock %}
 {% block page_title %}Floors{% endblock %}
 {% block page_subtitle %}Manage floors under each building{% endblock %}
 
 {% block content %}
 
 <style>
-/* Main page */
+/* =========================================================
+   FLOORS LIST - WORK SITE DESIGN
+========================================================= */
+
 .floor-page {
     width: 100%;
     max-width: 100%;
@@ -19,24 +22,26 @@
     font-size: 12px;
 }
 
-/* Main card */
 .floor-card {
     width: 100%;
     min-width: 0;
-    background: #fff;
+    box-sizing: border-box;
+    background: #ffffff;
     border: 1px solid #dbe3ef;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
 }
 
-/* Toolbar */
+/* TOOLBAR */
+
 .floor-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 12px 16px;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 14px 18px;
     border-bottom: 1px solid #e2e8f0;
 }
 
@@ -50,10 +55,10 @@
     margin: 0;
 }
 
-.floor-search-form input {
+.floor-search-input {
     flex: 1;
     min-width: 0;
-    height: 38px;
+    height: 40px;
     padding: 0 12px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
@@ -61,68 +66,82 @@
     background: #fff;
     color: #0f172a;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 13px;
     box-sizing: border-box;
 }
 
-.floor-search-form input:focus {
+.floor-search-input::placeholder {
+    color: #94a3b8;
+}
+
+.floor-search-input:focus {
     border-color: #6366f1;
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
 }
 
 .floor-search-btn,
 .floor-clear-btn {
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    min-height: 38px;
     padding: 0 13px;
     border: 1px solid #cbd5e1;
     border-radius: 8px;
     background: #fff;
-    color: #475569;
+    color: #334155;
+    text-decoration: none;
     font-family: inherit;
     font-size: 12px;
     font-weight: 800;
-    text-decoration: none;
-    white-space: nowrap;
     cursor: pointer;
+    white-space: nowrap;
 }
 
 .floor-search-btn:hover,
 .floor-clear-btn:hover {
     background: #f8fafc;
-    border-color: #94a3b8;
+    color: #0f172a;
 }
 
-/* Add Floor button */
-.floor-add-btn {
+/* ADD FLOOR BUTTON */
+
+.floor-page .floor-add-btn {
+    min-height: 40px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 7px;
-    min-height: 38px;
-    padding: 0 14px;
-    border: 1px solid #16a34a;
+    padding: 0 16px;
+    border: 1px solid #16a34a !important;
     border-radius: 8px;
-    background: #16a34a;
-    color: #fff;
+    background: #16a34a !important;
+    color: #ffffff !important;
     text-decoration: none;
     font-family: inherit;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 800;
     white-space: nowrap;
-    transition: background 0.2s ease;
+    cursor: pointer;
+    transition: background 0.18s ease, border-color 0.18s ease;
+    flex-shrink: 0;
 }
 
-.floor-add-btn:hover {
-    background: #15803d;
-    border-color: #15803d;
-    color: #fff;
+.floor-page .floor-add-btn:hover,
+.floor-page .floor-add-btn:focus-visible {
+    background: #15803d !important;
+    border-color: #15803d !important;
+    color: #ffffff !important;
 }
 
-/* Table */
+.floor-page .floor-add-btn:focus-visible {
+    outline: 3px solid rgba(22, 163, 74, 0.2);
+    outline-offset: 2px;
+}
+
+/* TABLE */
+
 .floor-table-wrap {
     width: 100%;
     max-width: 100%;
@@ -137,93 +156,140 @@
     text-align: left;
 }
 
-.floor-table th {
-    padding: 12px 10px;
+/* COLUMN WIDTHS */
+
+.floor-table th:nth-child(1),
+.floor-table td:nth-child(1) {
+    width: 5%;
+    text-align: center;
+}
+
+.floor-table th:nth-child(2),
+.floor-table td:nth-child(2) {
+    width: 19%;
+}
+
+.floor-table th:nth-child(3),
+.floor-table td:nth-child(3) {
+    width: 16%;
+}
+
+.floor-table th:nth-child(4),
+.floor-table td:nth-child(4) {
+    width: 18%;
+}
+
+.floor-table th:nth-child(5),
+.floor-table td:nth-child(5) {
+    width: 17%;
+}
+
+.floor-table th:nth-child(6),
+.floor-table td:nth-child(6) {
+    width: 11%;
+    text-align: center;
+}
+
+.floor-table th:nth-child(7),
+.floor-table td:nth-child(7) {
+    width: 14%;
+    text-align: center;
+}
+
+.floor-table thead th {
+    padding: 12px 8px;
     background: #f8fafc;
     border-bottom: 1px solid #e2e8f0;
     color: #64748b;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
+    text-align: left;
     text-transform: uppercase;
     vertical-align: middle;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
 }
 
-.floor-table td {
-    padding: 11px 10px;
+.floor-table tbody td {
+    padding: 13px 8px;
     border-bottom: 1px solid #edf1f7;
     color: #334155;
     font-size: 12px;
-    line-height: 1.5;
+    text-align: left;
     vertical-align: middle;
     overflow-wrap: anywhere;
+    line-height: 1.6;
+}
+
+.floor-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .floor-table tbody tr:hover {
     background: #f8fafc;
 }
 
-.floor-table tbody tr:last-child td {
-    border-bottom: 0;
+/* SERIAL NUMBER */
+
+.floor-serial {
+    color: #64748b !important;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center !important;
 }
 
-/* Column widths */
-.floor-table th:nth-child(1),
-.floor-table td:nth-child(1) {
-    width: 55px;
-    text-align: center;
+/* FLOOR NAME */
+
+.floor-name-wrapper {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
 }
 
-.floor-table th:nth-child(2),
-.floor-table td:nth-child(2) {
-    width: 170px;
+.floor-name-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 17px;
 }
 
-.floor-table th:nth-child(3),
-.floor-table td:nth-child(3) {
-    width: 170px;
+.floor-name-content {
+    flex: 1;
+    min-width: 0;
 }
 
-.floor-table th:nth-child(4),
-.floor-table td:nth-child(4) {
-    width: 160px;
-}
-
-.floor-table th:nth-child(5),
-.floor-table td:nth-child(5) {
-    width: 160px;
-}
-
-.floor-table th:nth-child(6),
-.floor-table td:nth-child(6) {
-    width: 100px;
-}
-
-.floor-table th:nth-child(7),
-.floor-table td:nth-child(7) {
-    width: 145px;
-}
-
-/* Floor name */
 .floor-name {
+    display: block;
     color: #0f172a;
     font-size: 12px;
     font-weight: 800;
+    overflow-wrap: anywhere;
 }
 
 .floor-number {
-    display: inline-block;
-    margin-left: 3px;
+    display: block;
+    margin-top: 2px;
     color: #64748b;
     font-size: 11px;
     font-weight: 500;
 }
 
-/* Related details */
+/* BUILDING / WORK SITE / COMPANY */
+
 .floor-related {
     color: #334155;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 700;
+    overflow-wrap: anywhere;
 }
 
 .floor-muted {
@@ -231,49 +297,59 @@
     font-size: 11px;
 }
 
-/* Status */
+/* STATUS */
+
 .floor-status {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 4px 8px;
+    gap: 4px;
+    padding: 5px 8px;
+    border: 1px solid #bbf7d0;
     border-radius: 6px;
     background: #dcfce7;
     color: #15803d;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
     white-space: nowrap;
 }
 
 .floor-status.inactive {
+    border-color: #fecaca;
     background: #fee2e2;
     color: #b91c1c;
 }
 
-/* Actions */
+/* ACTION BUTTONS */
+
 .floor-actions {
     display: flex;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
     gap: 5px;
     flex-wrap: nowrap;
+    width: 100%;
+    min-width: 0;
+    white-space: nowrap;
 }
 
 .floor-actions form {
     margin: 0;
 }
 
-.floor-actions a,
-.floor-actions button {
+.floor-action-btn {
+    min-height: 30px;
     display: inline-flex;
+    flex: 0 0 auto;
     align-items: center;
     justify-content: center;
     gap: 4px;
-    min-height: 29px;
-    padding: 0 8px;
-    border: 1px solid #e2e8f0;
+    padding: 0 7px;
+    border: 1px solid transparent;
     border-radius: 6px;
     font-family: inherit;
-    font-size: 10px;
+    font-size: 11px;
     font-weight: 800;
     text-decoration: none;
     white-space: nowrap;
@@ -281,20 +357,20 @@
 }
 
 .floor-edit-btn {
-    background: #eef2ff;
-    color: #4338ca;
-    border-color: #c7d2fe !important;
+    border-color: #bfdbfe;
+    background: #eff6ff;
+    color: #2563eb;
 }
 
 .floor-edit-btn:hover {
-    background: #e0e7ff;
-    color: #3730a3;
+    background: #dbeafe;
+    color: #1d4ed8;
 }
 
 .floor-delete-btn {
+    border-color: #fecdd3;
     background: #fff1f2;
     color: #be123c;
-    border-color: #fecdd3 !important;
 }
 
 .floor-delete-btn:hover {
@@ -302,67 +378,120 @@
     color: #9f1239;
 }
 
-/* Empty state */
+/* EMPTY STATE */
+
 .floor-empty {
-    padding: 38px 12px !important;
-    text-align: center;
-    color: #94a3b8 !important;
-    font-size: 12px !important;
+    padding: 45px 12px !important;
+    text-align: center !important;
 }
 
-/* Pagination */
+.floor-empty-icon {
+    display: block;
+    margin-bottom: 12px;
+    color: #94a3b8;
+    font-size: 34px;
+}
+
+.floor-empty-title {
+    margin-bottom: 6px;
+    color: #334155;
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.floor-empty-text {
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+/* PAGINATION */
+
 .floor-pagination {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
-    padding: 12px 16px;
+    padding: 14px 18px;
     border-top: 1px solid #e2e8f0;
     background: #fff;
+}
+
+.floor-pagination-info {
     color: #64748b;
-    font-size: 11px;
+    font-size: 12px;
+}
+
+.floor-pagination-info strong {
+    color: #0f172a;
 }
 
 .floor-pagination-links {
     display: flex;
     align-items: center;
-    gap: 4px;
+    justify-content: center;
+    gap: 5px;
     flex-wrap: wrap;
 }
 
-.floor-pagination a {
+.floor-page-btn,
+.floor-page-current {
+    min-width: 32px;
+    min-height: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 30px;
-    padding: 0 10px;
+    gap: 4px;
+    padding: 0 9px;
     border: 1px solid #cbd5e1;
     border-radius: 7px;
     background: #fff;
     color: #475569;
-    font-size: 11px;
-    font-weight: 800;
     text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
 }
 
-.floor-pagination a:hover {
-    border-color: #a5b4fc;
-    color: #4338ca;
+.floor-page-btn:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+    color: #0f172a;
 }
 
-.floor-page-info {
-    padding: 0 5px;
-    color: #64748b;
-    white-space: nowrap;
+.floor-page-current {
+    border-color: #2563eb;
+    background: #2563eb;
+    color: #fff;
 }
 
-/* Responsive */
+/* RESPONSIVE */
+
+@media (max-width: 1200px) {
+    .floor-table thead th {
+        padding: 10px 5px;
+        font-size: 10px;
+    }
+
+    .floor-table tbody td {
+        padding: 10px 5px;
+        font-size: 11px;
+    }
+
+    .floor-action-btn {
+        min-height: 28px;
+        padding: 0 5px;
+        font-size: 10px;
+    }
+
+    .floor-actions {
+        gap: 3px;
+    }
+}
+
 @media (max-width: 700px) {
     .floor-toolbar {
         align-items: stretch;
         flex-direction: column;
-        padding: 12px;
     }
 
     .floor-search-form {
@@ -370,17 +499,12 @@
         flex-wrap: wrap;
     }
 
-    .floor-search-form input {
-        flex-basis: 100%;
+    .floor-search-input {
         width: 100%;
+        flex-basis: 100%;
     }
 
-    .floor-search-btn,
-    .floor-clear-btn {
-        flex: 1;
-    }
-
-    .floor-add-btn {
+    .floor-page .floor-add-btn {
         width: 100%;
         box-sizing: border-box;
     }
@@ -389,22 +513,28 @@
         align-items: flex-start;
         flex-direction: column;
     }
+
+    .floor-pagination-links {
+        justify-content: flex-start;
+    }
 }
 </style>
 
 <div class="floor-page">
     <div class="floor-card">
 
-        <!-- Search and Add Floor -->
+        <!-- SEARCH TOOLBAR -->
         <div class="floor-toolbar">
 
             <form class="floor-search-form" method="get">
+
                 <input
                     type="text"
                     name="search"
-                    value="{{ search }}"
+                    value="{{ search|default:'' }}"
                     placeholder="Search floor or building..."
                     aria-label="Search floors"
+                    class="floor-search-input"
                 >
 
                 <button class="floor-search-btn" type="submit">
@@ -417,19 +547,21 @@
                         class="floor-clear-btn"
                         href="{% url 'floor_list' %}"
                     >
+                        <i class="ph ph-x"></i>
                         Clear
                     </a>
                 {% endif %}
+
             </form>
 
             <a class="floor-add-btn" href="{% url 'floor_create' %}">
-                <i class="ph ph-plus"></i>
+                <i class="ph-bold ph-plus"></i>
                 Add Floor
             </a>
 
         </div>
 
-        <!-- Floors Table -->
+        <!-- FLOORS TABLE -->
         <div class="floor-table-wrap">
             <table class="floor-table">
 
@@ -449,20 +581,30 @@
                     {% for item in page_obj %}
                         <tr>
 
-                            <td>
-                                {{ forloop.counter0|add:page_obj.start_index }}
+                            <td class="floor-serial">
+                                {{ page_obj.start_index|add:forloop.counter0 }}
                             </td>
 
                             <td>
-                                <span class="floor-name">
-                                    {{ item.name }}
-                                </span>
+                                <div class="floor-name-wrapper">
 
-                                {% if item.floor_number %}
-                                    <span class="floor-number">
-                                        (#{{ item.floor_number }})
-                                    </span>
-                                {% endif %}
+                                    <div class="floor-name-icon">
+                                        <i class="ph ph-buildings"></i>
+                                    </div>
+
+                                    <div class="floor-name-content">
+                                        <span class="floor-name">
+                                            {{ item.name }}
+                                        </span>
+
+                                        {% if item.floor_number %}
+                                            <span class="floor-number">
+                                                Floor #{{ item.floor_number }}
+                                            </span>
+                                        {% endif %}
+                                    </div>
+
+                                </div>
                             </td>
 
                             <td>
@@ -483,24 +625,27 @@
                                 </span>
                             </td>
 
-                            <td>
+                            <td style="text-align:center;">
                                 {% if item.status %}
                                     <span class="floor-status">
+                                        <i class="ph-fill ph-check-circle"></i>
                                         Active
                                     </span>
                                 {% else %}
                                     <span class="floor-status inactive">
+                                        <i class="ph-fill ph-x-circle"></i>
                                         Inactive
                                     </span>
                                 {% endif %}
                             </td>
 
-                            <td>
+                            <td style="text-align:center;">
                                 <div class="floor-actions">
 
                                     <a
-                                        class="floor-edit-btn"
+                                        class="floor-action-btn floor-edit-btn"
                                         href="{% url 'floor_edit' item.pk %}"
+                                        title="Edit Floor"
                                     >
                                         <i class="ph ph-pencil-simple"></i>
                                         Edit
@@ -514,8 +659,9 @@
                                         {% csrf_token %}
 
                                         <button
-                                            class="floor-delete-btn"
+                                            class="floor-action-btn floor-delete-btn"
                                             type="submit"
+                                            title="Delete Floor"
                                         >
                                             <i class="ph ph-trash"></i>
                                             Delete
@@ -530,8 +676,22 @@
                     {% empty %}
                         <tr>
                             <td colspan="7" class="floor-empty">
-                                <i class="ph ph-buildings" style="font-size:22px;"></i>
-                                <div>No floors found.</div>
+
+                                <i class="ph ph-buildings floor-empty-icon"></i>
+
+                                <div class="floor-empty-title">
+                                    No floors found
+                                </div>
+
+                                <div class="floor-empty-text">
+                                    {% if search %}
+                                        No floors match "{{ search }}".
+                                        Try another search term.
+                                    {% else %}
+                                        No floor records are available.
+                                    {% endif %}
+                                </div>
+
                             </td>
                         </tr>
                     {% endfor %}
@@ -540,39 +700,60 @@
             </table>
         </div>
 
-        <!-- Pagination -->
+        <!-- PAGINATION -->
         {% if page_obj.paginator.num_pages > 1 %}
             <div class="floor-pagination">
 
-                <span>
-                    Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}
-                    of {{ page_obj.paginator.count }}
-                </span>
+                <div class="floor-pagination-info">
+                    Page
+                    <strong>{{ page_obj.number }}</strong>
+                    of
+                    <strong>{{ page_obj.paginator.num_pages }}</strong>
+                    · Showing
+                    {{ page_obj.start_index }}–{{ page_obj.end_index }}
+                    of
+                    {{ page_obj.paginator.count }}
+                </div>
 
                 <div class="floor-pagination-links">
 
                     {% if page_obj.has_previous %}
-                        <a href="?page=1&amp;search={{ search|urlencode }}">
+                        <a
+                            href="?page=1{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="floor-page-btn"
+                        >
+                            <i class="ph ph-caret-double-left"></i>
                             First
                         </a>
 
-                        <a href="?page={{ page_obj.previous_page_number }}&amp;search={{ search|urlencode }}">
+                        <a
+                            href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="floor-page-btn"
+                        >
+                            <i class="ph ph-caret-left"></i>
                             Previous
                         </a>
                     {% endif %}
 
-                    <span class="floor-page-info">
-                        Page {{ page_obj.number }}
-                        of {{ page_obj.paginator.num_pages }}
+                    <span class="floor-page-current">
+                        {{ page_obj.number }}
                     </span>
 
                     {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}&amp;search={{ search|urlencode }}">
+                        <a
+                            href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="floor-page-btn"
+                        >
                             Next
+                            <i class="ph ph-caret-right"></i>
                         </a>
 
-                        <a href="?page={{ page_obj.paginator.num_pages }}&amp;search={{ search|urlencode }}">
+                        <a
+                            href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search|urlencode }}{% endif %}"
+                            class="floor-page-btn"
+                        >
                             Last
+                            <i class="ph ph-caret-double-right"></i>
                         </a>
                     {% endif %}
 

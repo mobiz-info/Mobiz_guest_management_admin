@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 
 {% block title %}{{ title }}{% endblock %}
@@ -8,76 +7,709 @@
 {% block content %}
 
 <style>
-.gv-form-wrap{width:100%;max-width:720px;margin:0 auto}
-.gv-form-card{background:#fff;border:1px solid #e2e8f0;border-radius:13px;overflow:hidden;box-shadow:0 7px 24px rgba(15,23,42,.06)}
-.gv-form-title{position:relative;min-height:42px;padding:7px 14px;display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#eff6ff,#fff);border-bottom:1px solid #e2e8f0;color:#172033;font-size:14px;font-weight:800}
-.gv-form-title:after{content:"";position:absolute;left:0;bottom:0;width:75px;height:2px;background:linear-gradient(90deg,#6366f1,#3b82f6)}
-.gv-form-title i{width:27px;height:27px;display:flex;align-items:center;justify-content:center;flex:0 0 27px;border-radius:8px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;font-size:16px}
-.gv-form-body{padding:11px 13px}
-.gv-error-box{padding:5px 8px;margin-bottom:9px;background:#fff7f7;border:1px solid #fecaca;border-left:3px solid #ef4444;border-radius:7px;color:#991b1b;font-size:11px}
-.gv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px 10px}
-.gv-field{min-width:0}
-.gv-field.full,.gv-section{grid-column:1/-1}
-.gv-field label{display:block;margin-bottom:3px;color:#334155;font-size:11px;font-weight:750}
-.gv-field label .text-danger{color:#ef4444!important}
-.gv-field input:not([type=checkbox]):not([type=radio]):not([type=hidden]),.gv-field select,.gv-field textarea{width:100%;box-sizing:border-box;min-height:32px;padding:5px 9px;border:1px solid #d7dee8;border-radius:7px;background:#fff;color:#172033;font-family:inherit;font-size:11.5px;outline:none;transition:.18s}
-.gv-field textarea{min-height:48px;height:48px;resize:vertical;line-height:1.4}
-.gv-field input::placeholder,.gv-field textarea::placeholder{color:#94a3b8}
-.gv-field input:focus,.gv-field select:focus,.gv-field textarea:focus{border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.09)}
-.gv-field select:disabled{background:#f1f5f9;color:#94a3b8;cursor:not-allowed}
-.gv-help{margin-top:3px;color:#64748b;font-size:9.5px;line-height:1.35}
-.gv-error{margin-top:3px;color:#dc2626;font-size:9.5px;line-height:1.3}
-.gv-phone-wrap{display:flex;width:100%;height:32px}
-.gv-dial-code{width:62px;min-width:62px;height:32px;display:flex;align-items:center;justify-content:center;box-sizing:border-box;padding:0 8px;background:#f8fafc;border:1px solid #d7dee8;border-right:0;border-radius:7px 0 0 7px;color:#475569;font-size:11px;font-weight:800;white-space:nowrap}
-.gv-phone-wrap input{flex:1;min-width:0;height:32px;box-sizing:border-box;border-radius:0 7px 7px 0!important}
-.gv-phone-wrap:focus-within .gv-dial-code{border-color:#6366f1;background:#f5f3ff;color:#4f46e5}
-.gv-time-wrap{position:relative;width:100%}
-.gv-time-display{width:100%;min-height:32px;box-sizing:border-box;padding:5px 34px 5px 9px;border:1px solid #d7dee8;border-radius:7px;background:#fff;color:#172033;font-family:inherit;font-size:11.5px;cursor:pointer}
-.gv-time-icon{position:absolute;right:11px;top:50%;transform:translateY(-50%);color:#6366f1;font-size:16px;pointer-events:none}
-.gv-time-picker{position:absolute;z-index:1000;top:calc(100% + 6px);left:0;width:225px;padding:9px;background:#fff;border:1px solid #dbe3ef;border-radius:11px;box-shadow:0 15px 35px rgba(15,23,42,.16);display:none}
-.gv-time-wrap.open .gv-time-picker{display:block}
-.gv-time-picker-title{margin-bottom:9px;color:#1e293b;font-size:11px;font-weight:800}
-.gv-time-select-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
-.gv-time-select{width:100%;min-height:31px;padding:5px 6px;border:1px solid #d7dee8;border-radius:7px;background:#f8fafc;color:#172033;font-size:11px;cursor:pointer}
-.gv-time-picker-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:7px;padding-top:9px;border-top:1px solid #e2e8f0}
-.gv-time-clear,.gv-time-done{min-height:30px;padding:0 10px;border-radius:6px;font-size:10px;font-weight:800;cursor:pointer}
-.gv-time-clear{background:#fff;border:1px solid #cbd5e1;color:#475569}
-.gv-time-done{background:linear-gradient(135deg,#6366f1,#4f46e5);border:1px solid #4f46e5;color:#fff}
-.gv-camera-card{position:relative;overflow:hidden;border:1px solid #d9e2f0;border-radius:14px;padding:12px;background:linear-gradient(145deg,#f8fbff,#fff);box-shadow:0 8px 22px rgba(15,23,42,.05)}
-.gv-camera-card:before{content:"";position:absolute;top:0;left:0;width:100%;height:3px;background:linear-gradient(90deg,#4f46e5,#06b6d4,#8b5cf6)}
-.gv-camera-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
-.gv-camera-title{display:flex;align-items:center;gap:8px;color:#172033;font-size:12px;font-weight:850}
-.gv-camera-title i{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border-radius:9px;background:#eef2ff;color:#4f46e5;font-size:17px}
-.gv-optional-badge{padding:5px 8px;border-radius:999px;background:#eef2ff;border:1px solid #c7d2fe;color:#4338ca;font-size:8px;font-weight:900}
-.gv-camera-stage{position:relative;min-height:112px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px;border-radius:11px;background:linear-gradient(135deg,#f1f5ff,#f8fafc 55%,#ecfeff);border:1px dashed #c7d2fe}
-.gv-camera-placeholder{display:flex;align-items:center;gap:9px;color:#64748b;font-size:10px;font-weight:750}
-.gv-camera-placeholder i{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;border-radius:11px;background:#fff;color:#6366f1;font-size:20px}
-.gv-photo-preview-wrap{position:relative;width:76px;height:76px;flex:0 0 76px;display:flex;align-items:center;justify-content:center;border-radius:12px;overflow:hidden;background:#fff;border:1px solid #dbe3ef}
-.gv-photo-preview-wrap img{display:none;width:100%;height:100%;object-fit:cover}
-.gv-photo-preview-wrap img.active{display:block}
-.gv-camera-actions{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:9px}
-.gv-camera-status{color:#64748b;font-size:9.5px;font-weight:700}
-.gv-camera-btn{min-height:34px;padding:0 12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:8px;font-size:10px;font-weight:850;cursor:pointer}
-.gv-camera-btn.primary{background:linear-gradient(135deg,#6366f1,#4f46e5);border:1px solid #4f46e5;color:#fff}
-.gv-camera-btn.secondary{background:#fff;border:1px solid #cbd5e1;color:#334155}
-.gv-camera-note{margin-top:7px;color:#94a3b8;font-size:9px;line-height:1.35}
-.gv-section{margin-top:3px;padding-top:10px;border-top:1px solid #e2e8f0}
-.gv-section h4{margin:0 0 5px;color:#1e293b;font-size:12px;font-weight:800}
-.gv-person-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:7px;margin:6px 0}
-.gv-person-row input{width:100%;min-height:31px;box-sizing:border-box;padding:5px 8px;border:1px solid #d7dee8;border-radius:7px;font-size:11px}
-.gv-add,.gv-remove{min-height:31px;padding:0 10px;border-radius:7px;font-size:10px;font-weight:800;cursor:pointer}
-.gv-add{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
-.gv-remove{background:#fff;color:#475569;border:1px solid #cbd5e1}
-.gv-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;margin-top:10px;padding-top:9px;border-top:1px solid #e2e8f0}
-.gv-actions a,.gv-actions button{min-height:31px;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:0 10px;border-radius:7px;font-size:10.5px;font-weight:800;text-decoration:none;cursor:pointer}
-.gv-cancel{background:#fff;border:1px solid #cbd5e1;color:#475569}
-.gv-save{background:linear-gradient(135deg,#6366f1,#4f46e5);border:1px solid #4f46e5;color:#fff}
-@media(max-width:650px){.gv-form-wrap{max-width:100%}.gv-grid{grid-template-columns:1fr}.gv-field.full,.gv-section{grid-column:auto}.gv-person-row{grid-template-columns:1fr}.gv-remove{justify-self:start}.gv-time-picker{width:100%;box-sizing:border-box}}
-@media(max-width:480px){.gv-form-body{padding:10px}.gv-form-title{padding:7px 10px}.gv-actions{flex-direction:column-reverse}.gv-actions a,.gv-actions button{width:100%;box-sizing:border-box}}
+:root{
+  --gv-primary:#2563eb;
+  --gv-primary-dark:#1d4ed8;
+  --gv-primary-soft:#eff6ff;
+  --gv-primary-ring:rgba(37,99,235,.14);
+  --gv-accent:#60a5fa;
+  --gv-text:#172b4d;
+  --gv-muted:#64748b;
+  --gv-border:#dbe5f1;
+  --gv-bg:#f8fbff;
+}
+
+.gv-form-wrap{
+    width:100%;
+    max-width:700px;
+    margin:0 auto;
+    padding:5px 0 22px;
+}
+
+.gv-form-card{
+    background:#fff;
+    border:1px solid #dbe5f1;
+    border-radius:17px;
+    overflow:visible;
+    box-shadow:0 14px 38px rgba(30,64,175,.08);
+}
+
+.gv-form-title{
+    position:relative;
+    min-height:58px;
+    padding:10px 20px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:linear-gradient(110deg,#eaf2ff 0%,#f7faff 62%,#fff 100%);
+    border-bottom:1px solid #e2eaf5;
+    border-radius:17px 17px 0 0;
+    color:#172b4d;
+    font-size:15px;
+    font-weight:800;
+    letter-spacing:-.15px;
+}
+
+.gv-form-title:after{
+    content:"";
+    position:absolute;
+    left:20px;
+    bottom:0;
+    width:74px;
+    height:3px;
+    border-radius:4px;
+    background:linear-gradient(90deg,#2563eb,#60a5fa);
+}
+
+.gv-form-title i{
+    width:34px;
+    height:34px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex:0 0 34px;
+    border-radius:11px;
+    background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+    color:#fff;
+    font-size:17px;
+    box-shadow:0 5px 13px rgba(37,99,235,.22);
+}
+
+.gv-form-body{
+    padding:20px 22px 18px;
+}
+
+.gv-error-box{
+    padding:9px 13px;
+    margin-bottom:14px;
+    background:#fff7f7;
+    border:1px solid #fecaca;
+    border-left:4px solid #ef4444;
+    border-radius:9px;
+    color:#991b1b;
+    font-size:11.5px;
+}
+
+.gv-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:14px 16px;
+}
+
+.gv-field{
+    min-width:0;
+}
+
+.gv-field.full,
+.gv-section{
+    grid-column:1/-1;
+}
+
+.gv-field label{
+    display:block;
+    margin-bottom:6px;
+    color:#334b6b;
+    font-size:11.5px;
+    font-weight:750;
+}
+
+.gv-field label .text-danger{
+    color:#ef4444!important;
+}
+
+.gv-field input:not([type=checkbox]):not([type=radio]):not([type=hidden]),
+.gv-field select,
+.gv-field textarea{
+    width:100%;
+    box-sizing:border-box;
+    min-height:39px;
+    padding:8px 12px;
+    border:1px solid #d7e2f0;
+    border-radius:9px;
+    background:#fbfdff;
+    color:#172b4d;
+    font-family:inherit;
+    font-size:12.5px;
+    outline:none;
+    transition:border-color .2s,box-shadow .2s,background .2s;
+}
+
+.gv-field textarea{
+    min-height:74px;
+    height:74px;
+    resize:vertical;
+    line-height:1.45;
+}
+
+.gv-field input::placeholder,
+.gv-field textarea::placeholder{
+    color:#9aaac0;
+    font-size:12px;
+}
+
+.gv-field input:hover,
+.gv-field select:hover,
+.gv-field textarea:hover{
+    border-color:#93b4ed;
+    background:#fff;
+}
+
+.gv-field input:focus,
+.gv-field select:focus,
+.gv-field textarea:focus{
+    border-color:#3b82f6;
+    background:#fff;
+    box-shadow:0 0 0 3px rgba(59,130,246,.13);
+}
+
+.gv-field select:disabled{
+    background:#f1f5f9;
+    color:#94a3b8;
+    cursor:not-allowed;
+}
+
+.gv-help{
+    margin-top:4px;
+    color:#71839c;
+    font-size:10.5px;
+    line-height:1.4;
+}
+
+.gv-error{
+    margin-top:4px;
+    color:#dc2626;
+    font-size:10.5px;
+    line-height:1.3;
+}
+
+/* Phone */
+
+.gv-phone-wrap{
+    display:flex;
+    width:100%;
+    height:39px;
+}
+
+.gv-dial-code{
+    width:58px;
+    min-width:58px;
+    height:39px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+    padding:0 8px;
+    background:#eff6ff;
+    border:1px solid #d7e2f0;
+    border-right:0;
+    border-radius:9px 0 0 9px;
+    color:#1d4ed8;
+    font-size:11.5px;
+    font-weight:800;
+    white-space:nowrap;
+}
+
+.gv-phone-wrap input{
+    flex:1;
+    min-width:0;
+    height:39px;
+    box-sizing:border-box;
+}
+
+.gv-phone-wrap:focus-within .gv-dial-code{
+    border-color:#3b82f6;
+    background:#dbeafe;
+}
+
+/* Time picker */
+
+.gv-time-wrap{
+    position:relative;
+    width:100%;
+}
+
+.gv-time-display{
+    width:100%;
+    min-height:39px;
+    box-sizing:border-box;
+    padding:8px 36px 8px 12px;
+    border:1px solid #d7e2f0;
+    border-radius:9px;
+    background:#fbfdff;
+    color:#172b4d;
+    font-family:inherit;
+    font-size:12.5px;
+    cursor:pointer;
+    outline:none;
+}
+
+.gv-time-display:hover{
+    border-color:#93b4ed;
+    background:#fff;
+}
+
+.gv-time-display:focus{
+    border-color:#3b82f6;
+    box-shadow:0 0 0 3px rgba(59,130,246,.13);
+}
+
+.gv-time-icon{
+    position:absolute;
+    right:11px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#2563eb;
+    font-size:16px;
+    pointer-events:none;
+}
+
+.gv-time-picker{
+    position:absolute;
+    z-index:1000;
+    top:calc(100% + 6px);
+    left:0;
+    width:250px;
+    padding:14px;
+    background:#fff;
+    border:1px solid #dbe5f1;
+    border-radius:13px;
+    box-shadow:0 18px 42px rgba(15,40,80,.16);
+    display:none;
+}
+
+.gv-time-wrap.open .gv-time-picker{
+    display:block;
+}
+
+.gv-time-picker-title{
+    margin-bottom:9px;
+    color:#172b4d;
+    font-size:12px;
+    font-weight:800;
+}
+
+.gv-time-select-row{
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    gap:6px;
+}
+
+.gv-time-select{
+    width:100%;
+    min-height:36px;
+    padding:5px 6px;
+    border:1px solid #d7e2f0;
+    border-radius:8px;
+    background:#f8fbff;
+    color:#172b4d;
+    font-size:12px;
+    cursor:pointer;
+}
+
+.gv-time-select:focus{
+    outline:none;
+    border-color:#3b82f6;
+    box-shadow:0 0 0 2px rgba(59,130,246,.12);
+}
+
+.gv-time-picker-actions{
+    display:flex;
+    justify-content:flex-end;
+    gap:6px;
+    margin-top:10px;
+    padding-top:10px;
+    border-top:1px solid #e5edf7;
+}
+
+.gv-time-clear,
+.gv-time-done{
+    min-height:33px;
+    padding:0 13px;
+    border-radius:7px;
+    font-size:11px;
+    font-weight:800;
+    cursor:pointer;
+}
+
+.gv-time-clear{
+    background:#fff;
+    border:1px solid #d7e2f0;
+    color:#475569;
+}
+
+.gv-time-done{
+    background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+    border:1px solid #1d4ed8;
+    color:#fff;
+}
+
+/* Camera */
+
+.gv-camera-card{
+    position:relative;
+    overflow:hidden;
+    border:1px solid #dbe5f1;
+    border-radius:13px;
+    padding:15px;
+    background:linear-gradient(145deg,#f5f9ff,#fff);
+    box-shadow:0 6px 18px rgba(30,64,175,.05);
+}
+
+.gv-camera-card:before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:3px;
+    background:linear-gradient(90deg,#2563eb,#60a5fa,#bfdbfe);
+}
+
+.gv-camera-top{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.gv-camera-title{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#172b4d;
+    font-size:12.5px;
+    font-weight:800;
+}
+
+.gv-camera-title i{
+    width:30px;
+    height:30px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:9px;
+    background:#eaf2ff;
+    color:#2563eb;
+    font-size:17px;
+}
+
+.gv-optional-badge{
+    padding:4px 9px;
+    border-radius:999px;
+    background:#eff6ff;
+    border:1px solid #bfdbfe;
+    color:#1d4ed8;
+    font-size:8.5px;
+    font-weight:900;
+    letter-spacing:.4px;
+}
+
+.gv-camera-stage{
+    position:relative;
+    min-height:90px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px;
+    border-radius:11px;
+    background:linear-gradient(135deg,#f1f6ff,#fff);
+    border:1px dashed #a9c5f3;
+}
+
+.gv-camera-placeholder{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:#64748b;
+    font-size:11px;
+    font-weight:700;
+}
+
+.gv-camera-placeholder i{
+    width:38px;
+    height:38px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:11px;
+    background:#fff;
+    color:#2563eb;
+    font-size:20px;
+    box-shadow:0 3px 8px rgba(15,42,46,.06);
+}
+
+.gv-photo-preview-wrap{
+    position:relative;
+    width:68px;
+    height:68px;
+    flex:0 0 68px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:12px;
+    overflow:hidden;
+    background:#fff;
+    border:1px solid #dbe5f1;
+    box-shadow:0 4px 10px rgba(15,42,46,.08);
+}
+
+.gv-photo-preview-wrap img{
+    display:none;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+.gv-photo-preview-wrap img.active{
+    display:block;
+}
+
+.gv-camera-actions{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:10px;
+}
+
+.gv-camera-status{
+    color:#64748b;
+    font-size:10px;
+    font-weight:700;
+}
+
+.gv-camera-btn{
+    min-height:34px;
+    padding:0 13px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    border-radius:9px;
+    font-size:11px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.gv-camera-btn.primary{
+    background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+    border:1px solid #1d4ed8;
+    color:#fff;
+    box-shadow:0 4px 11px rgba(37,99,235,.2);
+}
+
+.gv-camera-btn.primary:hover{
+    transform:translateY(-1px);
+    box-shadow:0 7px 15px rgba(37,99,235,.25);
+}
+
+.gv-camera-btn.secondary{
+    background:#fff;
+    border:1px solid #d7e2f0;
+    color:#334b6b;
+}
+
+.gv-camera-btn.secondary:hover{
+    background:#eff6ff;
+}
+
+.gv-camera-note{
+    margin-top:8px;
+    color:#8aa0a6;
+    font-size:9.5px;
+    line-height:1.35;
+}
+
+/* Accompanying persons */
+
+.gv-section{
+    margin-top:2px;
+    padding-top:15px;
+    border-top:1px solid #e4ebf4;
+}
+
+.gv-section h4{
+    margin:0 0 4px;
+    color:#172b4d;
+    font-size:13px;
+    font-weight:800;
+}
+
+.gv-person-row{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;
+    gap:8px;
+    margin:7px 0;
+}
+
+.gv-person-phone{
+    display:flex;
+    align-items:stretch;
+    min-width:0;
+    border:1px solid #d7e2f0;
+    border-radius:9px;
+    overflow:hidden;
+    background:#fbfdff;
+}
+.gv-person-phone .gv-person-dial-code{
+    display:flex;
+    align-items:center;
+    padding:0 10px;
+    background:#f1f5f9;
+    border-right:1px solid #d7e2f0;
+    color:#334155;
+    font-size:12px;
+    font-weight:700;
+    white-space:nowrap;
+}
+.gv-person-phone input{
+    min-width:0;
+    flex:1 1 auto;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+}
+.gv-person-row input{
+    width:100%;
+    min-height:38px;
+    box-sizing:border-box;
+    padding:7px 11px;
+    border:1px solid #d7e2f0;
+    border-radius:9px;
+    background:#fbfdff;
+    color:#172b4d;
+    font-size:12px;
+    outline:none;
+    transition:.2s;
+}
+
+.gv-person-row input:focus{
+    border-color:#3b82f6;
+    background:#fff;
+    box-shadow:0 0 0 3px rgba(59,130,246,.12);
+}
+
+.gv-add,
+.gv-remove{
+    min-height:33px;
+    padding:0 12px;
+    border-radius:8px;
+    font-size:11px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.gv-add{
+    background:#eff6ff;
+    color:#1d4ed8;
+    border:1px dashed #93b4ed;
+}
+
+.gv-add:hover{
+    background:#dbeafe;
+}
+
+.gv-remove{
+    background:#fff;
+    color:#b91c1c;
+    border:1px solid #fecaca;
+}
+
+.gv-remove:hover{
+    background:#fef2f2;
+}
+
+/* Actions */
+
+.gv-actions{
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+    gap:8px;
+    margin-top:15px;
+    padding-top:15px;
+    border-top:1px solid #e4ebf4;
+}
+
+.gv-actions a,
+.gv-actions button{
+    min-height:39px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:5px;
+    padding:0 16px;
+    border-radius:9px;
+    font-size:12px;
+    font-weight:800;
+    text-decoration:none;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.gv-cancel{
+    background:#fff;
+    border:1px solid #d7e2f0;
+    color:#475569;
+}
+
+.gv-cancel:hover{
+    background:#f8fafc;
+}
+
+.gv-save{
+    background:linear-gradient(135deg,#3b82f6,#1d4ed8);
+    border:1px solid #1d4ed8;
+    color:#fff;
+    box-shadow:0 5px 13px rgba(37,99,235,.22);
+}
+
+.gv-save:hover{
+    transform:translateY(-1px);
+    box-shadow:0 8px 17px rgba(37,99,235,.28);
+}
+
+/* Responsive */
+
+@media(max-width:700px){
+    .gv-form-wrap{max-width:100%}
+    .gv-form-body{padding:16px}
+    .gv-grid{grid-template-columns:1fr;gap:12px}
+    .gv-field.full,.gv-section{grid-column:auto}
+    .gv-person-row{grid-template-columns:1fr}
+    .gv-remove{justify-self:start}
+    .gv-time-picker{width:100%;box-sizing:border-box}
+}
+
+@media(max-width:480px){
+    .gv-form-title{
+        min-height:52px;
+        padding:9px 14px;
+        font-size:14px;
+    }
+    .gv-form-title:after{left:14px}
+    .gv-form-body{padding:13px}
+    .gv-camera-actions{
+        align-items:stretch;
+        flex-direction:column;
+    }
+    .gv-camera-btn{width:100%}
+    .gv-actions{flex-direction:column-reverse}
+    .gv-actions a,.gv-actions button{
+        width:100%;
+        box-sizing:border-box;
+    }
+}
 </style>
 
 <div class="gv-form-wrap">
 <div class="gv-form-card">
+
 <div class="gv-form-title">
     <i class="ph ph-user-plus"></i>
     <span>{{ title }}</span>
@@ -87,7 +719,9 @@
 
 {% if non_field_errors %}
 <div class="gv-error-box">
-    {% for error in non_field_errors %}<div>{{ error }}</div>{% endfor %}
+    {% for error in non_field_errors %}
+        <div>{{ error }}</div>
+    {% endfor %}
 </div>
 {% endif %}
 
@@ -96,7 +730,39 @@
 
 <div class="gv-grid">
 
-{% if is_tenant_self_service %}
+{% if is_unit_self_service %}
+
+<div class="gv-field full">
+    <label for="id_visit_type">Visit Type *</label>
+    <select name="visit_type" id="id_visit_type" required>
+        <option value="advance" selected>Advance Visit</option>
+    </select>
+    <div class="gv-help">Unit accounts can submit Advance Guest Visit requests only.</div>
+    {% for error in errors.visit_type %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
+</div>
+
+<div class="gv-field full">
+    <label for="id_tenant">Tenant to notify for approval *</label>
+    <select name="tenant" id="id_tenant" required>
+        <option value="">Select tenant</option>
+        {% for tenant in tenants %}
+        <option value="{{ tenant.pk }}" {% if values.tenant == tenant.pk|stringformat:'s' %}selected{% endif %}>
+            {{ tenant.full_name }}
+        </option>
+        {% endfor %}
+    </select>
+    {% for error in errors.tenant %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
+    {% if not tenants %}
+        <div class="gv-help">No active tenant is currently allocated to this Unit.</div>
+    {% endif %}
+</div>
+
+{% elif is_tenant_self_service %}
+
 <input type="hidden" name="tenant" value="{{ self_service_tenant.pk }}">
 
 <div class="gv-field full">
@@ -105,8 +771,12 @@
         <option value="advance" {% if values.visit_type == 'advance' %}selected{% endif %}>Advance Visit — submit for approval</option>
         <option value="walk_in" {% if values.visit_type == 'walk_in' %}selected{% endif %}>Walk-in Visit — send to Unit for acceptance</option>
     </select>
-    <div class="gv-help" id="gv-visit-type-help">Advance visits are approved by the Tenant. Walk-in requests require Unit acceptance, then Tenant approval.</div>
-    {% for error in errors.visit_type %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    <div class="gv-help" id="gv-visit-type-help">
+        Advance visits are approved by the Tenant. Walk-in requests require Unit acceptance, then Tenant approval.
+    </div>
+    {% for error in errors.visit_type %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
 
 {% else %}
@@ -116,10 +786,14 @@
     <select name="tenant" id="id_tenant" required>
         <option value="">Select tenant</option>
         {% for tenant in tenants %}
-        <option value="{{ tenant.pk }}" {% if values.tenant == tenant.pk|stringformat:'s' %}selected{% endif %}>{{ tenant.full_name }}</option>
+        <option value="{{ tenant.pk }}" {% if values.tenant == tenant.pk|stringformat:'s' %}selected{% endif %}>
+            {{ tenant.full_name }}
+        </option>
         {% endfor %}
     </select>
-    {% for error in errors.tenant %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    {% for error in errors.tenant %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
 
 <div class="gv-field">
@@ -128,12 +802,15 @@
         <option value="advance" {% if values.visit_type == 'advance' %}selected{% endif %}>Advance Visit</option>
         <option value="walk_in" {% if values.visit_type == 'walk_in' %}selected{% endif %}>Walk-in Visit (arrived at gate)</option>
     </select>
-    {% for error in errors.visit_type %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    {% for error in errors.visit_type %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
     <div class="gv-help">Unit advance requests are sent to the selected Tenant for approval.</div>
 </div>
 
 {% endif %}
 
+{% if not is_unit_self_service %}
 <div class="gv-field">
     <label for="id_building">Building *</label>
     <select name="building" id="id_building" required>
@@ -144,10 +821,14 @@
             data-dial-code="{{ building.company.country.dial_code|default:'' }}"
             value="{{ building.id }}"
             {% if values.building == building.id|stringformat:'s' %}selected{% endif %}
-        >{{ building.name }}</option>
+        >
+            {{ building.name }}
+        </option>
         {% endfor %}
     </select>
-    {% for error in errors.building %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    {% for error in errors.building %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
 
 <div class="gv-field">
@@ -162,62 +843,68 @@
                 data-dial-code="{{ allocation.unit.building.company.country.dial_code|default:'' }}"
                 value="{{ allocation.unit.pk }}"
                 {% if values.tenant == tenant.pk|stringformat:'s' and values.unit == allocation.unit.pk|stringformat:'s' %}selected{% endif %}
-            >{{ allocation.unit.name }} — {{ allocation.unit.building.name }}</option>
+            >
+                {{ allocation.unit.name }} — {{ allocation.unit.building.name }}
+            </option>
             {% endfor %}
         {% endfor %}
     </select>
-    {% for error in errors.unit %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    {% for error in errors.unit %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
+{% endif %}
 
 <div class="gv-field">
     <label for="id_guest_name">Guest Name *</label>
-    <input id="id_guest_name" name="guest_name" maxlength="150" required value="{{ values.guest_name }}" placeholder="Enter visitor name">
-    {% for error in errors.guest_name %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    <input
+        id="id_guest_name"
+        name="guest_name"
+        maxlength="150"
+        required
+        value="{{ values.guest_name }}"
+        placeholder="Enter visitor name"
+    >
+    {% for error in errors.guest_name %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
 
 <div class="gv-field">
     <label for="id_guest_mobile_number">Guest Mobile Number *</label>
     <div class="gv-phone-wrap">
-        <input id="id_guest_mobile_number" name="guest_mobile_number" maxlength="30" required value="{{ values.guest_mobile_number }}" placeholder="Enter visitor mobile number">
+        <span class="gv-dial-code" id="guestDialCode">{{ dial_code|default:"" }}</span>
+        <input
+            id="id_guest_mobile_number"
+            name="guest_mobile_number"
+            maxlength="30"
+            required
+            value="{{ values.guest_mobile_number }}"
+            placeholder="Enter visitor mobile number"
+        >
     </div>
-    {% for error in errors.guest_mobile_number %}<div class="gv-error">{{ error }}</div>{% endfor %}
-</div>
-
-<div class="gv-field full">
-    <label>Guest Photo <span style="font-weight:600;color:#64748b">(Optional)</span></label>
-    <div class="gv-camera-card">
-        <div class="gv-camera-top">
-            <div>
-                <div class="gv-camera-title"><i class="ph ph-camera"></i>Capture Guest Photo</div>
-                <div class="gv-help">Open the camera in a separate window, capture the guest photo, and return here.</div>
-            </div>
-            <span class="gv-optional-badge">OPTIONAL</span>
-        </div>
-        <div class="gv-camera-stage">
-            <div class="gv-camera-placeholder" id="camera-placeholder">
-                <i class="ph ph-camera-slash"></i>
-                <span id="camera-status-text">No guest photo captured</span>
-            </div>
-            <div class="gv-photo-preview-wrap">
-                <img id="guest-photo-preview" alt="Guest photo preview">
-            </div>
-        </div>
-        <div class="gv-camera-actions">
-            <span class="gv-camera-status" id="camera-window-status">Camera opens separately for a cleaner capture experience.</span>
-            <button type="button" class="gv-camera-btn primary" id="start-camera"><i class="ph ph-video-camera"></i>Open Camera</button>
-            <button type="button" class="gv-camera-btn secondary" id="retake-camera" style="display:none"><i class="ph ph-arrow-counter-clockwise"></i>Retake Photo</button>
-        </div>
-        <div class="gv-camera-note">Your captured photo is placed into this form automatically.</div>
-    </div>
-    <input type="hidden" name="webcam_photo" id="webcam-photo-data">
-    {% for error in errors.guest_photo %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    {% for error in errors.guest_mobile_number %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
 
 <div class="gv-field">
-    <label for="id_additional_visitors">Additional Visitors <span style="font-weight:500;color:#94a3b8">(excluding main guest)</span></label>
-    <input type="number" min="0" max="100" id="id_additional_visitors" name="additional_visitors" value="{{ values.additional_visitors|default:'0' }}">
+    <label for="id_additional_visitors">
+        Additional Visitors
+        <span style="font-weight:500;color:#94a3b8">(excluding main guest)</span>
+    </label>
+    <input
+        type="number"
+        min="0"
+        max="100"
+        id="id_additional_visitors"
+        name="additional_visitors"
+        value="{{ values.additional_visitors|default:'0' }}"
+    >
     <div class="gv-help">Example: 4 additional visitors = 5 people in total.</div>
-    {% for error in errors.additional_visitors %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    {% for error in errors.additional_visitors %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
 
 <div class="gv-field">
@@ -225,79 +912,271 @@
     <select name="purpose_of_visit" id="id_purpose_of_visit" required>
         <option value="">Select purpose</option>
         {% for purpose in purposes %}
-        <option value="{{ purpose.pk }}" {% if values.purpose_of_visit == purpose.pk|stringformat:'s' %}selected{% endif %}>{{ purpose.name }}</option>
+        <option value="{{ purpose.pk }}" {% if values.purpose_of_visit == purpose.pk|stringformat:'s' %}selected{% endif %}>
+            {{ purpose.name }}
+        </option>
         {% endfor %}
     </select>
-    {% for error in errors.purpose_of_visit %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    {% for error in errors.purpose_of_visit %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
 
 <div class="gv-field">
     <label for="id_visit_date">Visit Date *</label>
-    <input type="date" name="visit_date" id="id_visit_date" required value="{{ values.visit_date }}">
-    {% for error in errors.visit_date %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    <input
+        type="date"
+        name="visit_date"
+        id="id_visit_date"
+        required
+        value="{{ values.visit_date }}"
+    >
+    {% for error in errors.visit_date %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
 
 <div class="gv-field">
-    <label for="id_visit_time_display">Expected Visit Time <span style="font-weight:500;color:#94a3b8">(optional)</span></label>
+    <label for="id_visit_time_display">
+        Expected Visit Time
+        <span style="font-weight:500;color:#94a3b8">(optional)</span>
+    </label>
+
     <div class="gv-time-wrap" id="gv-time-wrap">
-        <input type="text" id="id_visit_time_display" class="gv-time-display" placeholder="Select time" readonly autocomplete="off">
+
+        <input
+            type="text"
+            id="id_visit_time_display"
+            class="gv-time-display"
+            placeholder="Select time"
+            readonly
+            autocomplete="off"
+        >
+
         <i class="ph ph-clock gv-time-icon"></i>
-        <input type="hidden" name="visit_time" id="id_visit_time" value="{{ values.visit_time }}">
+
+        <input
+            type="hidden"
+            name="visit_time"
+            id="id_visit_time"
+            value="{{ values.visit_time }}"
+        >
+
         <div class="gv-time-picker" id="gv-time-picker">
+
             <div class="gv-time-picker-title">Select Expected Visit Time</div>
+
             <div class="gv-time-select-row">
+
                 <select id="gv-time-hour" class="gv-time-select">
                     <option value="">Hour</option>
-                    {% for hour in "123456789" %}<option value="{{ forloop.counter }}">{{ forloop.counter }}</option>{% endfor %}
-                    <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                    {% for hour in "123456789" %}
+                        <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                    {% endfor %}
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
                 </select>
+
                 <select id="gv-time-minute" class="gv-time-select">
                     <option value="">Min</option>
-                    {% for minute in "000510152025303540455055"|make_list %}{% endfor %}
-                    <option value="00">00</option><option value="05">05</option><option value="10">10</option><option value="15">15</option><option value="20">20</option><option value="25">25</option><option value="30">30</option><option value="35">35</option><option value="40">40</option><option value="45">45</option><option value="50">50</option><option value="55">55</option>
+                    <option value="00">00</option>
+                    <option value="05">05</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                    <option value="35">35</option>
+                    <option value="40">40</option>
+                    <option value="45">45</option>
+                    <option value="50">50</option>
+                    <option value="55">55</option>
                 </select>
-                <select id="gv-time-period" class="gv-time-select"><option value="">AM/PM</option><option value="AM">AM</option><option value="PM">PM</option></select>
+
+                <select id="gv-time-period" class="gv-time-select">
+                    <option value="">AM/PM</option>
+                    <option value="AM">AM</option>
+                    <option value="PM">PM</option>
+                </select>
+
             </div>
+
             <div class="gv-time-picker-actions">
                 <button type="button" class="gv-time-clear" id="gv-time-clear">Clear</button>
                 <button type="button" class="gv-time-done" id="gv-time-done">Done</button>
             </div>
+
         </div>
     </div>
-    {% for error in errors.visit_time %}<div class="gv-error">{{ error }}</div>{% endfor %}
+
+    {% for error in errors.visit_time %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
 
 <div class="gv-field">
-    <label for="id_vehicle_details">Vehicle Details <span style="font-weight:500;color:#94a3b8">(optional)</span></label>
-    <input type="text" name="vehicle_details" id="id_vehicle_details" maxlength="150" value="{{ values.vehicle_details }}" placeholder="Vehicle type / registration number">
-    {% for error in errors.vehicle_details %}<div class="gv-error">{{ error }}</div>{% endfor %}
-</div>
-
-<div class="gv-section">
-    <h4>Accompanying Persons <span style="font-weight:500;color:#94a3b8">(optional)</span></h4>
-    <div class="gv-help">Add the name and mobile number for each person coming with the main guest.</div>
-    <div id="gv-person-list">
-        {% for row in accompanying_rows %}
-        <div class="gv-person-row">
-            <input name="accompanying_name" maxlength="150" value="{{ row.name }}" placeholder="Person name">
-            <input name="accompanying_mobile" maxlength="30" value="{{ row.mobile }}" placeholder="Mobile number">
-            <button type="button" class="gv-remove" {% if forloop.first and forloop.last %}style="display:none"{% endif %}>Remove</button>
-        </div>
-        {% empty %}
-        <div class="gv-person-row">
-            <input name="accompanying_name" maxlength="150" placeholder="Person name">
-            <input name="accompanying_mobile" maxlength="30" placeholder="Mobile number">
-            <button type="button" class="gv-remove" style="display:none">Remove</button>
-        </div>
-        {% endfor %}
-    </div>
-    <button type="button" class="gv-add" id="gv-add-person">+ Add accompanying person</button>
-    {% for error in errors.accompanying_people %}<div class="gv-error">{{ error }}</div>{% endfor %}
+    <label for="id_vehicle_details">
+        Vehicle Details
+        <span style="font-weight:500;color:#94a3b8">(optional)</span>
+    </label>
+    <input
+        type="text"
+        name="vehicle_details"
+        id="id_vehicle_details"
+        maxlength="150"
+        value="{{ values.vehicle_details }}"
+        placeholder="Vehicle type / registration number"
+    >
+    {% for error in errors.vehicle_details %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
 </div>
 
 <div class="gv-field full">
-    <label for="id_notes">Notes <span style="font-weight:500;color:#94a3b8">(optional)</span></label>
-    <textarea name="notes" id="id_notes" placeholder="Optional visit notes">{{ values.notes }}</textarea>
+    <label>
+        Guest Photo
+        <span style="font-weight:600;color:#64748b">(Optional)</span>
+    </label>
+
+    <div class="gv-camera-card">
+
+        <div class="gv-camera-top">
+            <div>
+                <div class="gv-camera-title">
+                    <i class="ph ph-camera"></i>
+                    Capture Guest Photo
+                </div>
+                <div class="gv-help">
+                    Open the camera in a separate window, capture the guest photo, and return here.
+                </div>
+            </div>
+            <span class="gv-optional-badge">OPTIONAL</span>
+        </div>
+
+        <div class="gv-camera-stage">
+
+            <div class="gv-camera-placeholder" id="camera-placeholder">
+                <i class="ph ph-camera-slash"></i>
+                <span id="camera-status-text">No guest photo captured</span>
+            </div>
+
+            <div class="gv-photo-preview-wrap">
+                <img id="guest-photo-preview" alt="Guest photo preview">
+            </div>
+
+        </div>
+
+        <div class="gv-camera-actions">
+
+            <span class="gv-camera-status" id="camera-window-status">
+                Camera opens separately for a cleaner capture experience.
+            </span>
+
+            <button type="button" class="gv-camera-btn primary" id="start-camera">
+                <i class="ph ph-video-camera"></i>
+                Open Camera
+            </button>
+
+            <button type="button" class="gv-camera-btn secondary" id="retake-camera" style="display:none">
+                <i class="ph ph-arrow-counter-clockwise"></i>
+                Retake Photo
+            </button>
+
+        </div>
+
+        <div class="gv-camera-note">
+            Your captured photo is placed into this form automatically.
+        </div>
+
+    </div>
+
+    <input type="hidden" name="webcam_photo" id="webcam-photo-data">
+
+    {% for error in errors.guest_photo %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
+</div>
+
+<div class="gv-section">
+
+    <h4>
+        Accompanying Persons
+        <span style="font-weight:500;color:#94a3b8">(optional)</span>
+    </h4>
+
+    <div class="gv-help">
+        Add the name and mobile number for each person coming with the main guest.
+    </div>
+
+    <div id="gv-person-list">
+
+        {% for row in accompanying_rows %}
+
+        <div class="gv-person-row">
+
+            <input
+                name="accompanying_name"
+                maxlength="150"
+                value="{{ row.name }}"
+                placeholder="Person name"
+            >
+
+            <div class="gv-person-phone">
+                <span class="gv-person-dial-code">{{ dial_code|default:"" }}</span>
+                <input
+                    name="accompanying_mobile"
+                    maxlength="30"
+                    value="{{ row.mobile }}"
+                    placeholder="Mobile number"
+                >
+            </div>
+
+            <button
+                type="button"
+                class="gv-remove"
+                {% if forloop.first and forloop.last %}style="display:none"{% endif %}
+            >
+                Remove
+            </button>
+
+        </div>
+
+        {% empty %}
+
+        <div class="gv-person-row">
+            <input name="accompanying_name" maxlength="150" placeholder="Person name">
+            <div class="gv-person-phone">
+                <span class="gv-person-dial-code">{{ dial_code|default:"" }}</span>
+                <input name="accompanying_mobile" maxlength="30" placeholder="Mobile number">
+            </div>
+            <button type="button" class="gv-remove" style="display:none">Remove</button>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    <button type="button" class="gv-add" id="gv-add-person">
+        + Add accompanying person
+    </button>
+
+    {% for error in errors.accompanying_people %}
+        <div class="gv-error">{{ error }}</div>
+    {% endfor %}
+
+</div>
+
+<div class="gv-field full">
+    <label for="id_notes">
+        Notes
+        <span style="font-weight:500;color:#94a3b8">(optional)</span>
+    </label>
+    <textarea
+        name="notes"
+        id="id_notes"
+        placeholder="Optional visit notes"
+    >{{ values.notes }}</textarea>
 </div>
 
 </div>
@@ -311,6 +1190,7 @@
 </div>
 </div>
 </div>
+
 <script>
 (function () {
     'use strict';
@@ -324,13 +1204,20 @@
     const submitButton = document.getElementById('gv-submit-button');
     const visitTypeHelp = document.getElementById('gv-visit-type-help');
 
-    const selfServiceTenantId =
-        '{{ self_service_tenant.pk|default:""|escapejs }}';
-
-    const defaultDialCode =
-        '{{ dial_code|default:""|escapejs }}';
+    const selfServiceTenantId = '{{ self_service_tenant.pk|default:""|escapejs }}';
+    const defaultDialCode = '{{ dial_code|default:""|escapejs }}';
 
     if (!buildingSelect || !unitSelect) {
+        // Unit self-service already knows its Building and Unit.
+        // Use the dial code supplied by the logged-in Unit context.
+        if (dialCode) {
+            let code = String(defaultDialCode || '').trim();
+            if (code && !code.startsWith('+')) code = '+' + code;
+            dialCode.textContent = code;
+        }
+        document.querySelectorAll('.gv-person-dial-code').forEach(function (prefix) {
+            prefix.textContent = (code || '');
+        });
         return;
     }
 
@@ -378,7 +1265,6 @@
 
         let code = '';
 
-        // Prefer the selected unit's country dial code.
         if (unitSelect.value) {
             const unit = unitSelect.selectedOptions[0];
 
@@ -387,7 +1273,6 @@
             }
         }
 
-        // If no unit is selected, use the building's dial code.
         if (!code && buildingSelect.value) {
             const building = buildingSelect.selectedOptions[0];
 
@@ -406,7 +1291,12 @@
             code = '+' + code;
         }
 
-        dialCode.textContent = code;
+        if (dialCode) {
+            dialCode.textContent = code;
+        }
+        document.querySelectorAll('.gv-person-dial-code').forEach(function (prefix) {
+            prefix.textContent = code;
+        });
     }
 
     // Show buildings belonging to the selected tenant.
@@ -442,7 +1332,6 @@
             buildingSelect.appendChild(option);
         });
 
-        // Restore the building only if it is still available.
         if (currentBuildingId) {
             const exists = Array.from(buildingSelect.options).some(
                 function (option) {
@@ -456,14 +1345,12 @@
         }
     }
 
-    // Show ONLY units belonging to the selected building.
+    // Show only units belonging to selected building.
     function filterUnits() {
         const tenantId = getTenantId();
         const buildingId = String(buildingSelect.value || '');
-
         const previousUnitId = String(unitSelect.value || '');
 
-        // Always clear the old unit options first.
         unitSelect.innerHTML = '';
 
         const placeholder = document.createElement('option');
@@ -484,11 +1371,8 @@
 
         unitOptions.forEach(function (unit) {
             const buildingMatches = unit.building === buildingId;
+            const tenantMatches = !tenantId || unit.tenant === tenantId;
 
-            const tenantMatches =
-                !tenantId || unit.tenant === tenantId;
-
-            // Building AND tenant must match.
             if (!buildingMatches || !tenantMatches) {
                 return;
             }
@@ -511,7 +1395,6 @@
             placeholder.textContent = 'No units available in this building';
         }
 
-        // Keep the previous unit only if it is still in this building.
         if (previousUnitId && matchingUnits > 0) {
             const stillAvailable = Array.from(unitSelect.options).some(
                 function (option) {
@@ -527,7 +1410,7 @@
         updateDialCode();
     }
 
-    // Tenant change: reset building and unit.
+    // Tenant change.
     if (tenantSelect) {
         tenantSelect.addEventListener('change', function () {
             buildingSelect.value = '';
@@ -538,16 +1421,16 @@
         });
     }
 
-    // Building change: reset unit and load that building's units.
+    // Building change.
     buildingSelect.addEventListener('change', function () {
         unitSelect.value = '';
         filterUnits();
     });
 
-    // Unit change: update the phone dial code.
+    // Unit change.
     unitSelect.addEventListener('change', updateDialCode);
 
-    // Initialise the form, including after validation errors.
+    // Initialise building and unit dropdowns.
     const initialBuildingId = String(buildingSelect.value || '');
     const initialUnitId = String(unitSelect.value || '');
 
@@ -600,26 +1483,201 @@
     }
 
     if (visitTypeSelect) {
-        visitTypeSelect.addEventListener(
-            'change',
-            updateVisitTypeText
-        );
+        visitTypeSelect.addEventListener('change', updateVisitTypeText);
     }
 
     updateVisitTypeText();
 
-    // Guest photo camera
+    /* =========================================
+       EXPECTED VISIT TIME PICKER
+    ========================================= */
+
+    const timeWrap = document.getElementById('gv-time-wrap');
+    const timeDisplay = document.getElementById('id_visit_time_display');
+    const timeInput = document.getElementById('id_visit_time');
+
+    const hourSelect = document.getElementById('gv-time-hour');
+    const minuteSelect = document.getElementById('gv-time-minute');
+    const periodSelect = document.getElementById('gv-time-period');
+
+    const timeDone = document.getElementById('gv-time-done');
+    const timeClear = document.getElementById('gv-time-clear');
+
+    function closeTimePicker() {
+        if (timeWrap) {
+            timeWrap.classList.remove('open');
+        }
+    }
+
+    function openTimePicker() {
+        if (timeWrap) {
+            timeWrap.classList.add('open');
+        }
+    }
+
+    function setTimeDisplay(hour24, minute) {
+        const hour12 = (hour24 % 12) || 12;
+        const period = hour24 >= 12 ? 'PM' : 'AM';
+
+        const paddedHour = String(hour12).padStart(2, '0');
+        const paddedMinute = String(minute).padStart(2, '0');
+
+        if (timeDisplay) {
+            timeDisplay.value = paddedHour + ':' + paddedMinute + ' ' + period;
+        }
+
+        if (timeInput) {
+            timeInput.value =
+                String(hour24).padStart(2, '0') + ':' + paddedMinute;
+        }
+    }
+
+    function loadExistingTime() {
+        if (!timeInput || !timeDisplay) {
+            return;
+        }
+
+        const existing = String(timeInput.value || '').trim();
+
+        if (!existing) {
+            return;
+        }
+
+        // Supports Django time values: HH:MM or HH:MM:SS.
+        let match = existing.match(/^([01]?\d|2[0-3]):([0-5]\d)(?::[0-5]\d)?$/);
+
+        if (match) {
+            const hour24 = parseInt(match[1], 10);
+            const minute = match[2];
+
+            const hour12 = (hour24 % 12) || 12;
+
+            hourSelect.value = String(hour12);
+            minuteSelect.value = minute;
+            periodSelect.value = hour24 >= 12 ? 'PM' : 'AM';
+
+            setTimeDisplay(hour24, minute);
+            return;
+        }
+
+        // Supports 12-hour values like 02:30 PM.
+        match = existing.match(/^(0?[1-9]|1[0-2]):([0-5]\d)\s*(AM|PM)$/i);
+
+        if (match) {
+            const hour12 = parseInt(match[1], 10);
+            const minute = match[2];
+            const period = match[3].toUpperCase();
+
+            hourSelect.value = String(hour12);
+            minuteSelect.value = minute;
+            periodSelect.value = period;
+
+            let hour24 = hour12 % 12;
+
+            if (period === 'PM') {
+                hour24 += 12;
+            }
+
+            setTimeDisplay(hour24, minute);
+            return;
+        }
+
+        timeDisplay.value = existing;
+    }
+
+    if (
+        timeWrap &&
+        timeDisplay &&
+        timeInput &&
+        hourSelect &&
+        minuteSelect &&
+        periodSelect
+    ) {
+
+        loadExistingTime();
+
+        timeDisplay.addEventListener('click', function () {
+            if (timeWrap.classList.contains('open')) {
+                closeTimePicker();
+            } else {
+                openTimePicker();
+            }
+        });
+
+        if (timeDone) {
+            timeDone.addEventListener('click', function () {
+
+                const hour = parseInt(hourSelect.value, 10);
+                const minute = minuteSelect.value;
+                const period = periodSelect.value;
+
+                if (
+                    !hourSelect.value ||
+                    !minute ||
+                    !period
+                ) {
+                    alert('Please select hour, minute and AM/PM.');
+                    return;
+                }
+
+                let hour24 = hour % 12;
+
+                if (period === 'PM') {
+                    hour24 += 12;
+                }
+
+                setTimeDisplay(hour24, parseInt(minute, 10));
+
+                closeTimePicker();
+            });
+        }
+
+        if (timeClear) {
+            timeClear.addEventListener('click', function () {
+                hourSelect.value = '';
+                minuteSelect.value = '';
+                periodSelect.value = '';
+
+                timeDisplay.value = '';
+                timeInput.value = '';
+
+                closeTimePicker();
+            });
+        }
+
+        document.addEventListener('click', function (event) {
+            if (!timeWrap.contains(event.target)) {
+                closeTimePicker();
+            }
+        });
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeTimePicker();
+            }
+        });
+    }
+
+    /* =========================================
+       GUEST PHOTO CAMERA
+    ========================================= */
+
     const openCameraButton = document.getElementById('start-camera');
     const retakeCameraButton = document.getElementById('retake-camera');
+
     const webcamPhotoInput = document.getElementById('webcam-photo-data');
     const guestPhotoPreview = document.getElementById('guest-photo-preview');
+
     const cameraPlaceholder = document.getElementById('camera-placeholder');
     const cameraStatusText = document.getElementById('camera-status-text');
     const cameraWindowStatus = document.getElementById('camera-window-status');
+
     let cameraWindow = null;
 
     function showGuestPhoto(photo) {
-        if (!photo || !webcamPhotoInput) return;
+        if (!photo || !webcamPhotoInput) {
+            return;
+        }
 
         webcamPhotoInput.value = photo;
 
@@ -651,18 +1709,26 @@
     }
 
     window.addEventListener('message', function (event) {
-        if (event.origin !== window.location.origin) return;
-        if (!event.data || event.data.type !== 'guest-photo-captured') return;
+        if (event.origin !== window.location.origin) {
+            return;
+        }
+
+        if (!event.data || event.data.type !== 'guest-photo-captured') {
+            return;
+        }
 
         showGuestPhoto(event.data.photo);
 
         if (cameraWindow && !cameraWindow.closed) {
-            try { cameraWindow.close(); } catch (e) {}
+            try {
+                cameraWindow.close();
+            } catch (e) {}
         }
     });
 
     if (openCameraButton) {
         openCameraButton.addEventListener('click', function () {
+
             const cameraUrl = '{% url "guest_visit_camera" %}';
 
             cameraWindow = window.open(
@@ -673,14 +1739,19 @@
 
             if (!cameraWindow) {
                 if (cameraWindowStatus) {
-                    cameraWindowStatus.textContent = 'Camera window was blocked. Please allow pop-ups for this site and try again.';
+                    cameraWindowStatus.textContent =
+                        'Camera window was blocked. Please allow pop-ups for this site and try again.';
+
                     cameraWindowStatus.style.color = '#b91c1c';
                 }
+
                 return;
             }
 
             if (cameraWindowStatus) {
-                cameraWindowStatus.textContent = 'Camera window opened. Allow camera permission, capture the photo, then click Use This Photo.';
+                cameraWindowStatus.textContent =
+                    'Camera window opened. Allow camera permission, capture the photo, then click Use This Photo.';
+
                 cameraWindowStatus.style.color = '#64748b';
             }
 
@@ -690,23 +1761,45 @@
 
     if (retakeCameraButton) {
         retakeCameraButton.addEventListener('click', function () {
-            if (webcamPhotoInput) webcamPhotoInput.value = '';
+
+            if (webcamPhotoInput) {
+                webcamPhotoInput.value = '';
+            }
+
             if (guestPhotoPreview) {
                 guestPhotoPreview.removeAttribute('src');
                 guestPhotoPreview.classList.remove('active');
             }
-            if (cameraPlaceholder) cameraPlaceholder.style.display = 'flex';
-            if (cameraStatusText) cameraStatusText.textContent = 'No guest photo captured';
-            if (openCameraButton) openCameraButton.style.display = 'inline-flex';
-            if (retakeCameraButton) retakeCameraButton.style.display = 'none';
+
+            if (cameraPlaceholder) {
+                cameraPlaceholder.style.display = 'flex';
+            }
+
+            if (cameraStatusText) {
+                cameraStatusText.textContent = 'No guest photo captured';
+            }
+
+            if (openCameraButton) {
+                openCameraButton.style.display = 'inline-flex';
+            }
+
+            if (retakeCameraButton) {
+                retakeCameraButton.style.display = 'none';
+            }
+
             if (cameraWindowStatus) {
-                cameraWindowStatus.textContent = 'Camera opens separately for a cleaner capture experience.';
+                cameraWindowStatus.textContent =
+                    'Camera opens separately for a cleaner capture experience.';
+
                 cameraWindowStatus.style.color = '#64748b';
             }
         });
     }
 
-    // Accompanying persons.
+    /* =========================================
+       ACCOMPANYING PERSONS
+    ========================================= */
+
     const peopleList = document.getElementById('gv-person-list');
     const addButton = document.getElementById('gv-add-person');
 
@@ -721,14 +1814,15 @@
             const button = row.querySelector('.gv-remove');
 
             if (button) {
-                button.style.display =
-                    rows.length > 1 ? '' : 'none';
+                button.style.display = rows.length > 1 ? '' : 'none';
             }
         });
     }
 
     if (peopleList && addButton) {
+
         addButton.addEventListener('click', function () {
+
             const row = document.createElement('div');
             row.className = 'gv-person-row';
 
@@ -737,10 +1831,21 @@
             name.maxLength = 150;
             name.placeholder = 'Person name';
 
+            const phoneWrap = document.createElement('div');
+            phoneWrap.className = 'gv-person-phone';
+
+            const prefix = document.createElement('span');
+            prefix.className = 'gv-person-dial-code';
+            let code = String(defaultDialCode || '').trim();
+            if (code && !code.startsWith('+')) code = '+' + code;
+            prefix.textContent = code;
+
             const mobile = document.createElement('input');
             mobile.name = 'accompanying_mobile';
             mobile.maxLength = 30;
             mobile.placeholder = 'Mobile number';
+            phoneWrap.appendChild(prefix);
+            phoneWrap.appendChild(mobile);
 
             const remove = document.createElement('button');
             remove.type = 'button';
@@ -748,14 +1853,16 @@
             remove.textContent = 'Remove';
 
             row.appendChild(name);
-            row.appendChild(mobile);
+            row.appendChild(phoneWrap);
             row.appendChild(remove);
 
             peopleList.appendChild(row);
+
             updateRemoveButtons();
         });
 
         peopleList.addEventListener('click', function (event) {
+
             const target = event.target;
 
             if (
@@ -775,6 +1882,8 @@
 
         updateRemoveButtons();
     }
+
 })();
 </script>
+
 {% endblock %}

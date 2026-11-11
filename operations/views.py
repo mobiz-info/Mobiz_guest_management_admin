@@ -1286,11 +1286,35 @@ def _tenant_values(request, instance):
 
 
 def _tenant_form_context(request, instance, units, errors=None, non_field_errors=None):
+    # Keep the location choices scoped on the server as well as in the
+    # dependent dropdown JavaScript. Company Admins must never receive
+    # another company's Work Sites or Units in the tenant form context.
+    company = get_user_company(request)
+    building_staff = get_building_staff(request)
+
+    companies = (
+        Company.objects.filter(status=True).select_related('country').order_by('name')
+        if request.user.is_superuser
+        else Company.objects.filter(pk=company.pk, status=True).select_related('country')
+        if company else Company.objects.none()
+    )
+
+    work_sites = WorkSite.objects.filter(status=True)
+    if not request.user.is_superuser:
+        if building_staff:
+            work_sites = work_sites.filter(pk=building_staff.building.work_site_id)
+        elif company:
+            work_sites = work_sites.filter(company_id=company.pk)
+        else:
+            work_sites = work_sites.none()
+
     return {
         'title': 'Edit Tenant' if instance.pk else 'Add Tenant',
         'is_edit': bool(instance.pk),
         'tenant': instance,
         'units': units,
+        'companies': companies,
+        'work_sites': work_sites.order_by('name'),
         'values': _tenant_values(request, instance),
         'errors': errors or {},
         'non_field_errors': non_field_errors or [],
@@ -1356,11 +1380,6 @@ def _save_tenant_post(request, instance, units):
 
     if tenant_type not in dict(Tenant.TENANT_TYPE_CHOICES):
         errors['tenant_type'] = ['Select Rental Tenant or Owner.']
-
-    if selected_units:
-        company_ids = {unit.company_id for unit in selected_units}
-        if len(company_ids) > 1:
-            errors['units'] = ['All units assigned to one tenant must belong to the same company.']
 
     def read_date(raw, field_name):
         if not raw:
@@ -1459,8 +1478,9 @@ def _save_tenant_post(request, instance, units):
                 ).values_list('pk', flat=True)
             )
             selected_set = set(selected_ids)
-            if instance.pk and is_building_staff(request) and status:
-                # Building Staff must not remove allocations in another building.
+            if instance.pk and not request.user.is_superuser and status:
+                # Scoped administrators may update only allocations in their own scope.
+                # Preserve allocations outside that scope instead of releasing them.
                 selected_set |= (existing_active_ids - allowed_ids)
 
             # Lock selected units and check only active allocations.
@@ -1714,12 +1734,12 @@ def tenant_edit(request, pk):
         if building_staff:
             queryset = queryset.filter(
                 Q(unit__building_id=building_staff.building_id)
-                | Q(unit_allocations__unit__building_id=building_staff.building_id)
+                | Q(unit_allocations__released_at__isnull=True, unit_allocations__unit__building_id=building_staff.building_id)
             ).distinct()
         else:
             company = get_user_company(request)
             queryset = queryset.filter(
-                Q(unit__company=company) | Q(unit_allocations__unit__company=company)
+                Q(unit__company=company) | Q(unit_allocations__released_at__isnull=True, unit_allocations__unit__company=company)
             ).distinct()
 
     instance = get_object_or_404(queryset, pk=pk)
@@ -1757,16 +1777,25 @@ def tenant_delete(request, pk):
         if building_staff:
             queryset = queryset.filter(
                 Q(unit__building_id=building_staff.building_id)
-                | Q(unit_allocations__unit__building_id=building_staff.building_id)
+                | Q(unit_allocations__released_at__isnull=True, unit_allocations__unit__building_id=building_staff.building_id)
             ).distinct()
         else:
+            company = get_user_company(request)
             queryset = queryset.filter(
-                Q(unit__company=get_user_company(request))
-                | Q(unit_allocations__unit__company=get_user_company(request))
+                Q(unit__company=company)
+                | Q(unit_allocations__released_at__isnull=True, unit_allocations__unit__company=company)
             ).distinct()
 
     item = get_object_or_404(queryset, pk=pk)
     if request.method == 'POST':
+        if not request.user.is_superuser:
+            company = get_user_company(request)
+            has_other_company_allocations = item.unit_allocations.filter(
+                released_at__isnull=True
+            ).exclude(unit__company=company).exists()
+            if has_other_company_allocations:
+                messages.error(request, 'This Tenant also has active allocations in another Company. Ask Super Admin to deactivate or delete this Tenant.')
+                return redirect('tenant_list')
         # Tenant deletion is intentionally a HARD DELETE.
         # All data that belongs to this tenant is removed, while master
         # data such as Company / Building / Unit / Country is preserved.
@@ -1893,7 +1922,22 @@ def _family_tenant_for_request(request, tenant_pk=None):
     tenants = Tenant.objects.select_related(
         'user', 'unit', 'unit__company', 'unit__building', 'unit__work_site'
     )
-    tenants = _scope_queryset(request, tenants, company_field='unit__company')
+    if not request.user.is_superuser:
+        building_staff = get_building_staff(request)
+        if building_staff:
+            tenants = tenants.filter(
+                Q(unit__building_id=building_staff.building_id)
+                | Q(unit_allocations__released_at__isnull=True,
+                    unit_allocations__unit__building_id=building_staff.building_id)
+            )
+        else:
+            company = get_user_company(request)
+            tenants = tenants.filter(
+                Q(unit__company=company)
+                | Q(unit_allocations__released_at__isnull=True,
+                    unit_allocations__unit__company=company)
+            ) if company else tenants.none()
+        tenants = tenants.distinct()
     return get_object_or_404(tenants, pk=tenant_pk), False
 
 
@@ -1916,6 +1960,7 @@ def _family_member_context(request, tenant, member, errors=None, non_field_error
         values = {
             'name': request.POST.get('name', ''),
             'mobile_number': request.POST.get('mobile_number', ''),
+            'relationship': request.POST.get('relationship', ''),
             'email': request.POST.get('email', ''),
             'address': request.POST.get('address', ''),
             'unit_id': request.POST.get('unit', ''),
@@ -1924,6 +1969,7 @@ def _family_member_context(request, tenant, member, errors=None, non_field_error
         values = {
             'name': member.name if member.pk else '',
             'mobile_number': member.mobile_number if member.pk else '',
+            'relationship': member.relationship if member.pk else '',
             'email': member.email if member.pk and member.email else '',
             'address': member.address if member.pk else '',
             'unit_id': str(member.unit_id) if member.pk and member.unit_id else '',
@@ -1949,6 +1995,7 @@ def _save_family_member_post(request, tenant, member):
     errors, non_field_errors = {}, []
     name = request.POST.get('name', '').strip()
     mobile_number = request.POST.get('mobile_number', '').strip()
+    relationship = request.POST.get('relationship', '').strip()
     email = request.POST.get('email', '').strip()
     address = request.POST.get('address', '').strip()
     unit = _related(Unit, request.POST.get('unit'), 'unit', errors, queryset=_tenant_member_units(tenant, member))
@@ -1975,6 +2022,7 @@ def _save_family_member_post(request, tenant, member):
     member.tenant = tenant
     member.name = name
     member.mobile_number = mobile_number
+    member.relationship = relationship
     member.email = email or None
     member.address = address
     member.unit = unit
@@ -2435,6 +2483,14 @@ def guest_visit_create(request):
         return redirect('guest_visit_list')
 
     tenants = _guest_visit_tenant_queryset(request).order_by('full_name')
+    if is_unit_self_service:
+        # A Unit login already identifies the destination. Only tenants currently
+        # allocated to this Unit may be selected for the approval notification.
+        tenants = tenants.filter(
+            unit_allocations__unit=unit_profile,
+            unit_allocations__released_at__isnull=True,
+            status=True,
+        ).distinct().order_by('full_name')
     purposes = PurposeOfVisit.objects.filter(status=True).order_by('name')
     errors, non_field_errors = {}, []
     accompanying_names = request.POST.getlist('accompanying_name') if request.method == 'POST' else ['']
@@ -2472,13 +2528,23 @@ def guest_visit_create(request):
             errors['visit_type'] = ['Select a valid visit type.']
         if is_unit_self_service and values['visit_type'] != GuestVisit.TYPE_ADVANCE:
             errors['visit_type'] = ['Unit accounts can create Advance Guest Visit requests only.']
-        if is_tenant_self_service and values['visit_type'] != GuestVisit.TYPE_WALK_IN:
-            errors['visit_type'] = ['Tenant accounts can create Walk-in requests from this screen.']
 
         purpose = _related(PurposeOfVisit, values['purpose_of_visit'], 'purpose_of_visit', errors, queryset=purposes)
         unit = None
         building = None
-        if tenant:
+        if is_unit_self_service:
+            # Never trust Building/Unit values submitted by the browser for a
+            # Unit account: derive both from the authenticated Unit profile.
+            unit = unit_profile
+            building = unit_profile.building
+            if tenant and not TenantUnitAllocation.objects.filter(
+                tenant=tenant,
+                unit=unit_profile,
+                released_at__isnull=True,
+            ).exists():
+                errors['tenant'] = ['Select a tenant currently allocated to this Unit.']
+                tenant = None
+        elif tenant:
             tenant_units = Unit.objects.filter(
                 tenant_allocations__tenant=tenant,
                 tenant_allocations__released_at__isnull=True,
@@ -2592,7 +2658,12 @@ def guest_visit_create(request):
                     visit_time=visit_time,
                     notes=values['notes'].strip(),
                     status=status,
-                    unit_approval_status=(GuestVisit.STATUS_APPROVED if is_unit_self_service and values['visit_type'] == GuestVisit.TYPE_ADVANCE else GuestVisit.STATUS_PENDING),
+                    unit_approval_status=(
+                        GuestVisit.STATUS_APPROVED
+                        if (is_unit_self_service and values['visit_type'] == GuestVisit.TYPE_ADVANCE)
+                        or (is_tenant_self_service and values['visit_type'] == GuestVisit.TYPE_ADVANCE)
+                        else GuestVisit.STATUS_PENDING
+                    ),
                     tenant_approval_status=(GuestVisit.STATUS_PENDING),
                     approved_at=approved_at,
                     gate_pass_code=gate_pass_code,
@@ -2606,9 +2677,13 @@ def guest_visit_create(request):
                         for name, mobile in valid_companions
                     ])
                     if is_unit_self_service:
-                        messages.success(request, 'Advance guest request sent to the Tenant for approval. Gate Pass will be created only after Tenant approval.')
+                        messages.success(request, 'Advance guest request sent to the Tenant for approval.')
+                    elif is_tenant_self_service and values['visit_type'] == GuestVisit.TYPE_ADVANCE:
+                        messages.success(request, 'Advance guest visit request created. Please approve it to generate the Gate Pass.')
+                    elif is_tenant_self_service:
+                        messages.success(request, 'Walk-in request sent to the Unit for acceptance.')
                     else:
-                        messages.success(request, 'Walk-in request sent to the Unit. The Unit must accept it before Tenant approval and Gate Pass generation.')
+                        messages.success(request, 'Guest visit request created successfully.')
                     return redirect('guest_visit_list')
                 except ValidationError as exc:
                     field_errors, general_errors = _validation_errors(exc)
@@ -2638,8 +2713,10 @@ def guest_visit_create(request):
         'tenants': tenants,
         'allocated_buildings': allocated_buildings,
         'is_tenant_self_service': is_tenant_self_service,
+        'is_unit_self_service': is_unit_self_service,
         'is_staff_role': is_staff_role,
         'self_service_tenant': tenant_profile if is_tenant_self_service else None,
+        'dial_code': get_company_dial_code(unit_profile.company) if is_unit_self_service and unit_profile else '',
         'purposes': purposes,
         'values': values,
         'errors': errors,
@@ -2764,16 +2841,31 @@ def guest_visit_deny(request, pk):
         return redirect('guest_visit_list')
 
     tenant_profile = getattr(request.user, 'tenant_profile', None)
+    unit_profile = Unit.objects.filter(user=request.user, status=True).first()
+    is_unit_request = bool(unit_profile and not request.user.is_superuser)
+
+    if is_unit_request:
+        if visit.unit_id != unit_profile.pk or visit.visit_type != GuestVisit.TYPE_WALK_IN:
+            return HttpResponseForbidden('You can cancel only walk-in requests sent to your Unit.')
+        if visit.status != GuestVisit.STATUS_PENDING or visit.unit_approval_status != GuestVisit.STATUS_PENDING:
+            messages.warning(request, 'This walk-in request has already been processed.')
+            return redirect('guest_visit_list')
+        visit.unit_approval_status = GuestVisit.STATUS_DENIED
+        visit.status = GuestVisit.STATUS_DENIED
+        visit.gate_pass_code = None
+        visit.approved_at = None
+        visit.save(update_fields=['unit_approval_status', 'status', 'gate_pass_code', 'approved_at', 'updated_at'])
+        messages.success(request, 'Walk-in request cancelled by the Unit.')
+        return redirect('guest_visit_list')
+
     if not self_service and not request.user.is_superuser:
         messages.error(request, 'Only the assigned tenant or Super Admin can deny this visit.')
         return redirect('guest_visit_list')
     if self_service and (not tenant_profile or visit.tenant_id != tenant_profile.pk):
         return HttpResponseForbidden('You cannot deny this visit.')
-
     if visit.status != GuestVisit.STATUS_PENDING:
         messages.warning(request, 'This visit has already been processed.')
         return redirect('guest_visit_list')
-
     visit.status = GuestVisit.STATUS_DENIED
     visit.tenant_approval_status = GuestVisit.STATUS_DENIED
     visit.gate_pass_code = None
@@ -2832,48 +2924,108 @@ def gate_pass_scan(request, code):
     )
     return render(request, 'operations/guest_visit/gate_pass_scan.html', {'visit': visit})
 
+
 @login_required
 def guest_visit_check_in(request, pk):
     if request.method != 'POST':
         return redirect('guest_visit_list')
 
     visit, self_service = _get_authorized_guest_visit(request, pk)
+
     is_staff_role = (
         request.user.is_superuser
         or get_building_staff(request) is not None
         or CompanyStaff.objects.filter(
-            user=request.user, status=True, company__status=True
+            user=request.user,
+            status=True,
+            company__status=True
         ).exists()
     )
-    if not (is_staff_role or self_service):
-        return HttpResponseForbidden('You do not have permission to check this guest in.')
 
+    if not (is_staff_role or self_service):
+        return HttpResponseForbidden(
+            'You do not have permission to check this guest in.'
+        )
+
+    # ID document details are OPTIONAL.
     id_type = request.POST.get('id_type', '').strip()
     id_number = request.POST.get('id_number', '').strip()
-    valid_id_types = {choice[0] for choice in GuestVisit.ID_TYPE_CHOICES}
+
+    valid_id_types = {
+        choice[0] for choice in GuestVisit.ID_TYPE_CHOICES
+    }
 
     if visit.status != GuestVisit.STATUS_APPROVED:
-        messages.error(request, 'Only an approved visit can be checked in.')
+        messages.error(
+            request,
+            'Only an approved visit can be checked in.'
+        )
         return redirect('guest_visit_list')
 
     if visit.checked_in_at:
-        messages.warning(request, 'This guest has already been checked in.')
+        messages.warning(
+            request,
+            'This guest has already been checked in.'
+        )
         return redirect('guest_visit_list')
 
-    if id_type not in valid_id_types or not id_number:
-        messages.error(request, 'Select the guest ID type and enter the ID number before check-in.')
+    # Both ID fields must be provided together, or both can be blank.
+    if bool(id_type) != bool(id_number):
+        messages.error(
+            request,
+            'Please provide both ID type and ID number, or leave both fields empty.'
+        )
         return redirect('guest_visit_list')
+
+    if id_type and id_type not in valid_id_types:
+        messages.error(
+            request,
+            'Please select a valid guest ID type.'
+        )
+        return redirect('guest_visit_list')
+
+    if len(id_number) > 100:
+        messages.error(
+            request,
+            'ID number must be 100 characters or fewer.'
+        )
+        return redirect('guest_visit_list')
+
+    # ID is considered received only when both fields are provided.
+    id_was_received = bool(id_type and id_number)
 
     with transaction.atomic():
-        # Lock the visit while allocating its single security tag. This also
-        # prevents repeated/concurrent submissions from creating multiple issues.
-        locked_visit = GuestVisit.objects.select_for_update().select_related(
-            'unit', 'unit__building'
-        ).get(pk=visit.pk)
 
-        existing_issue = locked_visit.tag_issues.filter(
-            status=IDTagIssue.STATUS_ISSUED
-        ).select_related('tag').first()
+        # Lock the visit to prevent duplicate or concurrent check-ins.
+        locked_visit = (
+            GuestVisit.objects
+            .select_for_update()
+            .select_related('unit', 'unit__building')
+            .get(pk=visit.pk)
+        )
+
+        # Recheck status after obtaining the database lock.
+        if locked_visit.status != GuestVisit.STATUS_APPROVED:
+            messages.error(
+                request,
+                'Only an approved visit can be checked in.'
+            )
+            return redirect('guest_visit_list')
+
+        if locked_visit.checked_in_at:
+            messages.warning(
+                request,
+                'This guest has already been checked in.'
+            )
+            return redirect('guest_visit_list')
+
+        existing_issue = (
+            locked_visit.tag_issues
+            .filter(status=IDTagIssue.STATUS_ISSUED)
+            .select_related('tag')
+            .first()
+        )
+
         if existing_issue:
             messages.warning(
                 request,
@@ -2882,34 +3034,60 @@ def guest_visit_check_in(request, pk):
             return redirect('guest_visit_list')
 
         now = timezone.now()
+
+        # Record guest check-in.
         locked_visit.checked_in_at = now
         locked_visit.checked_in_by = request.user
-        locked_visit.id_type = id_type
-        locked_visit.id_number = id_number
-        locked_visit.id_received_at = now
-        locked_visit.id_received_by = request.user
+
+        # Save ID details only when an ID document was actually received.
+        if id_was_received:
+            locked_visit.id_type = id_type
+            locked_visit.id_number = id_number
+            locked_visit.id_received_at = now
+            locked_visit.id_received_by = request.user
+        else:
+            # No original ID was received.
+            locked_visit.id_type = ''
+            locked_visit.id_number = ''
+            locked_visit.id_received_at = None
+            locked_visit.id_received_by = None
+
         locked_visit.save(update_fields=[
-            'checked_in_at', 'checked_in_by', 'id_type', 'id_number',
-            'id_received_at', 'id_received_by', 'updated_at',
+            'checked_in_at',
+            'checked_in_by',
+            'id_type',
+            'id_number',
+            'id_received_at',
+            'id_received_by',
+            'updated_at',
         ])
 
         # Business rule: exactly ONE security ID tag per Guest Visit,
         # regardless of additional visitors.
         tag = (
-            IDTag.objects.select_for_update()
+            IDTag.objects
+            .select_for_update()
             .filter(
                 building=locked_visit.unit.building,
-                status__in=[IDTag.STATUS_AVAILABLE, IDTag.STATUS_RETURNED],
+                status__in=[
+                    IDTag.STATUS_AVAILABLE,
+                    IDTag.STATUS_RETURNED,
+                ],
             )
             .order_by('tag_number')
             .first()
         )
 
-        # Dynamic cards can be generated when no registered tag is available.
+        # Generate a dynamic ID tag if no registered tag is available.
         if tag is None:
+
             for _ in range(20):
                 candidate = f'DYN-{secrets.token_hex(4).upper()}'
-                if not IDTag.objects.filter(tag_number=candidate).exists():
+
+                if not IDTag.objects.filter(
+                    tag_number=candidate
+                ).exists():
+
                     tag = IDTag.objects.create(
                         tag_number=candidate,
                         tag_type=IDTag.TYPE_DYNAMIC,
@@ -2919,23 +3097,36 @@ def guest_visit_check_in(request, pk):
                     break
 
         if tag is None:
-            # Keep the check-in record, but make the operational failure clear.
+
             messages.warning(
                 request,
-                'Check-in recorded, but no ID tag could be allocated. Please assign a tag before checkout.'
+                'Guest check-in recorded, but no ID tag could be allocated. Please assign a tag before checkout.'
             )
+
         else:
+
             tag.status = IDTag.STATUS_ISSUED
-            tag.save(update_fields=['status', 'updated_at'])
+            tag.save(update_fields=[
+                'status',
+                'updated_at',
+            ])
+
             IDTagIssue.objects.create(
                 visit=locked_visit,
                 tag=tag,
                 issued_by=request.user,
             )
-            messages.success(
-                request,
-                f'Guest check-in recorded. One ID tag issued: {tag.tag_number}.'
-            )
+
+            if id_was_received:
+                messages.success(
+                    request,
+                    f'Guest check-in recorded. Original ID received and ID tag issued: {tag.tag_number}.'
+                )
+            else:
+                messages.success(
+                    request,
+                    f'Guest check-in recorded without collecting an original ID. ID tag issued: {tag.tag_number}.'
+                )
 
     return redirect('guest_visit_list')
 
@@ -3295,77 +3486,146 @@ def hold_document_list(request):
     })
 
 
+
 @login_required
 def hold_document_create(request):
-    scoped_tenants = _guest_visit_tenant_queryset(request).values_list('pk', flat=True)
+    scoped_tenants = _guest_visit_tenant_queryset(
+        request
+    ).values_list('pk', flat=True)
+
+    # Show every Guest Visit that has an ID Tag issue record.
+    # Original ID document / Visitor ID number is NOT required.
+    # Returned tags are also included because the requirement is
+    # to show all visitors who have been issued a tag.
     visits = (
         GuestVisit.objects
-        .select_related('tenant', 'unit', 'unit__building', 'unit__company', 'unit__company__country', 'purpose_of_visit')
+        .select_related(
+            'tenant',
+            'unit',
+            'unit__building',
+            'unit__company',
+            'unit__company__country',
+            'purpose_of_visit'
+        )
         .filter(
             tenant_id__in=scoped_tenants,
-            visitor_id_card_number__isnull=False,
+            tag_issues__isnull=False,
         )
-        .exclude(visitor_id_card_number='')
+        .distinct()
         .order_by('-visit_date', '-created_at')
     )
+
     errors = {}
+
     values = {
         'visit': request.POST.get('visit', ''),
-        'person_type': request.POST.get('person_type', HoldDocument.PERSON_GUEST),
-        'person_name': request.POST.get('person_name', '').strip(),
-        'person_mobile': request.POST.get('person_mobile', '').strip(),
-        'item_name': request.POST.get('item_name', '').strip(),
-        'description': request.POST.get('description', '').strip(),
+        'person_type': request.POST.get(
+            'person_type',
+            HoldDocument.PERSON_GUEST
+        ),
+        'person_name': request.POST.get(
+            'person_name', ''
+        ).strip(),
+        'person_mobile': request.POST.get(
+            'person_mobile', ''
+        ).strip(),
+        'item_name': request.POST.get(
+            'item_name', ''
+        ).strip(),
+        'description': request.POST.get(
+            'description', ''
+        ).strip(),
         'quantity': request.POST.get('quantity', '1'),
-        'reference_number': request.POST.get('reference_number', '').strip(),
-        'notes': request.POST.get('notes', '').strip(),
+        'reference_number': request.POST.get(
+            'reference_number', ''
+        ).strip(),
+        'notes': request.POST.get(
+            'notes', ''
+        ).strip(),
     }
-    valid_person_types = {value for value, _ in HoldDocument.PERSON_TYPE_CHOICES}
+
+    valid_person_types = {
+        value for value, _ in HoldDocument.PERSON_TYPE_CHOICES
+    }
+
     if values['person_type'] not in valid_person_types:
         values['person_type'] = HoldDocument.PERSON_OTHER
 
     if request.method == 'POST':
+
         visit = None
+
         if not values['visit']:
-            errors['visit'] = ['Visitor ID / Guest Visit is required for a Hold Document.']
+            errors['visit'] = [
+                'Please select a Guest Visit.'
+            ]
         else:
             visit = _related(
-                GuestVisit, values['visit'], 'visit', errors,
-                queryset=GuestVisit.objects.filter(pk__in=visits.values_list('pk', flat=True))
+                GuestVisit,
+                values['visit'],
+                'visit',
+                errors,
+                queryset=visits
             )
-            if visit and not visit.visitor_id_card_number:
-                errors['visit'] = ['The selected visitor does not have a Visitor ID.']
+
+        # Automatically use the selected guest's name.
         if not values['person_name'] and visit:
             values['person_name'] = visit.guest_name
+
         if not values['person_name']:
-            errors['person_name'] = ['Person name is required.']
+            errors['person_name'] = [
+                'Person name is required.'
+            ]
+
         if not values['item_name']:
-            errors['item_name'] = ['Item/document name is required.']
+            errors['item_name'] = [
+                'Item/document name is required.'
+            ]
+
         try:
             quantity = int(values['quantity'] or 1)
+
             if quantity < 1 or quantity > 10000:
                 raise ValueError
+
         except (TypeError, ValueError):
             quantity = 1
-            errors['quantity'] = ['Enter a quantity from 1 to 10000.']
+            errors['quantity'] = [
+                'Enter a quantity from 1 to 10000.'
+            ]
+
         if not errors:
             HoldDocument.objects.create(
                 visit=visit,
                 person_type=values['person_type'],
                 person_name=values['person_name'],
                 person_mobile=values['person_mobile'],
-                item_name=values['item_name'], description=values['description'],
-                quantity=quantity, reference_number=values['reference_number'],
-                notes=values['notes'], received_by=request.user,
+                item_name=values['item_name'],
+                description=values['description'],
+                quantity=quantity,
+                reference_number=values['reference_number'],
+                notes=values['notes'],
+                received_by=request.user,
             )
-            messages.success(request, 'Document/item has been recorded under Hold Documents.')
-            return redirect('hold_document_list')
-    return render(request, 'operations/hold_document/form.html', {
-        'visits': visits, 'values': values, 'errors': errors,
-        'person_type_choices': HoldDocument.PERSON_TYPE_CHOICES,
-        'title': 'Hold Document / Customer Item',
-    })
 
+            messages.success(
+                request,
+                'Document/item has been recorded under Hold Documents.'
+            )
+
+            return redirect('hold_document_list')
+
+    return render(
+        request,
+        'operations/hold_document/form.html',
+        {
+            'visits': visits,
+            'values': values,
+            'errors': errors,
+            'person_type_choices': HoldDocument.PERSON_TYPE_CHOICES,
+            'title': 'Hold Document / Customer Item',
+        }
+    )
 
 @login_required
 def hold_document_collect(request, pk):

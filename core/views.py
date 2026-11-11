@@ -151,7 +151,7 @@ def dashboard_view(request):
                 'role': 'tenant',
                 'role_name': 'Tenant',
                 'title': 'Tenant Dashboard',
-                'subtitle': f'Welcome, {tenant.full_name}',
+                'subtitle': 'Manage your family members, staff and guest visits',
                 'tenant_name': tenant.full_name,
                 'tenant_mobile_number': tenant.mobile_number,
                 'tenant_dial_code': (tenant.unit.company.country.dial_code or '') if tenant.unit.company.country_id else '',

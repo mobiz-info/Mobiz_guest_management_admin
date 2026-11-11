@@ -1,1369 +1,1540 @@
 {% extends 'base.html' %}
 
 {% block title %}{{ title }}{% endblock %}
-
-{% block page_title %}
-    {{ title }}
-{% endblock %}
-
+{% block page_title %}{{ title }}{% endblock %}
 {% block page_subtitle %}
-    Tenant details, login credentials and unit assignment
+Tenant details, login credentials and unit assignment
 {% endblock %}
 
 {% block content %}
 
 <style>
-
-/* ============================================================
-   TENANT FORM
-============================================================ */
-
-.tenant-form-wrap{
-    width:100%;
-    max-width:820px;
-    margin:0 auto;
+:root {
+    --tenant-ink: #172554;
+    --tenant-muted: #64748b;
+    --tenant-line: #e2e8f0;
+    --tenant-blue: #3157d5;
+    --tenant-blue-dark: #2445b8;
 }
 
-.tenant-form-card{
-    background:#fff;
-    border:1px solid #e2e8f0;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 12px 35px rgba(15,23,42,.08);
+/* MAIN FORM */
+.tenant-form-wrap {
+    width: min(100%, 900px);
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 6px 12px 20px;
+    box-sizing: border-box;
 }
 
-/* Header */
-
-.tenant-form-title{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:18px 22px;
-    background:linear-gradient(135deg,#eff6ff,#ffffff);
-    border-bottom:1px solid #e2e8f0;
-    color:#0f172a;
-    font-size:15px;
-    font-weight:800;
+.tenant-form-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 8px 28px rgba(15, 23, 42, .07);
 }
 
-.tenant-form-title i{
-    width:38px;
-    height:38px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:11px;
-    background:#2563eb;
-    color:#fff;
-    font-size:20px;
-    box-shadow:0 6px 14px rgba(37,99,235,.20);
+/* HEADER */
+.tenant-form-title {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 20px;
+    background: linear-gradient(110deg, #eef2ff, #f8faff 55%, #fff);
+    border-bottom: 1px solid var(--tenant-line);
+    color: var(--tenant-ink);
+    font-size: 14px;
+    font-weight: 800;
 }
 
-/* Body */
-
-.tenant-form-body{
-    padding:24px;
+.tenant-form-title:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: var(--tenant-blue);
 }
 
-.tenant-grid{
-    display:grid;
-    grid-template-columns:repeat(2,minmax(0,1fr));
-    gap:18px;
+.tenant-form-title i {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 11px;
+    background: linear-gradient(145deg, #4268e8, #2445b8);
+    color: #fff;
+    font-size: 17px;
+    box-shadow: 0 4px 12px rgba(49, 87, 213, .18);
 }
 
-.tenant-section-title{
-    grid-column:1/-1;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-top:8px;
-    padding-bottom:10px;
-    border-bottom:1px solid #e2e8f0;
-    color:#0f172a;
-    font-size:13px;
-    font-weight:800;
+/* BODY */
+.tenant-form-body {
+    padding: 22px;
 }
 
-.tenant-section-title i{
-    color:#2563eb;
-    font-size:17px;
+.tenant-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 15px 17px;
 }
 
-.tenant-field{
-    min-width:0;
+/* SECTION TITLE */
+.tenant-section-title {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 9px;
+    padding-bottom: 9px;
+    border-bottom: 1px solid var(--tenant-line);
+    color: var(--tenant-ink);
+    font-size: 13px;
+    font-weight: 800;
 }
 
-.tenant-field.full{
-    grid-column:1/-1;
+.tenant-section-title i {
+    width: 27px;
+    height: 27px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background: #eef2ff;
+    color: var(--tenant-blue);
+    font-size: 15px;
 }
 
-.tenant-field label{
-    display:block;
-    margin-bottom:7px;
-    color:#334155;
-    font-size:12px;
-    font-weight:750;
+/* FORM FIELDS */
+.tenant-field {
+    min-width: 0;
+}
+
+.tenant-field.full {
+    grid-column: 1 / -1;
+}
+
+.tenant-field label {
+    display: block;
+    margin-bottom: 5px;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 750;
 }
 
 .tenant-field input:not([type="checkbox"]),
 .tenant-field select,
-.tenant-field textarea{
-    width:100%;
-    min-height:42px;
-    box-sizing:border-box;
-    padding:10px 12px;
-    border:1px solid #cbd5e1;
-    border-radius:10px;
-    background:#fff;
-    color:#0f172a;
-    font-family:inherit;
-    font-size:12px;
-    transition:.2s ease;
+.tenant-field textarea {
+    width: 100%;
+    min-height: 39px;
+    box-sizing: border-box;
+    padding: 8px 11px;
+    border: 1px solid #d7dfeb;
+    border-radius: 9px;
+    background: #fff;
+    color: #172554;
+    font-family: inherit;
+    font-size: 12px;
+    box-shadow: none;
+    transition: border-color .18s ease, box-shadow .18s ease;
 }
 
-.tenant-field textarea{
-    min-height:85px;
-    resize:vertical;
+.tenant-field textarea {
+    min-height: 75px;
+    resize: vertical;
 }
 
 .tenant-field input:focus,
 .tenant-field select:focus,
-.tenant-field textarea:focus{
-    outline:none;
-    border-color:#3b82f6;
-    box-shadow:0 0 0 4px rgba(59,130,246,.10);
+.tenant-field textarea:focus {
+    outline: none;
+    border-color: #6b83eb;
+    box-shadow: 0 0 0 3px rgba(79, 105, 220, .10);
 }
 
-.tenant-field input[readonly]{
-    background:#f8fafc;
-    color:#64748b;
+.tenant-field input[readonly] {
+    background: #f8fafc;
+    color: #64748b;
 }
 
-/* ============================================================
-   BUILDING / UNIT SELECTOR
-============================================================ */
-
-.location-selector{
-    grid-column:1/-1;
-    padding:18px;
-    border:1px solid #dbe4f0;
-    border-radius:15px;
-    background:linear-gradient(145deg,#f8fbff,#ffffff);
+/* LOCATION SELECTOR */
+.location-selector {
+    grid-column: 1 / -1;
+    padding: 16px;
+    border: 1px solid #dce4f4;
+    border-radius: 13px;
+    background: #f8faff;
+    box-shadow: none;
 }
 
-.location-selector-head{
-    display:flex;
-    align-items:flex-start;
-    gap:12px;
-    margin-bottom:16px;
+.location-selector-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 14px;
 }
 
-.location-selector-icon{
-    width:40px;
-    height:40px;
-    flex-shrink:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    border-radius:12px;
-    background:#eff6ff;
-    color:#2563eb;
-    font-size:20px;
+.location-selector-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #e8edff;
+    color: var(--tenant-blue);
+    font-size: 17px;
 }
 
-.location-selector-title{
-    color:#0f172a;
-    font-size:13px;
-    font-weight:800;
+.location-selector-title {
+    color: var(--tenant-ink);
+    font-size: 13px;
+    font-weight: 800;
 }
 
-.location-selector-subtitle{
-    margin-top:3px;
-    color:#64748b;
-    font-size:11px;
-    line-height:1.5;
+.location-selector-subtitle {
+    margin-top: 3px;
+    color: #64748b;
+    font-size: 11px;
+    line-height: 1.45;
 }
 
-/* Dropdown row */
-
-.location-select-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:14px;
+.location-select-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
 }
 
-.select-box{
-    position:relative;
+.select-box {
+    min-width: 0;
 }
 
-.select-box label{
-    display:block;
-    margin-bottom:7px;
-    color:#334155;
-    font-size:11px;
-    font-weight:800;
+.select-box label {
+    display: block;
+    margin-bottom: 5px;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 750;
 }
 
-.select-box select{
-    width:100%;
-    height:45px;
-    padding:0 40px 0 13px;
-    border:1px solid #cbd5e1;
-    border-radius:10px;
-    background:#fff;
-    color:#0f172a;
-    font-family:inherit;
-    font-size:12px;
-    font-weight:600;
-    cursor:pointer;
-    transition:.2s ease;
+.select-box select {
+    width: 100%;
+    height: 39px;
+    box-sizing: border-box;
+    padding: 0 10px;
+    border: 1px solid #d7dfeb;
+    border-radius: 9px;
+    background: #fff;
+    color: #172554;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
 }
 
-.select-box select:hover{
-    border-color:#94a3b8;
+.select-box select:focus {
+    outline: none;
+    border-color: #6b83eb;
+    box-shadow: 0 0 0 3px rgba(79, 105, 220, .10);
 }
 
-.select-box select:focus{
-    outline:none;
-    border-color:#3b82f6;
-    box-shadow:0 0 0 4px rgba(59,130,246,.10);
+.select-box select:disabled {
+    background: #f1f5f9;
+    color: #94a3b8;
+    cursor: not-allowed;
 }
 
-.select-box select:disabled{
-    background:#f1f5f9;
-    color:#94a3b8;
-    cursor:not-allowed;
+/* UNIT LIST */
+.unit-checkbox-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-height: 38px;
+    max-height: 150px;
+    overflow-y: auto;
+    padding: 7px;
+    border: 1px solid #e1e7f0;
+    border-radius: 9px;
+    background: #fff;
 }
 
-.select-box select option{
-    color:#0f172a;
+.unit-option {
+    display: none !important;
+    margin: 0;
 }
 
-/* Unit status */
-
-.unit-status{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin-top:11px;
-    padding:9px 11px;
-    border-radius:9px;
-    background:#f8fafc;
-    color:#64748b;
-    font-size:10px;
+.unit-option.visible {
+    display: flex !important;
 }
 
-.unit-status i{
-    color:#2563eb;
-    font-size:15px;
+/* UNIT CHECKBOX */
+.tenant-check.unit-option {
+    display: none !important;
 }
 
-.unit-status.success{
-    background:#f0fdf4;
-    color:#166534;
+.tenant-check.unit-option.visible {
+    display: flex !important;
 }
 
-.unit-status.success i{
-    color:#16a34a;
+.tenant-check.unit-option {
+    min-height: 35px;
+    padding: 7px 9px;
+    border: 1px solid #e7ebf3;
+    border-radius: 8px;
+    background: #fbfcff;
+    color: #334155;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
 }
 
-.unit-status.warning{
-    background:#fffbeb;
-    color:#92400e;
+.tenant-check.unit-option.visible:hover {
+    border-color: #a9b8f4;
+    background: #f5f7ff;
 }
 
-.unit-status.warning i{
-    color:#d97706;
+.tenant-check input {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    accent-color: var(--tenant-blue);
 }
 
-/* Hidden unit inputs */
-
-.hidden-unit-input{
-    display:none !important;
+/* UNIT STATUS */
+.unit-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 32px;
+    margin-top: 9px;
+    padding: 7px 10px;
+    border: 1px solid #e5eaf2;
+    border-radius: 8px;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 10px;
 }
 
-/* Errors */
-
-.tenant-help{
-    margin-top:5px;
-    color:#64748b;
-    font-size:10px;
-    line-height:1.5;
+.unit-status i {
+    color: #2563eb;
+    font-size: 14px;
 }
 
-.tenant-error{
-    margin-top:5px;
-    color:#dc2626;
-    font-size:11px;
+.unit-status.success {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+    color: #166534;
 }
 
-.tenant-error-box{
-    margin-bottom:18px;
-    padding:11px 13px;
-    border:1px solid #fecaca;
-    border-radius:10px;
-    background:#fef2f2;
-    color:#b91c1c;
-    font-size:12px;
+.unit-status.warning {
+    border-color: #fde68a;
+    background: #fffbeb;
+    color: #92400e;
 }
 
-/* ============================================================
-   CHECKBOX
-============================================================ */
-
-.tenant-check{
-    display:flex !important;
-    align-items:center;
-    gap:9px;
-    min-height:42px;
-    box-sizing:border-box;
-    padding:10px 12px;
-    border:1px solid #e2e8f0;
-    border-radius:10px;
-    background:#f8fafc;
-    color:#334155 !important;
-    font-size:12px !important;
-    font-weight:700;
-    cursor:pointer;
+/* PHONE - SINGLE DIAL CODE */
+.tenant-phone-wrap {
+    display: flex;
+    align-items: stretch;
+    position: relative;
+    width: 100%;
 }
 
-.tenant-check input{
-    width:16px;
-    height:16px;
-    accent-color:#2563eb;
+.tenant-phone-wrap:before,
+.tenant-phone-wrap:after {
+    content: none !important;
+    display: none !important;
 }
 
-/* ============================================================
-   LOGIN INFO
-============================================================ */
-
-.tenant-login-info{
-    display:flex;
-    align-items:flex-start;
-    gap:12px;
-    padding:14px;
-    border:1px solid #bfdbfe;
-    border-radius:11px;
-    background:#eff6ff;
-    color:#1e40af;
-    font-size:11px;
-    line-height:1.6;
+.tenant-phone-wrap .tenant-dial-code {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 64px;
+    width: 64px;
+    min-width: 64px;
+    box-sizing: border-box;
+    padding: 0 6px;
+    border: 1px solid #d7dfeb;
+    border-right: 0;
+    border-radius: 9px 0 0 9px;
+    background: #f6f8fc;
+    color: #294bc2;
+    font-size: 12px;
+    font-weight: 800;
 }
 
-.tenant-login-info i{
-    margin-top:2px;
-    font-size:19px;
-    flex-shrink:0;
+.tenant-phone-wrap input {
+    flex: 1;
+    width: 0;
+    min-width: 0;
+    border-radius: 0 9px 9px 0 !important;
 }
 
-.tenant-login-info strong{
-    display:block;
-    margin-bottom:3px;
-    font-size:12px;
+.tenant-phone-wrap:focus-within .tenant-dial-code {
+    border-color: #6b83eb;
+    background: #eef2ff;
 }
 
-/* ============================================================
-   PHONE
-============================================================ */
-
-.tenant-phone-wrap{
-    display:flex;
-    align-items:stretch;
-    width:100%;
+/* CHECKBOX */
+.tenant-check {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 9px;
+    background: #f8fafc;
+    color: #334155 !important;
+    font-size: 11px !important;
+    font-weight: 700;
+    cursor: pointer;
 }
 
-.tenant-dial-code{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    min-width:68px;
-    padding:0 10px;
-    border:1px solid #cbd5e1;
-    border-right:0;
-    border-radius:10px 0 0 10px;
-    background:#f8fafc;
-    color:#334155;
-    font-size:12px;
-    font-weight:800;
+.tenant-check input {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--tenant-blue);
 }
 
-.tenant-phone-wrap input{
-    border-radius:0 10px 10px 0 !important;
-    flex:1;
+/* LOGIN INFO */
+.tenant-login-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    padding: 12px;
+    border: 1px solid #d9e3ff;
+    border-radius: 11px;
+    background: #f2f6ff;
+    color: #1e40af;
+    font-size: 10px;
+    line-height: 1.55;
 }
 
-.tenant-phone-wrap:focus-within .tenant-dial-code{
-    border-color:#3b82f6;
-    background:#eff6ff;
-    color:#1d4ed8;
+.tenant-login-info i {
+    margin-top: 2px;
+    font-size: 16px;
+    flex-shrink: 0;
 }
 
-/* ============================================================
-   ACTIONS
-============================================================ */
+.tenant-login-info strong {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 11px;
+}
 
-.tenant-actions{
-    display:flex;
-    justify-content:flex-end;
-    gap:9px;
-    margin-top:22px;
-    padding-top:16px;
-    border-top:1px solid #e2e8f0;
+/* ERRORS */
+.tenant-error {
+    margin-top: 4px;
+    color: #dc2626;
+    font-size: 10px;
+}
+
+.tenant-error-box {
+    margin-bottom: 13px;
+    padding: 9px 11px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 11px;
+}
+
+/* ACTIONS */
+.tenant-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #e2e8f0;
 }
 
 .tenant-actions a,
-.tenant-actions button{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:7px;
-    min-height:40px;
-    box-sizing:border-box;
-    padding:0 16px;
-    border-radius:10px;
-    font-size:11px;
-    font-weight:800;
-    text-decoration:none;
-    cursor:pointer;
-    transition:.2s ease;
+.tenant-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 38px;
+    box-sizing: border-box;
+    padding: 0 16px;
+    border-radius: 9px;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .18s ease, border-color .18s ease;
 }
 
-.tenant-cancel{
-    border:1px solid #cbd5e1;
-    background:#fff;
-    color:#475569;
+.tenant-cancel {
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    color: #475569;
 }
 
-.tenant-cancel:hover{
-    background:#f8fafc;
+.tenant-cancel:hover {
+    background: #f8fafc;
 }
 
-.tenant-save{
-    border:1px solid #16a34a;
-    background:#16a34a;
-    color:#fff;
-    box-shadow:0 5px 12px rgba(22,163,74,.15);
+.tenant-save {
+    border: 1px solid var(--tenant-blue);
+    background: linear-gradient(135deg, #4268e8, #294bc2);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(49, 87, 213, .16);
 }
 
-.tenant-save:hover{
-    border-color:#15803d;
-    background:#15803d;
-    transform:translateY(-1px);
+.tenant-save:hover {
+    border-color: var(--tenant-blue-dark);
+    background: linear-gradient(135deg, #365bd6, #203fae);
 }
 
-.tenant-save:disabled{
-    opacity:.5;
-    cursor:not-allowed;
-    transform:none;
+.tenant-save:disabled {
+    opacity: .5;
+    cursor: not-allowed;
 }
 
-/* ============================================================
-   RESPONSIVE
-============================================================ */
+#addAnotherLocation {
+    min-height: 35px;
+    padding: 0 12px;
+    border: 1px solid #cbd5ff;
+    border-radius: 8px;
+    color: #294bc2;
+    background: #f3f5ff;
+    box-shadow: none;
+    font-size: 11px;
+}
 
-@media(max-width:700px){
+#addAnotherLocation:hover {
+    background: #e9edff;
+}
 
-    .tenant-form-body{
-        padding:15px;
+.location-remove {
+    margin-top: 9px;
+    padding: 7px 10px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fff7f7;
+    color: #b91c1c;
+    cursor: pointer;
+    font-size: 10px;
+    font-weight: 800;
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+    .tenant-form-wrap {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 8px 15px;
     }
 
-    .tenant-grid{
-        grid-template-columns:1fr;
+    .tenant-form-body {
+        padding: 16px;
     }
 
-    .location-select-grid{
-        grid-template-columns:1fr;
+    .tenant-grid {
+        grid-template-columns: 1fr;
+        gap: 13px;
     }
 
-    .tenant-field.full,
-    .tenant-section-title,
-    .location-selector{
-        grid-column:1/-1;
+    .location-selector {
+        padding: 13px;
+    }
+
+    .location-select-grid {
+        grid-template-columns: 1fr;
+        gap: 11px;
     }
 }
 
-@media(max-width:480px){
-
-    .tenant-form-title{
-        padding:15px;
+@media (max-width: 480px) {
+    .tenant-form-title {
+        padding: 13px 15px;
+        font-size: 13px;
     }
 
-    .tenant-form-body{
-        padding:12px;
+    .tenant-form-title i {
+        width: 32px;
+        height: 32px;
+        font-size: 15px;
     }
 
-    .tenant-actions{
-        flex-direction:column-reverse;
+    .tenant-form-body {
+        padding: 12px;
+    }
+
+    .location-selector {
+        padding: 11px;
+    }
+
+    .tenant-actions {
+        flex-direction: column-reverse;
     }
 
     .tenant-actions a,
-    .tenant-actions button{
-        width:100%;
+    .tenant-actions button {
+        width: 100%;
     }
 }
-
 </style>
 
 
 <div class="tenant-form-wrap">
-
-    <div class="tenant-form-card">
-
-        <!-- HEADER -->
-        <div class="tenant-form-title">
-            <i class="ph ph-user-circle"></i>
-            <span>{{ title }}</span>
-        </div>
-
-
-        <div class="tenant-form-body">
-
-            <form method="post" autocomplete="off">
-
-                {% csrf_token %}
-
-
-                {% if non_field_errors %}
-
-                    <div class="tenant-error-box">
-
-                        {% for error in non_field_errors %}
-                            <div>{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-                {% endif %}
-
-
-                <div class="tenant-grid">
-
-
-                    <!-- ==================================================
-                         TENANT & UNIT INFORMATION
-                    =================================================== -->
-
-                    <div class="tenant-section-title">
-
-                        <i class="ph ph-buildings"></i>
-
-                        <span>Tenant &amp; Unit Information</span>
-
-                    </div>
-
-
-                    <!-- BUILDING / UNIT -->
-
-                    <div class="location-selector">
-
-                        <div class="location-selector-head">
-
-                            <div class="location-selector-icon">
-                                <i class="ph ph-buildings"></i>
-                            </div>
-
-                            <div>
-
-                                <div class="location-selector-title">
-                                    Select Building &amp; Unit
-                                </div>
-
-                                <div class="location-selector-subtitle">
-                                    Select a building first. Only available units
-                                    from the selected building will be shown.
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <div class="location-select-grid">
-
-
-                            <!-- BUILDING -->
-
-                            <div class="select-box">
-
-                                <label for="buildingSelect">
-                                    Building
-                                    <span style="color:#dc2626">*</span>
-                                </label>
-
-                                <select
-                                    id="buildingSelect"
-                                    name="building"
-                                    required
-                                >
-
-                                    <option value="">
-                                        Select Building
-                                    </option>
-
-                                    {% regroup units by building as building_groups %}
-
-                                    {% for group in building_groups %}
-
-                                        <option
-                                            value="{{ group.grouper.pk }}"
-                                            data-company="{{ group.grouper.company.name }}"
-                                            data-site="{{ group.grouper.work_site.name }}"
-                                        >
-                                            {{ group.grouper.name }}
-                                        </option>
-
-                                    {% endfor %}
-
-                                </select>
-
-                            </div>
-
-
-                            <!-- UNIT -->
-
-                            <div class="select-box">
-
-                                <label for="unitSelect">
-                                    Unit
-                                    <span style="color:#dc2626">*</span>
-                                </label>
-
-                                <select
-                                    id="unitSelect"
-                                    name="units"
-                                    required
-                                    disabled
-                                >
-
-                                    <option value="">
-                                        Select Building First
-                                    </option>
-
-                                    {% for unit in units %}
-
-                                        <option
-                                            value="{{ unit.pk }}"
-                                            data-building="{{ unit.building.pk }}"
-                                            data-dial-code="{{ unit.building.company.country.dial_code|default:'' }}"
-                                            data-unit-type="{{ unit.get_unit_type_display|default:unit.unit_type }}"
-                                            data-floor="{% if unit.floor %}{{ unit.floor.name }}{% endif %}"
-                                            {% if unit.pk|stringformat:'s' in values.unit_ids %}
-                                                data-selected="true"
-                                            {% endif %}
-                                        >
-
-                                            Unit {{ unit.name }}
-
-                                            {% if unit.floor %}
-                                                — {{ unit.floor.name }}
-                                            {% endif %}
-
-                                        </option>
-
-                                    {% endfor %}
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- STATUS -->
-
-                        <div
-                            class="unit-status"
-                            id="unitStatus"
-                        >
-
-                            <i class="ph ph-info"></i>
-
-                            <span id="unitStatusText">
-                                Select a building to view available units.
-                            </span>
-
-                        </div>
-
-
-                        <!-- UNIT ERROR -->
-
-                        {% for error in errors.units %}
-
-                            <div class="tenant-error">
-                                {{ error }}
-                            </div>
-
-                        {% endfor %}
-
-                    </div>
-
-
-                    <!-- ==================================================
-                         FULL NAME
-                    =================================================== -->
-
-                    <div class="tenant-field">
-
-                        <label for="id_full_name">
-
-                            Tenant Full Name
-
-                            <span style="color:#dc2626">*</span>
-
-                        </label>
-
-                        <input
-                            type="text"
-                            name="full_name"
-                            id="id_full_name"
-                            maxlength="150"
-                            value="{{ values.full_name|default:'' }}"
-                            required
-                            placeholder="Enter tenant name"
-                        >
-
-                        {% for error in errors.full_name %}
-                            <div class="tenant-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-                    <!-- TENANT TYPE -->
-
-                    <div class="tenant-field">
-
-                        <label for="id_tenant_type">
-
-                            Tenant Type
-
-                            <span style="color:#dc2626">*</span>
-
-                        </label>
-
-                        <select
-                            name="tenant_type"
-                            id="id_tenant_type"
-                            required
-                        >
-
-                            <option
-                                value="rental"
-                                {% if values.tenant_type == 'rental' %}
-                                    selected
-                                {% endif %}
-                            >
-                                Rental Tenant
-                            </option>
-
-                            <option
-                                value="owner"
-                                {% if values.tenant_type == 'owner' %}
-                                    selected
-                                {% endif %}
-                            >
-                                Owner
-                            </option>
-
-                        </select>
-
-                        {% for error in errors.tenant_type %}
-                            <div class="tenant-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-                    <!-- ADDRESS -->
-
-                    <div class="tenant-field full">
-
-                        <label for="id_address">
-
-                            Address
-
-                            <span style="color:#dc2626">*</span>
-
-                        </label>
-
-                        <textarea
-                            name="address"
-                            id="id_address"
-                            required
-                            placeholder="Enter tenant address"
-                        >{{ values.address|default:'' }}</textarea>
-
-                        {% for error in errors.address %}
-                            <div class="tenant-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-                    <!-- IDENTITY -->
-
-                    <div class="tenant-field">
-
-                        <label for="id_identity_number">
-                            Identity / Reference Number
-                        </label>
-
-                        <input
-                            type="text"
-                            name="identity_number"
-                            id="id_identity_number"
-                            maxlength="100"
-                            value="{{ values.identity_number|default:'' }}"
-                            placeholder="Optional reference"
-                        >
-
-                        {% for error in errors.identity_number %}
-                            <div class="tenant-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-                    <!-- LEASE START -->
-
-                    <div class="tenant-field">
-
-                        <label for="id_lease_start_date">
-                            Lease Start Date
-                        </label>
-
-                        <input
-                            type="date"
-                            name="lease_start_date"
-                            id="id_lease_start_date"
-                            value="{{ values.lease_start_date|default:'' }}"
-                        >
-
-                        {% for error in errors.lease_start_date %}
-                            <div class="tenant-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-                    <!-- LEASE END -->
-
-                    <div class="tenant-field">
-
-                        <label for="id_lease_end_date">
-                            Lease End Date
-                        </label>
-
-                        <input
-                            type="date"
-                            name="lease_end_date"
-                            id="id_lease_end_date"
-                            value="{{ values.lease_end_date|default:'' }}"
-                        >
-
-                        {% for error in errors.lease_end_date %}
-                            <div class="tenant-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-                    <!-- NOTES -->
-
-                    <div class="tenant-field full">
-
-                        <label for="id_notes">
-                            Notes (optional)
-                        </label>
-
-                        <textarea
-                            name="notes"
-                            id="id_notes"
-                            placeholder="Optional notes"
-                        >{{ values.notes|default:'' }}</textarea>
-
-                        {% for error in errors.notes %}
-                            <div class="tenant-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-                    <!-- STATUS -->
-
-                    <div class="tenant-field full">
-
-                        <label class="tenant-check">
-
-                            <input
-                                type="checkbox"
-                                name="status"
-                                {% if values.status == 'True' or values.status == 'on' or values.status == True %}
-                                    checked
-                                {% endif %}
-                            >
-
-                            Active Tenant
-
-                        </label>
-
-                    </div>
-
-
-                    <!-- ==================================================
-                         LOGIN
-                    =================================================== -->
-
-                    <div class="tenant-section-title">
-
-                        <i class="ph ph-shield-check"></i>
-
-                        <span>Tenant Login Details</span>
-
-                    </div>
-
-
-                    <!-- EMAIL -->
-
-                    <div class="tenant-field">
-
-                        <label for="id_email">
-
-                            Email
-
-                            <span style="color:#dc2626">*</span>
-
-                        </label>
-
-                        <input
-                            type="email"
-                            name="email"
-                            id="id_email"
-                            maxlength="254"
-                            value="{{ values.email|default:'' }}"
-                            autocomplete="email"
-                            placeholder="name@example.com"
-                            required
-                        >
-
-                        {% for error in errors.email %}
-                            <div class="tenant-error">{{ error }}</div>
-                        {% endfor %}
-
-                    </div>
-
-
-                    <!-- MOBILE -->
-
-                    <div class="tenant-field">
-
-                        <label for="id_mobile_number">
-
-                            Mobile Number
-
-                            <span style="color:#dc2626">*</span>
-
-                        </label>
-
-                        <div class="tenant-phone-wrap">
-                            <input
-                                type="text"
-                                name="mobile_number"
-                                id="id_mobile_number"
-                                maxlength="30"
-                                value="{{ values.mobile_number|default:'' }}"
-                                autocomplete="tel"
-                                required
-                                placeholder="Enter mobile number"
-                            >
-
-                        </div>
-
-                        {% for error in errors.mobile_number %}
-                            <div class="tenant-error">
-                                {{ error }}
-                            </div>
-                        {% endfor %}
-
-                    </div>
-
-
-                    <!-- LOGIN INFO -->
-
-                    <div class="tenant-field full">
-
-                        <div class="tenant-login-info">
-
-                            <i class="ph ph-shield-check"></i>
-
-                            <div>
-
-                                <strong>
-                                    Tenant Login Credentials
-                                </strong>
-
-                                Username:
-                                Registered email address.
-                                <br>
-
-                                Initial password:
-                                Registered mobile number.
-                                <br>
-
-                                <span>
-                                    The initial password is configured by
-                                    the server when the tenant account is created.
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                </div>
-
-
-                <!-- ======================================================
-                     ACTIONS
-                ======================================================= -->
-
-                <div class="tenant-actions">
-
-                    <a
-                        class="tenant-cancel"
-                        href="{% url 'tenant_list' %}"
-                    >
-
-                        <i class="ph ph-x"></i>
-
-                        Cancel
-
-                    </a>
-
-
-                    <button
-                        class="tenant-save"
-                        type="submit"
-                        id="saveTenantBtn"
-                        disabled
-                    >
-
-                        <i class="ph ph-check"></i>
-
-                        {% if is_edit %}
-
-                            Update Tenant
-
-                        {% else %}
-
-                            Save Tenant
-
-                        {% endif %}
-
-                    </button>
-
-                </div>
-
-
-            </form>
-
-        </div>
-
+<div class="tenant-form-card">
+
+    <div class="tenant-form-title">
+        <i class="ph ph-user-circle"></i>
+        <span>{{ title }}</span>
     </div>
 
+    <div class="tenant-form-body">
+
+        <form method="post" autocomplete="off">
+            {% csrf_token %}
+
+            {% if non_field_errors %}
+                <div class="tenant-error-box">
+                    {% for error in non_field_errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="tenant-grid">
+
+                <!-- TENANT AND UNIT INFORMATION -->
+                <div class="tenant-section-title">
+                    <i class="ph ph-buildings"></i>
+                    <span>Tenant &amp; Unit Information</span>
+                </div>
+
+                <!-- FIRST LOCATION CARD -->
+                <div class="location-selector">
+
+                    <div class="location-selector-head">
+                        <div class="location-selector-icon">
+                            <i class="ph ph-buildings"></i>
+                        </div>
+                        <div>
+                            <div class="location-selector-title">
+                                Select Building &amp; Unit
+                            </div>
+                            <div class="location-selector-subtitle">
+                                Select a company, work site and building.
+                                Only available units from the selected building will be shown.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="location-select-grid">
+
+                        <div class="select-box">
+                            <label for="companySelect">
+                                Company <span style="color:#dc2626">*</span>
+                            </label>
+
+                            <select id="companySelect"
+                                    class="allocation-company"
+                                    required>
+                                <option value="">Select Company</option>
+
+                                {% for company in companies %}
+                                    <option value="{{ company.pk }}"
+                                            data-dial-code="{{ company.country.dial_code|default:'' }}">
+                                        {{ company.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="select-box">
+                            <label for="workSiteSelect">
+                                Work Site <span style="color:#dc2626">*</span>
+                            </label>
+
+                            <select id="workSiteSelect"
+                                    class="allocation-site"
+                                    required disabled>
+                                <option value="">Select Company First</option>
+
+                                {% for site in work_sites %}
+                                    <option value="{{ site.pk }}"
+                                            data-company="{{ site.company_id }}">
+                                        {{ site.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="select-box">
+                            <label for="buildingSelect">
+                                Building <span style="color:#dc2626">*</span>
+                            </label>
+
+                            <select id="buildingSelect"
+                                    name="building"
+                                    class="allocation-building"
+                                    required disabled>
+                                <option value="">Select Work Site First</option>
+
+                                {% regroup units by building as building_groups %}
+
+                                {% for group in building_groups %}
+                                    <option value="{{ group.grouper.pk }}"
+                                            data-company="{{ group.grouper.company_id }}"
+                                            data-site="{{ group.grouper.work_site_id }}">
+                                        {{ group.grouper.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="select-box">
+                            <label>
+                                Units <span style="color:#dc2626">*</span>
+                            </label>
+
+                            <div class="unit-checkbox-list allocation-units">
+
+                                {% for unit in units %}
+                                    <label class="tenant-check unit-option"
+                                           data-building="{{ unit.building_id }}"
+                                           data-company="{{ unit.company_id }}"
+                                           data-site="{{ unit.work_site_id }}">
+
+                                        <input type="checkbox"
+                                               name="units"
+                                               value="{{ unit.pk }}"
+                                               {% if unit.pk|stringformat:'s' in values.unit_ids %}checked{% endif %}>
+
+                                        <span>
+                                            {{ unit.building.name }} — {{ unit.name }}
+                                            {% if unit.floor %}
+                                                ({{ unit.floor.name }})
+                                            {% endif %}
+                                        </span>
+                                    </label>
+                                {% endfor %}
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="unit-status allocation-status">
+                        <i class="ph ph-info"></i>
+                        <span class="allocation-status-text">
+                            Select company, work site and building to view available units.
+                        </span>
+                    </div>
+
+                    {% for error in errors.units %}
+                        <div class="tenant-error">{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+
+                <!-- ADD ANOTHER LOCATION -->
+                <div class="tenant-field full" style="margin-top:10px;">
+                    <button type="button"
+                            id="addAnotherLocation"
+                            class="tenant-save"
+                            style="min-height:38px;">
+                        <i class="ph ph-plus"></i>
+                        Add Another Location
+                    </button>
+                </div>
+
+                <!-- FULL NAME -->
+                <div class="tenant-field">
+                    <label for="id_full_name">
+                        Tenant Full Name <span style="color:#dc2626">*</span>
+                    </label>
+
+                    <input type="text"
+                           name="full_name"
+                           id="id_full_name"
+                           maxlength="150"
+                           value="{{ values.full_name|default:'' }}"
+                           required
+                           placeholder="Enter tenant name">
+
+                    {% for error in errors.full_name %}
+                        <div class="tenant-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- TENANT TYPE -->
+                <div class="tenant-field">
+                    <label for="id_tenant_type">
+                        Tenant Type <span style="color:#dc2626">*</span>
+                    </label>
+
+                    <select name="tenant_type" id="id_tenant_type" required>
+                        <option value="rental"
+                            {% if values.tenant_type == 'rental' %}selected{% endif %}>
+                            Rental Tenant
+                        </option>
+                        <option value="owner"
+                            {% if values.tenant_type == 'owner' %}selected{% endif %}>
+                            Owner
+                        </option>
+                    </select>
+
+                    {% for error in errors.tenant_type %}
+                        <div class="tenant-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- ADDRESS -->
+                <div class="tenant-field full">
+                    <label for="id_address">
+                        Address <span style="color:#dc2626">*</span>
+                    </label>
+
+                    <textarea name="address"
+                              id="id_address"
+                              required
+                              placeholder="Enter tenant address">{{ values.address|default:'' }}</textarea>
+
+                    {% for error in errors.address %}
+                        <div class="tenant-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- IDENTITY -->
+                <div class="tenant-field">
+                    <label for="id_identity_number">
+                        Identity / Reference Number
+                    </label>
+
+                    <input type="text"
+                           name="identity_number"
+                           id="id_identity_number"
+                           maxlength="100"
+                           value="{{ values.identity_number|default:'' }}"
+                           placeholder="Optional reference">
+
+                    {% for error in errors.identity_number %}
+                        <div class="tenant-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- LEASE START -->
+                <div class="tenant-field">
+                    <label for="id_lease_start_date">Lease Start Date</label>
+
+                    <input type="date"
+                           name="lease_start_date"
+                           id="id_lease_start_date"
+                           value="{{ values.lease_start_date|default:'' }}">
+
+                    {% for error in errors.lease_start_date %}
+                        <div class="tenant-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- LEASE END -->
+                <div class="tenant-field">
+                    <label for="id_lease_end_date">Lease End Date</label>
+
+                    <input type="date"
+                           name="lease_end_date"
+                           id="id_lease_end_date"
+                           value="{{ values.lease_end_date|default:'' }}">
+
+                    {% for error in errors.lease_end_date %}
+                        <div class="tenant-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- NOTES -->
+                <div class="tenant-field full">
+                    <label for="id_notes">Notes (optional)</label>
+
+                    <textarea name="notes"
+                              id="id_notes"
+                              placeholder="Optional notes">{{ values.notes|default:'' }}</textarea>
+
+                    {% for error in errors.notes %}
+                        <div class="tenant-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- STATUS -->
+                <div class="tenant-field full">
+                    <label class="tenant-check">
+                        <input type="checkbox"
+                               name="status"
+                               {% if values.status == 'True' or values.status == 'on' or values.status == True %}checked{% endif %}>
+                        Active Tenant
+                    </label>
+                </div>
+
+                <!-- LOGIN -->
+                <div class="tenant-section-title">
+                    <i class="ph ph-shield-check"></i>
+                    <span>Tenant Login Details</span>
+                </div>
+
+                <!-- EMAIL -->
+                <div class="tenant-field">
+                    <label for="id_email">
+                        Email <span style="color:#dc2626">*</span>
+                    </label>
+
+                    <input type="email"
+                           name="email"
+                           id="id_email"
+                           maxlength="254"
+                           value="{{ values.email|default:'' }}"
+                           autocomplete="email"
+                           placeholder="name@example.com"
+                           required>
+
+                    {% for error in errors.email %}
+                        <div class="tenant-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <!-- MOBILE -->
+                <div class="tenant-field">
+
+                    <label for="id_mobile_number">
+                        Mobile Number <span style="color:#dc2626">*</span>
+                    </label>
+
+                    <!--
+                        "phone-input-group" tells the global script in base.html
+                        NOT to add its own "+--" prefix box here.
+                    -->
+                    <div class="tenant-phone-wrap phone-input-group">
+
+                        <!-- ONLY ONE DIAL CODE ELEMENT -->
+                        <span class="tenant-dial-code"
+                              id="tenantDialCode"></span>
+
+                        <input type="text"
+                               name="mobile_number"
+                               id="id_mobile_number"
+                               maxlength="30"
+                               value="{{ values.mobile_number|default:'' }}"
+                               autocomplete="tel"
+                               required
+                               placeholder="Enter mobile number">
+                    </div>
+
+                    {% for error in errors.mobile_number %}
+                        <div class="tenant-error">{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+
+                <!-- LOGIN INFO -->
+                <div class="tenant-field full">
+                    <div class="tenant-login-info">
+                        <i class="ph ph-shield-check"></i>
+
+                        <div>
+                            <strong>Tenant Login Credentials</strong>
+
+                            Username: Registered email address.
+                            <br>
+
+                            Initial password: Registered mobile number.
+                            <br>
+
+                            <span>
+                                The initial password is configured by
+                                the server when the tenant account is created.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ACTIONS -->
+            <div class="tenant-actions">
+
+                <a class="tenant-cancel"
+                   href="{% url 'tenant_list' %}">
+                    <i class="ph ph-x"></i>
+                    Cancel
+                </a>
+
+                <button class="tenant-save"
+                        type="submit"
+                        id="saveTenantBtn"
+                        disabled>
+                    <i class="ph ph-check"></i>
+
+                    {% if is_edit %}
+                        Update Tenant
+                    {% else %}
+                        Save Tenant
+                    {% endif %}
+                </button>
+
+            </div>
+
+        </form>
+    </div>
+</div>
 </div>
 
 
 <script>
-
 document.addEventListener("DOMContentLoaded", function () {
 
-    const buildingSelect =
-        document.getElementById("buildingSelect");
+    const grid = document.querySelector(".tenant-grid");
+    const firstCard = document.querySelector(".location-selector");
+    const addButton = document.getElementById("addAnotherLocation");
+    const dial = document.getElementById("tenantDialCode");
+    const save = document.getElementById("saveTenantBtn");
 
-    const unitSelect =
-        document.getElementById("unitSelect");
-
-    const unitStatus =
-        document.getElementById("unitStatus");
-
-    const unitStatusText =
-        document.getElementById("unitStatusText");
-
-    const dial =
-        document.getElementById("tenantDialCode");
-
-    const saveBtn =
-        document.getElementById("saveTenantBtn");
-
-
-    if (!buildingSelect || !unitSelect) {
+    if (!grid || !firstCard || !addButton || !dial || !save) {
         return;
     }
 
+    const siteOptions = Array.from(
+        firstCard.querySelector(".allocation-site").options
+    ).filter(option => option.value)
+     .map(option => option.cloneNode(true));
 
-    /* ============================================================
-       STORE ORIGINAL UNIT OPTIONS
-    ============================================================ */
+    const buildingOptions = Array.from(
+        firstCard.querySelector(".allocation-building").options
+    ).filter(option => option.value)
+     .map(option => option.cloneNode(true));
 
-    const allUnitOptions =
-        Array.from(
-            unitSelect.querySelectorAll(
-                "option[data-building]"
-            )
+
+    function cards() {
+        return Array.from(
+            grid.querySelectorAll(".location-selector")
         );
-
-
-    /* ============================================================
-       PRESELECT BUILDING WHEN EDITING
-    ============================================================ */
-
-    let selectedUnit =
-        allUnitOptions.find(function(option){
-
-            return option.dataset.selected === "true";
-
-        });
-
-
-    if (selectedUnit) {
-
-        buildingSelect.value =
-            selectedUnit.dataset.building;
-
     }
 
 
-    /* ============================================================
-       UPDATE UNITS
-    ============================================================ */
+    function filterSelect(select, options, predicate, placeholder) {
 
-    function updateUnits(){
+        const previousValue = select.value;
 
-        const buildingId =
-            buildingSelect.value;
+        select.innerHTML = "";
 
+        const firstOption = document.createElement("option");
+        firstOption.value = "";
+        firstOption.textContent = placeholder;
 
-        /* Clear current unit options */
+        select.appendChild(firstOption);
 
-        unitSelect.innerHTML = "";
-
-
-        if (!buildingId){
-
-            const option =
-                document.createElement("option");
-
-            option.value = "";
-
-            option.textContent =
-                "Select Building First";
-
-            unitSelect.appendChild(option);
-
-            unitSelect.disabled = true;
-
-            unitStatus.className =
-                "unit-status";
-
-            unitStatusText.textContent =
-                "Select a building to view available units.";
-
-            updateDial();
-
-            validateForm();
-
-            return;
-
-        }
-
-
-        /* Placeholder */
-
-        const placeholder =
-            document.createElement("option");
-
-        placeholder.value = "";
-
-        placeholder.textContent =
-            "Select Unit";
-
-        unitSelect.appendChild(placeholder);
-
-
-        /* Add units belonging to selected building */
-
-        let count = 0;
-
-        allUnitOptions.forEach(function(original){
-
-            if (
-                original.dataset.building ===
-                buildingId
-            ){
-
-                const option =
-                    original.cloneNode(true);
-
-                unitSelect.appendChild(option);
-
-                count++;
-
-            }
-
+        options.filter(predicate).forEach(option => {
+            select.appendChild(option.cloneNode(true));
         });
 
-
-        unitSelect.disabled =
-            count === 0;
-
-
-        if (count === 0){
-
-            unitStatus.className =
-                "unit-status warning";
-
-            unitStatusText.textContent =
-                "No available units found in this building.";
-
-        }
-        else{
-
-            unitStatus.className =
-                "unit-status success";
-
-            unitStatusText.textContent =
-                count +
-                (count === 1
-                    ? " available unit found."
-                    : " available units found."
-                );
-
-        }
-
-
-        /* Restore selected unit while editing */
-
-        const selected =
-            unitSelect.querySelector(
-                'option[data-selected="true"]'
-            );
-
-        if (selected){
-
-            unitSelect.value =
-                selected.value;
-
-        }
-
-
-        updateDial();
-
-        validateForm();
-
-    }
-
-
-    /* ============================================================
-       DIAL CODE
-    ============================================================ */
-
-    function updateDial(){
-
-        if (!dial) return;
-
-        const selected =
-            unitSelect.options[
-                unitSelect.selectedIndex
-            ];
+        select.disabled = select.options.length <= 1;
 
         if (
-            selected &&
-            selected.dataset &&
-            selected.dataset.dialCode
-        ){
+            previousValue &&
+            Array.from(select.options).some(
+                option => option.value === previousValue
+            )
+        ) {
+            select.value = previousValue;
+        } else {
+            select.value = "";
+        }
+    }
 
-            let code =
-                selected.dataset.dialCode.trim();
 
-            if (code){
+    function refresh(card) {
 
-                if (!code.startsWith("+")){
-                    code = "+" + code;
+        const company = card.querySelector(".allocation-company");
+        const site = card.querySelector(".allocation-site");
+        const building = card.querySelector(".allocation-building");
+
+        const statusText = card.querySelector(".allocation-status-text");
+        const statusBox = card.querySelector(".allocation-status");
+
+        const labels = Array.from(
+            card.querySelectorAll(".unit-option")
+        );
+
+        const companyId = company.value;
+        const previousSite = site.value;
+        const previousBuilding = building.value;
+
+
+        filterSelect(
+            site,
+            siteOptions,
+            option => option.dataset.company === companyId,
+            companyId ? "Select Work Site" : "Select Company First"
+        );
+
+        if (
+            previousSite &&
+            Array.from(site.options).some(
+                option => option.value === previousSite
+            )
+        ) {
+            site.value = previousSite;
+        }
+
+
+        filterSelect(
+            building,
+            buildingOptions,
+            option =>
+                option.dataset.company === companyId &&
+                option.dataset.site === site.value,
+            site.value ? "Select Building" : "Select Work Site First"
+        );
+
+        if (
+            previousBuilding &&
+            Array.from(building.options).some(
+                option => option.value === previousBuilding
+            )
+        ) {
+            building.value = previousBuilding;
+        }
+
+
+        let shown = 0;
+
+        labels.forEach(label => {
+
+            const input = label.querySelector(
+                'input[name="units"]'
+            );
+
+            const visible = Boolean(
+                companyId &&
+                site.value &&
+                building.value &&
+                label.dataset.company === companyId &&
+                label.dataset.site === site.value &&
+                label.dataset.building === building.value
+            );
+
+            label.classList.toggle("visible", visible);
+
+            if (input) {
+                input.disabled = !visible;
+
+                if (!visible) {
+                    input.checked = false;
                 }
-
-                dial.textContent = code;
-
-                return;
-
             }
 
+            if (visible) shown++;
+        });
+
+
+        if (shown) {
+
+            statusText.textContent =
+                shown + " unit(s) available. Select one or more units.";
+
+            statusBox.className =
+                "unit-status allocation-status success";
+
+        } else if (!companyId) {
+
+            statusText.textContent =
+                "Select a company first to view its work sites and units.";
+
+            statusBox.className =
+                "unit-status allocation-status";
+
+        } else if (!site.value) {
+
+            statusText.textContent =
+                "Select a work site to continue.";
+
+            statusBox.className =
+                "unit-status allocation-status";
+
+        } else if (!building.value) {
+
+            statusText.textContent =
+                "Select a building to view its available units.";
+
+            statusBox.className =
+                "unit-status allocation-status";
+
+        } else {
+
+            statusText.textContent =
+                "No available units in this building.";
+
+            statusBox.className =
+                "unit-status allocation-status warning";
         }
-
-        dial.textContent = "";
-
     }
 
 
-    /* ============================================================
-       FORM VALIDATION
-    ============================================================ */
+    /* UPDATE SINGLE DIAL CODE BOX */
 
-    function validateForm(){
+    function updateDialCode() {
 
-        if (!saveBtn) return;
+        let activeCard = null;
 
-        const buildingSelected =
-            buildingSelect.value !== "";
+        // Prefer the company currently being changed.
+        const focusedElement = document.activeElement;
 
-        const unitSelected =
-            unitSelect.value !== "" &&
-            !unitSelect.disabled;
+        if (
+            focusedElement &&
+            focusedElement.classList.contains("allocation-company")
+        ) {
+            activeCard = focusedElement.closest(".location-selector");
+        }
 
+        // Otherwise use the card containing a selected unit.
+        if (!activeCard) {
+            activeCard = cards().find(card =>
+                card.querySelector(
+                    'input[name="units"]:checked:not(:disabled)'
+                )
+            );
+        }
 
-        saveBtn.disabled =
-            !(buildingSelected && unitSelected);
+        // If no unit is selected, use the first selected company.
+        if (!activeCard) {
+            activeCard = cards().find(card =>
+                card.querySelector(".allocation-company").value
+            );
+        }
 
+        const company = activeCard
+            ? activeCard.querySelector(".allocation-company")
+            : null;
+
+        const selectedOption = company
+            ? company.selectedOptions[0]
+            : null;
+
+        const rawCode = selectedOption
+            ? (selectedOption.dataset.dialCode || "").trim()
+            : "";
+
+        dial.textContent = rawCode
+            ? (rawCode.startsWith("+") ? rawCode : "+" + rawCode)
+            : "";
     }
 
 
-    /* ============================================================
-       EVENTS
-    ============================================================ */
+    function refreshAll() {
 
-    buildingSelect.addEventListener(
-        "change",
-        function(){
+        cards().forEach(refresh);
 
-            updateUnits();
+        const selectedCount = document.querySelectorAll(
+            '.location-selector input[name="units"]:checked:not(:disabled)'
+        ).length;
 
+        save.disabled = selectedCount === 0;
+
+        updateDialCode();
+    }
+
+
+    function addRemoveButton(card) {
+
+        if (card.querySelector(".location-remove")) {
+            return;
         }
-    );
+
+        const remove = document.createElement("button");
+
+        remove.type = "button";
+        remove.className = "location-remove";
+
+        remove.innerHTML =
+            '<i class="ph ph-trash"></i> Remove this location';
+
+        remove.addEventListener("click", function () {
+
+            if (cards().length > 1) {
+                card.remove();
+                refreshAll();
+            }
+
+        });
+
+        card.appendChild(remove);
+    }
 
 
-    unitSelect.addEventListener(
-        "change",
-        function(){
+    function bindCard(card) {
 
-            updateDial();
+        const company = card.querySelector(".allocation-company");
+        const site = card.querySelector(".allocation-site");
+        const building = card.querySelector(".allocation-building");
 
-            validateForm();
 
+        company.addEventListener("change", function () {
+
+            site.value = "";
+            building.value = "";
+
+            card.querySelectorAll(
+                'input[name="units"]'
+            ).forEach(input => {
+                input.checked = false;
+            });
+
+            refreshAll();
+        });
+
+
+        site.addEventListener("change", function () {
+
+            building.value = "";
+
+            card.querySelectorAll(
+                'input[name="units"]'
+            ).forEach(input => {
+                input.checked = false;
+            });
+
+            refreshAll();
+        });
+
+
+        building.addEventListener("change", function () {
+
+            card.querySelectorAll(
+                'input[name="units"]'
+            ).forEach(input => {
+                input.checked = false;
+            });
+
+            refreshAll();
+        });
+
+
+        card.querySelectorAll(
+            'input[name="units"]'
+        ).forEach(input => {
+
+            input.addEventListener("change", function () {
+
+                if (input.checked) {
+
+                    // Prevent the same unit being selected twice.
+                    cards().forEach(otherCard => {
+
+                        if (otherCard !== card) {
+
+                            otherCard.querySelectorAll(
+                                'input[name="units"]'
+                            ).forEach(otherInput => {
+
+                                if (otherInput.value === input.value) {
+                                    otherInput.checked = false;
+                                }
+
+                            });
+                        }
+                    });
+                }
+
+                refreshAll();
+            });
+        });
+    }
+
+
+    function setCardGroup(card, group, selectedIds) {
+
+        const company = card.querySelector(".allocation-company");
+        const site = card.querySelector(".allocation-site");
+        const building = card.querySelector(".allocation-building");
+
+        company.value = group.company;
+
+        filterSelect(
+            site,
+            siteOptions,
+            option => option.dataset.company === group.company,
+            "Select Work Site"
+        );
+
+        site.value = group.site;
+
+        filterSelect(
+            building,
+            buildingOptions,
+            option =>
+                option.dataset.company === group.company &&
+                option.dataset.site === group.site,
+            "Select Building"
+        );
+
+        building.value = group.building;
+
+        card.querySelectorAll(
+            'input[name="units"]'
+        ).forEach(input => {
+            input.checked = selectedIds.includes(input.value);
+        });
+    }
+
+
+    /* PRESERVE EXISTING UNIT ALLOCATIONS */
+
+    const selectedGroups = new Map();
+
+    firstCard.querySelectorAll(".unit-option").forEach(label => {
+
+        const input = label.querySelector(
+            'input[name="units"]'
+        );
+
+        if (input && input.checked) {
+
+            const key = [
+                label.dataset.company,
+                label.dataset.site,
+                label.dataset.building
+            ].join(":");
+
+            if (!selectedGroups.has(key)) {
+
+                selectedGroups.set(key, {
+                    company: label.dataset.company,
+                    site: label.dataset.site,
+                    building: label.dataset.building,
+                    ids: []
+                });
+            }
+
+            selectedGroups.get(key).ids.push(input.value);
         }
-    );
+    });
 
 
-    /* ============================================================
-       INITIAL LOAD
-    ============================================================ */
+    const groups = Array.from(selectedGroups.values());
 
-    updateUnits();
+    bindCard(firstCard);
+
+
+    /* RESTORE MULTIPLE EXISTING LOCATIONS */
+
+    if (groups.length > 1) {
+
+        groups.slice(1).forEach(() => {
+
+            const clone = firstCard.cloneNode(true);
+
+            clone.querySelectorAll("[id]").forEach(element => {
+                element.removeAttribute("id");
+            });
+
+            clone.querySelectorAll(
+                'input[name="units"]'
+            ).forEach(input => {
+                input.checked = false;
+                input.disabled = false;
+            });
+
+            firstCard.parentNode.insertBefore(
+                clone,
+                addButton.parentNode
+            );
+
+            addRemoveButton(clone);
+            bindCard(clone);
+        });
+
+        groups.forEach((group, index) => {
+            setCardGroup(cards()[index], group, group.ids);
+        });
+
+    } else if (groups.length === 1) {
+
+        setCardGroup(firstCard, groups[0], groups[0].ids);
+    }
+
+
+    /* ADD ANOTHER LOCATION */
+
+    addButton.addEventListener("click", function () {
+
+        const clone = firstCard.cloneNode(true);
+
+        // Remove duplicate HTML IDs from cloned location.
+        clone.querySelectorAll("[id]").forEach(element => {
+            element.removeAttribute("id");
+        });
+
+        clone.querySelectorAll(
+            'input[name="units"]'
+        ).forEach(input => {
+            input.checked = false;
+            input.disabled = false;
+        });
+
+        const company = clone.querySelector(".allocation-company");
+        const site = clone.querySelector(".allocation-site");
+        const building = clone.querySelector(".allocation-building");
+
+        company.value = "";
+
+        site.innerHTML =
+            '<option value="">Select Company First</option>';
+
+        site.disabled = true;
+
+        building.innerHTML =
+            '<option value="">Select Work Site First</option>';
+
+        building.disabled = true;
+
+        const statusText = clone.querySelector(
+            ".allocation-status-text"
+        );
+
+        if (statusText) {
+            statusText.textContent =
+                "Select a company first to view its work sites and units.";
+        }
+
+        const statusBox = clone.querySelector(
+            ".allocation-status"
+        );
+
+        if (statusBox) {
+            statusBox.className =
+                "unit-status allocation-status";
+        }
+
+        clone.classList.add("location-card-added");
+
+        firstCard.parentNode.insertBefore(
+            clone,
+            addButton.parentNode
+        );
+
+        addRemoveButton(clone);
+        bindCard(clone);
+
+        refreshAll();
+    });
+
+
+    /* INITIAL LOAD */
+
+    refreshAll();
 
 });
-
 </script>
 
 {% endblock %}
-```

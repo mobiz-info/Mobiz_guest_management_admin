@@ -839,75 +839,6 @@
 
         {% endif %}
 
-        <!-- COMPANY ADMIN REPORTS -->
-        {% if request.user.is_authenticated and not request.user.is_superuser and request.user.company_staff and not request.user.tenant_profile and not request.user.unit_profile %}
-
-            <div class="nav-section-title">REPORTS</div>
-
-            <a
-                href="{% url 'report_detail' 'work-site-summary' %}"
-                class="nav-item {% if report_type == 'work-site-summary' %}active{% endif %}"
-            >
-                <div class="nav-item-left">
-                    <i class="ph ph-map-pin"></i>
-                    Work Site Report
-                </div>
-            </a>
-
-            <a
-                href="{% url 'report_detail' 'building-summary' %}"
-                class="nav-item {% if report_type == 'building-summary' %}active{% endif %}"
-            >
-                <div class="nav-item-left">
-                    <i class="ph ph-building"></i>
-                    Building Report
-                </div>
-            </a>
-
-            <a
-                href="{% url 'report_detail' 'tenant-occupancy' %}"
-                class="nav-item {% if report_type == 'tenant-occupancy' %}active{% endif %}"
-            >
-                <div class="nav-item-left">
-                    <i class="ph ph-users-three"></i>
-                    Tenant / Occupancy Report
-                </div>
-            </a>
-
-            <a
-                href="{% url 'report_detail' 'guest-visit-summary' %}"
-                class="nav-item {% if report_type == 'guest-visit-summary' %}active{% endif %}"
-            >
-                <div class="nav-item-left">
-                    <i class="ph ph-users-three"></i>
-                    Guest Visit Summary
-                </div>
-            </a>
-
-            <a
-                href="{% url 'report_detail' 'id-card-gate-pass-summary' %}"
-                class="nav-item {% if report_type == 'id-card-gate-pass-summary' %}active{% endif %}"
-            >
-                <div class="nav-item-left">
-                    <i class="ph ph-identification-card"></i>
-                    ID Card / Gate Pass
-                </div>
-            </a>
-
-            <a
-                href="{% url 'report_detail' 'hold-document-summary' %}"
-                class="nav-item {% if report_type == 'hold-document-summary' %}active{% endif %}"
-            >
-                <div class="nav-item-left">
-                    <i class="ph ph-package"></i>
-                    Hold Document Report
-                </div>
-            </a>
-
-        {% endif %}
-
-
-
         <!-- TENANT SELF-SERVICE MENU -->
 
         {% if request.user.is_authenticated and not request.user.is_superuser and request.user.tenant_profile and not request.user.building_staff and not request.user.company_staff %}
@@ -921,6 +852,16 @@
                 <div class="nav-item-left">
                     <i class="ph ph-house"></i>
                     Dashboard
+                </div>
+            </a>
+
+            <a
+                href="{% url 'my_family_members' %}"
+                class="nav-item {% if 'family_member' in request.resolver_match.url_name or request.resolver_match.url_name == 'my_family_members' %}active{% endif %}"
+            >
+                <div class="nav-item-left">
+                    <i class="ph ph-users-three"></i>
+                    Family Members
                 </div>
             </a>
 
@@ -975,6 +916,12 @@
                 <a href="{% url 'report_detail' 'active-id-tags' %}" class="{% if report_type == 'active-id-tags' %}active{% endif %}">
                     <i class="ph ph-tag"></i> Active ID Tags Report
                 </a>
+                <a href="{% url 'report_detail' 'family-members' %}" class="{% if report_type == 'family-members' %}active{% endif %}">
+                    <i class="ph ph-users"></i> Family Members Report
+                </a>
+                <a href="{% url 'report_detail' 'staff-report' %}" class="{% if report_type == 'staff-report' %}active{% endif %}">
+                    <i class="ph ph-identification-badge"></i> Staff Report
+                </a>
             </div>
 
         {% endif %}
@@ -1019,6 +966,14 @@
         <!-- COMPANY ADMIN MENU -->
 
         {% if request.user.is_authenticated and not request.user.is_superuser and not request.user.building_staff and not request.user.tenant_profile and not request.user.unit_profile %}
+
+            <div class="nav-section-title">MAIN</div>
+            <a href="{% url 'dashboard' %}" class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <i class="ph ph-house"></i>
+                    Dashboard
+                </div>
+            </a>
 
             <div class="nav-section-title">MY COMPANY</div>
 
@@ -1154,6 +1109,36 @@
 
             </div>
 
+            <!-- REPORTS -->
+            <div class="nav-item dropdown-toggle {% if request.resolver_match.url_name == 'reports_home' or request.resolver_match.url_name == 'report_detail' %}active{% endif %}">
+                <div class="nav-item-left">
+                    <i class="ph ph-chart-bar"></i>
+                    Reports
+                </div>
+                <i class="ph-bold ph-caret-right nav-right-icon"></i>
+            </div>
+
+            <div class="nav-submenu {% if request.resolver_match.url_name == 'reports_home' or request.resolver_match.url_name == 'report_detail' %}open{% endif %}">
+                <a href="{% url 'report_detail' 'work-site-summary' %}" class="{% if report_type == 'work-site-summary' %}active{% endif %}">
+                    <i class="ph ph-map-pin"></i> Work Site Report
+                </a>
+                <a href="{% url 'report_detail' 'building-summary' %}" class="{% if report_type == 'building-summary' %}active{% endif %}">
+                    <i class="ph ph-building"></i> Building Report
+                </a>
+                <a href="{% url 'report_detail' 'tenant-occupancy' %}" class="{% if report_type == 'tenant-occupancy' %}active{% endif %}">
+                    <i class="ph ph-users-three"></i> Tenant / Occupancy Report
+                </a>
+                <a href="{% url 'report_detail' 'guest-visit-summary' %}" class="{% if report_type == 'guest-visit-summary' %}active{% endif %}">
+                    <i class="ph ph-users-three"></i> Guest Visit Summary Report
+                </a>
+                <a href="{% url 'report_detail' 'id-card-gate-pass-summary' %}" class="{% if report_type == 'id-card-gate-pass-summary' %}active{% endif %}">
+                    <i class="ph ph-identification-card"></i> ID Card / Gate Pass Summary
+                </a>
+                <a href="{% url 'report_detail' 'hold-document-summary' %}" class="{% if report_type == 'hold-document-summary' %}active{% endif %}">
+                    <i class="ph ph-package"></i> Hold Document Report
+                </a>
+            </div>
+
         {% endif %}
 
     </div>
@@ -1185,27 +1170,19 @@
                         <i class="ph-fill ph-user-circle"></i>
 
                         <span>
-                            {{ request.user.get_full_name|default:request.user.username }}
+                            {% if request.user.tenant_profile %}
+                                {{ request.user.tenant_profile.full_name }}
+                            {% else %}
+                                {{ request.user.get_full_name|default:request.user.username }}
+                            {% endif %}
                         </span>
 
                         {% if request.user.is_superuser %}
-
-                            <span style="opacity:0.7;font-size:11px;">
-                                (Super Admin)
-                            </span>
-
-                        {% elif False %}
-
-                            <span style="opacity:0.7;font-size:11px;">
-                                
-                            </span>
-
+                            <span style="opacity:0.7;font-size:11px;">(Super Admin)</span>
                         {% elif request.user.tenant_profile %}
-
-                            <span style="opacity:0.7;font-size:11px;">
-                                (Tenant)
-                            </span>
-
+                            <span style="opacity:0.7;font-size:11px;">(Tenant)</span>
+                        {% elif request.user.unit_profile %}
+                            <span style="opacity:0.7;font-size:11px;">(Unit)</span>
                         {% else %}
 
                             <span style="opacity:0.7;font-size:11px;">
@@ -1512,8 +1489,8 @@
 
         function attachDialCode(input) {
             if (!input || input.dataset.dialCodeAttached === 'true') return;
-            // Company forms already have their own working dial-code prefix.
-            if (input.closest('.phone-input-group')) return;
+            // Forms with their own dial-code prefix must not receive a second one.
+            if (input.closest('.phone-input-group, .gv-phone-wrap, .gv-person-phone, .staff-phone-input, .tenant-phone-wrap, .family-phone-wrap')) return;
             input.dataset.dialCodeAttached = 'true';
             const wrap = document.createElement('div');
             wrap.className = 'global-dial-input-wrap';

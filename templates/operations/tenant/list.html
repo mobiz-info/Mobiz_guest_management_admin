@@ -7,44 +7,53 @@
 {% block content %}
 
 <style>
+
+/* ============================================================
+   TENANT LIST PAGE
+============================================================ */
+
 .tenant-list-page {
     width: 100%;
-    max-width: 1220px;
+    max-width: 1400px;
     min-width: 0;
     margin: 0 auto;
-    font-family: inherit;
-    font-size: 12px;
     color: #334155;
+    font-family: inherit;
+    font-size: 13px;
     box-sizing: border-box;
 }
 
 .tenant-list-card {
     width: 100%;
     min-width: 0;
-    box-sizing: border-box;
     background: #fff;
-    border: 1px solid #dbe3ef;
+    border: 1px solid #e2e8f0;
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
+
+
+/* ============================================================
+   TOOLBAR
+============================================================ */
 
 .tenant-toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
-    padding: 10px 12px;
+    gap: 10px;
+    padding: 12px 15px;
     border-bottom: 1px solid #e2e8f0;
-    box-sizing: border-box;
 }
 
 .tenant-search-form {
     display: flex;
     align-items: center;
-    gap: 6px;
-    flex: 1 1 350px;
+    gap: 7px;
+    flex: 1;
+    width: 100%;
+    max-width: 600px;
     min-width: 0;
     margin: 0;
 }
@@ -53,16 +62,16 @@
     flex: 1;
     min-width: 0;
     width: 100%;
-    height: 33px;
-    padding: 0 9px;
-    box-sizing: border-box;
+    height: 36px;
+    padding: 0 11px;
     border: 1px solid #cbd5e1;
     border-radius: 6px;
     outline: none;
     background: #fff;
-    color: #0f172a;
+    color: #334155;
     font-family: inherit;
-    font-size: 11px;
+    font-size: 13px;
+    box-sizing: border-box;
 }
 
 .tenant-search-input::placeholder {
@@ -70,112 +79,161 @@
 }
 
 .tenant-search-input:focus {
-    border-color: #64748b;
-    box-shadow: 0 0 0 2px rgba(100, 116, 139, 0.10);
+    border-color: #16a34a;
+    box-shadow: 0 0 0 2px rgba(22, 163, 74, 0.08);
 }
 
 .tenant-search-btn,
 .tenant-clear-btn {
-    min-height: 33px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 0 9px;
-    border: 1px solid #cbd5e1;
+    gap: 5px;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid #dbe3ed;
     border-radius: 6px;
     background: #fff;
     color: #475569;
     text-decoration: none;
     font-family: inherit;
-    font-size: 10px;
-    font-weight: 700;
-    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
     white-space: nowrap;
+    cursor: pointer;
     box-sizing: border-box;
+    transition: 0.2s ease;
 }
 
 .tenant-search-btn:hover,
 .tenant-clear-btn:hover {
     background: #f8fafc;
     border-color: #94a3b8;
-    color: #0f172a;
+    color: #334155;
 }
 
+.tenant-search-btn i,
+.tenant-clear-btn i {
+    font-size: 14px;
+}
+
+
+/* ============================================================
+   ADD TENANT BUTTON
+============================================================ */
+
 .tenant-create-btn {
-    min-height: 33px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    padding: 0 10px;
-    border: 1px solid #16a34a !important;
-    border-radius: 6px !important;
-    background: #16a34a !important;
-    color: #fff !important;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 13px;
+    border: 1px solid #16a34a;
+    border-radius: 6px;
+    background: #16a34a;
+    color: #fff;
     text-decoration: none;
     font-family: inherit;
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 13px;
+    font-weight: 600;
     white-space: nowrap;
     flex-shrink: 0;
     box-sizing: border-box;
+    transition: 0.2s ease;
 }
 
 .tenant-create-btn:hover {
-    background: #15803d !important;
-    border-color: #15803d !important;
-    color: #fff !important;
+    background: #15803d;
+    border-color: #15803d;
+    color: #fff;
 }
+
+.tenant-create-btn i {
+    font-size: 15px;
+}
+
+
+/* ============================================================
+   TABLE WRAPPER
+============================================================ */
 
 .tenant-table-wrapper {
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
-    box-sizing: border-box;
+    overflow-y: visible;
 }
+
+
+/* ============================================================
+   TABLE
+============================================================ */
 
 .tenant-table {
     width: 100%;
+    max-width: 100%;
     min-width: 0;
     table-layout: fixed;
     border-collapse: collapse;
     text-align: left;
 }
 
+
+/* ============================================================
+   TABLE HEADER
+============================================================ */
+
 .tenant-table thead th {
-    padding: 9px 4px;
+    padding: 11px 6px;
     background: #f8fafc !important;
     border-bottom: 1px solid #e2e8f0;
     color: #64748b !important;
-    font-size: 9px;
+    font-size: 11px;
     font-weight: 700;
     text-align: left;
     text-transform: uppercase;
+    letter-spacing: 0.2px;
     vertical-align: middle;
     white-space: normal;
+    line-height: 1.4;
     overflow-wrap: anywhere;
 }
 
+
+/* ============================================================
+   TABLE CELLS
+============================================================ */
+
 .tenant-table tbody td {
-    padding: 8px 4px;
+    padding: 11px 6px;
     border-bottom: 1px solid #edf1f7;
-    color: #334155;
-    font-size: 10px;
-    line-height: 1.4;
+    color: #475569;
+    font-size: 12px;
+    line-height: 1.5;
     vertical-align: middle;
+    white-space: normal;
     overflow-wrap: anywhere;
-    word-break: normal;
+    word-break: break-word;
     box-sizing: border-box;
+}
+
+.tenant-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.tenant-table tbody tr:hover {
+    background: #f8fafc;
 }
 
 .tenant-table tbody tr:last-child td {
     border-bottom: 0;
 }
 
-.tenant-table tbody tr:hover {
-    background: #f8fafc;
-}
+
+/* ============================================================
+   COLUMN WIDTHS
+============================================================ */
 
 .tenant-table th:nth-child(1),
 .tenant-table td:nth-child(1) {
@@ -185,7 +243,7 @@
 
 .tenant-table th:nth-child(2),
 .tenant-table td:nth-child(2) {
-    width: 10%;
+    width: 9%;
 }
 
 .tenant-table th:nth-child(3),
@@ -200,7 +258,7 @@
 
 .tenant-table th:nth-child(5),
 .tenant-table td:nth-child(5) {
-    width: 11%;
+    width: 10%;
 }
 
 .tenant-table th:nth-child(6),
@@ -210,56 +268,65 @@
 
 .tenant-table th:nth-child(7),
 .tenant-table td:nth-child(7) {
-    width: 8%;
+    width: 9%;
 }
 
 .tenant-table th:nth-child(8),
 .tenant-table td:nth-child(8) {
-    width: 10%;
+    width: 9%;
 }
 
 .tenant-table th:nth-child(9),
 .tenant-table td:nth-child(9) {
-    width: 8%;
+    width: 9%;
 }
 
 .tenant-table th:nth-child(10),
 .tenant-table td:nth-child(10) {
-    width: 10%;
+    width: 9%;
 }
 
 .tenant-table th:nth-child(11),
 .tenant-table td:nth-child(11) {
-    width: 6%;
+    width: 11%;
 }
 
 .tenant-table th:nth-child(12),
 .tenant-table td:nth-child(12) {
-    width: 8%;
+    width: 12%;
 }
+
+
+/* ============================================================
+   TENANT DETAILS
+============================================================ */
 
 .tenant-serial {
     color: #64748b !important;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .tenant-name {
-    color: #0f172a;
-    font-size: 10px;
-    font-weight: 700;
+    display: block;
+    color: #334155;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
     overflow-wrap: anywhere;
 }
 
 .tenant-muted {
     color: #94a3b8;
-    font-size: 9px;
+    font-size: 11px;
 }
 
 .tenant-contact {
     display: block;
     margin-top: 3px;
     color: #64748b;
-    font-size: 9px;
+    font-size: 11px;
+    line-height: 1.4;
     overflow-wrap: anywhere;
 }
 
@@ -279,45 +346,64 @@
     text-decoration: underline;
 }
 
+
+/* ============================================================
+   UNIT CHIP
+============================================================ */
+
 .tenant-unit-chip {
     display: inline-block;
     margin: 2px 1px;
-    padding: 2px 4px;
+    padding: 3px 6px;
     border: 1px solid #bfdbfe;
     border-radius: 4px;
     background: #eff6ff;
     color: #1d4ed8;
-    font-size: 9px;
-    font-weight: 700;
+    font-size: 10px;
+    font-weight: 600;
     white-space: normal;
     overflow-wrap: anywhere;
 }
 
+
+/* ============================================================
+   TENANT TYPE BADGE
+============================================================ */
+
 .tenant-type-badge {
     display: inline-block;
-    padding: 3px 4px;
+    padding: 4px 6px;
     border-radius: 4px;
     background: #eef2ff;
     color: #4338ca;
-    font-size: 9px;
-    font-weight: 700;
+    font-size: 10px;
+    font-weight: 600;
     white-space: normal;
     overflow-wrap: anywhere;
 }
+
+
+/* ============================================================
+   STATUS BADGES
+============================================================ */
 
 .tenant-status {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    padding: 3px 4px;
+    gap: 4px;
+    padding: 4px 6px;
     border: 1px solid #bbf7d0;
     border-radius: 4px;
     background: #dcfce7;
     color: #15803d;
-    font-size: 9px;
-    font-weight: 700;
-    white-space: normal;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.tenant-status i {
+    font-size: 12px;
 }
 
 .tenant-status.inactive {
@@ -326,91 +412,121 @@
     color: #b91c1c;
 }
 
+
+/* ============================================================
+   LEASE STATUS
+============================================================ */
+
 .tenant-lease-expired {
     display: inline-block;
     margin-top: 4px;
-    padding: 3px 4px;
+    padding: 4px 6px;
     border-radius: 4px;
     background: #fee2e2;
     color: #991b1b;
-    font-size: 9px;
-    font-weight: 700;
+    font-size: 10px;
+    font-weight: 600;
 }
 
 .tenant-lease-soon {
     display: inline-block;
     margin-top: 4px;
-    padding: 3px 4px;
+    padding: 4px 6px;
     border-radius: 4px;
     background: #fef3c7;
     color: #92400e;
-    font-size: 9px;
-    font-weight: 700;
+    font-size: 10px;
+    font-weight: 600;
 }
+
+
+/* ============================================================
+   ACTION BUTTONS - SINGLE LINE
+============================================================ */
 
 .tenant-actions {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+    flex-wrap: nowrap;
     min-width: 0;
+    white-space: nowrap;
 }
 
 .tenant-actions form {
+    display: inline-flex;
+    align-items: center;
     margin: 0;
-    max-width: 100%;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.tenant-actions > a {
+    flex-shrink: 0;
 }
 
 .tenant-action-btn {
-    min-height: 25px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
-    max-width: 100%;
-    padding: 0 5px;
+    gap: 4px;
+    min-height: 29px;
+    padding: 0 7px;
     border: 1px solid transparent;
-    border-radius: 4px;
+    border-radius: 5px;
     text-decoration: none;
     font-family: inherit;
-    font-size: 9px;
-    font-weight: 700;
-    white-space: normal;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
     cursor: pointer;
     box-sizing: border-box;
+    flex-shrink: 0;
+    transition: 0.2s ease;
+}
+
+.tenant-action-btn i {
+    font-size: 13px;
 }
 
 .tenant-edit-btn {
-    background: #eef2ff;
-    border-color: #c7d2fe;
-    color: #4338ca;
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #2563eb;
 }
 
 .tenant-edit-btn:hover {
-    background: #e0e7ff;
-    color: #3730a3;
+    background: #dbeafe;
+    color: #1d4ed8;
 }
 
 .tenant-delete-btn {
     background: #fff1f2;
     border-color: #fecdd3;
-    color: #be123c;
+    color: #e11d48;
 }
 
 .tenant-delete-btn:hover {
     background: #ffe4e6;
-    color: #9f1239;
+    color: #be123c;
 }
 
+
+/* ============================================================
+   EMPTY STATE
+============================================================ */
+
 .tenant-empty {
-    padding: 30px 10px !important;
+    padding: 35px 10px !important;
     text-align: center !important;
     color: #94a3b8 !important;
+    font-size: 13px !important;
 }
 
 .tenant-empty-icon {
     display: block;
-    margin-bottom: 7px;
+    margin-bottom: 8px;
     color: #94a3b8;
     font-size: 24px;
 }
@@ -418,74 +534,209 @@
 .tenant-empty-title {
     margin-bottom: 5px;
     color: #334155;
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 16px;
+    font-weight: 600;
 }
 
 .tenant-empty-text {
     color: #94a3b8;
-    font-size: 10px;
+    font-size: 13px;
 }
+
+
+/* ============================================================
+   PAGINATION
+============================================================ */
 
 .tenant-pagination {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 10px;
     flex-wrap: wrap;
-    padding: 10px 12px;
+    padding: 12px 15px;
     border-top: 1px solid #e2e8f0;
     background: #fff;
 }
 
 .tenant-pagination-info {
     color: #64748b;
-    font-size: 10px;
+    font-size: 12px;
 }
 
 .tenant-pagination-info strong {
-    color: #0f172a;
+    color: #334155;
+    font-weight: 600;
 }
 
 .tenant-pagination-links {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 4px;
+    gap: 5px;
     flex-wrap: wrap;
 }
 
 .tenant-page-btn,
 .tenant-page-current {
-    min-width: 26px;
-    min-height: 26px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 3px;
-    padding: 0 6px;
-    border: 1px solid #cbd5e1;
+    gap: 4px;
+    min-height: 30px;
+    padding: 0 9px;
+    border: 1px solid #dbe3ed;
     border-radius: 5px;
     background: #fff;
     color: #475569;
     text-decoration: none;
-    font-size: 10px;
-    font-weight: 700;
+    font-size: 12px;
+    font-weight: 600;
+    transition: 0.2s ease;
 }
 
 .tenant-page-btn:hover {
-    background: #f8fafc;
-    border-color: #94a3b8;
-    color: #334155;
+    border-color: #86efac;
+    background: #f0fdf4;
+    color: #15803d;
 }
 
 .tenant-page-current {
-    border-color: #2563eb;
-    background: #2563eb;
+    border-color: #16a34a;
+    background: #16a34a;
     color: #fff;
 }
 
-@media (max-width: 900px) {
+.tenant-page-btn i {
+    font-size: 13px;
+}
+
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1200px) {
+
+    .tenant-table thead th {
+        padding: 9px 5px;
+        font-size: 10px;
+    }
+
+    .tenant-table tbody td {
+        padding: 9px 5px;
+        font-size: 11px;
+    }
+
+    .tenant-name {
+        font-size: 11px;
+    }
+
+    .tenant-contact {
+        font-size: 10px;
+    }
+
+    .tenant-actions {
+        gap: 3px;
+        flex-wrap: nowrap;
+    }
+
+    .tenant-action-btn {
+        min-height: 27px;
+        padding: 0 5px;
+        font-size: 10px;
+    }
+
+    .tenant-unit-chip,
+    .tenant-type-badge {
+        font-size: 9px;
+    }
+
+    .tenant-status {
+        padding: 3px 5px;
+        font-size: 10px;
+    }
+}
+
+
+@media (max-width: 850px) {
+
+    .tenant-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .tenant-search-form {
+        max-width: 100%;
+    }
+
+    .tenant-create-btn {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .tenant-table thead th {
+        padding: 8px 4px;
+        font-size: 9px;
+    }
+
+    .tenant-table tbody td {
+        padding: 8px 4px;
+        font-size: 10px;
+    }
+
+    .tenant-name {
+        font-size: 10px;
+    }
+
+    .tenant-contact {
+        font-size: 9px;
+    }
+
+    .tenant-actions {
+        gap: 3px;
+        flex-wrap: nowrap;
+    }
+
+    .tenant-action-btn {
+        min-height: 26px;
+        padding: 0 4px;
+        font-size: 9px;
+    }
+
+    .tenant-action-btn i {
+        display: none;
+    }
+
+    .tenant-status,
+    .tenant-type-badge,
+    .tenant-unit-chip {
+        font-size: 8px;
+        padding: 3px 4px;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    .tenant-toolbar {
+        padding: 10px;
+    }
+
+    .tenant-search-form {
+        flex-wrap: wrap;
+    }
+
+    .tenant-search-input {
+        flex-basis: 100%;
+        width: 100%;
+    }
+
+    .tenant-search-btn,
+    .tenant-clear-btn {
+        flex: 1;
+    }
+
     .tenant-table thead th {
         padding: 7px 3px;
         font-size: 8px;
@@ -500,62 +751,49 @@
         font-size: 9px;
     }
 
-    .tenant-action-btn {
+    .tenant-contact {
         font-size: 8px;
-        padding: 0 3px;
     }
 
     .tenant-status,
     .tenant-type-badge,
     .tenant-unit-chip {
+        font-size: 7px;
+        padding: 3px;
+    }
+
+    .tenant-actions {
+        gap: 2px;
+        flex-wrap: nowrap;
+    }
+
+    .tenant-action-btn {
+        min-height: 24px;
+        padding: 0 3px;
         font-size: 8px;
-        padding: 2px 3px;
-    }
-}
-
-@media (max-width: 600px) {
-    .tenant-toolbar {
-        align-items: stretch;
-        flex-direction: column;
-        padding: 10px;
-    }
-
-    .tenant-search-form {
-        flex: 1 1 auto;
-        width: 100%;
-        max-width: 100%;
-        flex-wrap: wrap;
-    }
-
-    .tenant-search-input {
-        flex: 1 1 100%;
-        width: 100%;
-    }
-
-    .tenant-search-btn,
-    .tenant-clear-btn {
-        flex: 1;
-    }
-
-    .tenant-create-btn {
-        width: 100%;
     }
 
     .tenant-pagination {
         align-items: flex-start;
         flex-direction: column;
+        padding: 10px;
     }
 
     .tenant-pagination-links {
         justify-content: flex-start;
     }
+
 }
+
 </style>
 
+
 <div class="tenant-list-page">
+
     <div class="tenant-list-card">
 
         <!-- SEARCH TOOLBAR -->
+
         <div class="tenant-toolbar">
 
             <form
@@ -563,6 +801,7 @@
                 action="{% if lease_list %}{% url 'tenant_lease_list' %}{% else %}{% url 'tenant_list' %}{% endif %}"
                 class="tenant-search-form"
             >
+
                 <input
                     type="text"
                     name="search"
@@ -578,6 +817,7 @@
                 </button>
 
                 {% if search %}
+
                     <a
                         href="{% if lease_list %}{% url 'tenant_lease_list' %}{% else %}{% url 'tenant_list' %}{% endif %}"
                         class="tenant-clear-btn"
@@ -585,34 +825,49 @@
                         <i class="ph ph-x"></i>
                         Clear
                     </a>
+
                 {% endif %}
+
             </form>
 
+
             {% if lease_list %}
+
                 <a href="{% url 'tenant_list' %}" class="tenant-clear-btn">
                     <i class="ph ph-users"></i>
                     All Tenants
                 </a>
+
             {% else %}
+
                 <a href="{% url 'tenant_lease_list' %}" class="tenant-clear-btn">
                     <i class="ph ph-calendar-warning"></i>
                     Lease Alerts
                 </a>
+
             {% endif %}
 
+
             {% if request.user.is_superuser %}
+
                 <a href="{% url 'tenant_create' %}" class="tenant-create-btn">
                     <i class="ph ph-plus"></i>
                     Add Tenant
                 </a>
+
             {% endif %}
 
         </div>
 
+
         <!-- TENANT TABLE -->
+
         <div class="tenant-table-wrapper">
+
             <table class="tenant-table">
+
                 <thead>
+
                     <tr>
                         <th>#</th>
                         <th>Tenant</th>
@@ -620,103 +875,160 @@
                         <th>Email</th>
                         <th>Address</th>
                         <th>Tenant Type</th>
-                        <th>Login Username</th>
                         <th>Allocated Units</th>
                         <th>Building(s)</th>
                         <th>Lease Period</th>
                         <th>Status</th>
                         <th>Actions</th>
                     </tr>
+
                 </thead>
 
+
                 <tbody>
+
                     {% for item in page_obj %}
+
                         <tr>
+
                             <td class="tenant-serial">
                                 {{ page_obj.start_index|add:forloop.counter0 }}
                             </td>
 
+
                             <td>
-                                <span class="tenant-name">{{ item.full_name }}</span>
+
+                                <span class="tenant-name">
+                                    {{ item.full_name }}
+                                </span>
 
                                 {% if item.identity_number %}
+
                                     <span class="tenant-contact">
                                         Reference: {{ item.identity_number }}
                                     </span>
+
                                 {% endif %}
+
                             </td>
 
+
                             <!-- MOBILE WITH COUNTRY DIAL CODE -->
+
                             <td>
+
                                 {% if item.mobile_number %}
+
                                     {% with allocations=item.active_unit_allocations %}
+
                                         {% for allocation in allocations %}
+
                                             {% if forloop.first %}
+
                                                 {% with country=allocation.unit.building.company.country %}
+
                                                     {% if country.dial_code %}
                                                         {{ country.dial_code }}
                                                     {% endif %}
+
                                                 {% endwith %}
+
                                             {% endif %}
+
                                         {% endfor %}
+
                                     {% endwith %}
+
                                     {{ item.mobile_number }}
+
                                 {% else %}
+
                                     —
+
                                 {% endif %}
+
                             </td>
+
 
                             <td class="tenant-email">
+
                                 {% if item.email %}
-                                    <a href="mailto:{{ item.email }}">{{ item.email }}</a>
+
+                                    <a href="mailto:{{ item.email }}">
+                                        {{ item.email }}
+                                    </a>
+
                                 {% else %}
+
                                     <span class="tenant-muted">—</span>
+
                                 {% endif %}
+
                             </td>
 
+
                             <td>
+
                                 {% if item.address %}
+
                                     {{ item.address|truncatechars:70 }}
+
                                 {% else %}
+
                                     <span class="tenant-muted">—</span>
+
                                 {% endif %}
+
                             </td>
 
+
                             <td>
+
                                 <span class="tenant-type-badge">
                                     {{ item.get_tenant_type_display }}
                                 </span>
+
                             </td>
 
-                            <td>
-                                {% if item.user %}
-                                    {{ item.user.username }}
-                                {% else %}
-                                    <span class="tenant-muted">Not configured</span>
-                                {% endif %}
-                            </td>
 
                             <td>
+
                                 {% for allocation in item.active_unit_allocations %}
+
                                     <span class="tenant-unit-chip">
                                         {{ allocation.unit.name }}
                                     </span>
+
                                 {% empty %}
-                                    <span class="tenant-muted">No active allocation</span>
+
+                                    <span class="tenant-muted">
+                                        No active allocation
+                                    </span>
+
                                 {% endfor %}
+
                             </td>
 
+
                             <td>
+
                                 {% for allocation in item.active_unit_allocations %}
+
                                     <span class="tenant-contact">
                                         {{ allocation.unit.building.name }}
                                     </span>
+
                                 {% empty %}
+
                                     <span class="tenant-muted">—</span>
+
                                 {% endfor %}
+
                             </td>
 
+
                             <td>
+
                                 {% if item.lease_start_date %}
                                     {{ item.lease_start_date|date:'d-m-Y' }}
                                 {% else %}
@@ -731,39 +1043,57 @@
                                     —
                                 {% endif %}
 
+
                                 {% if item.tenant_type == 'rental' and item.lease_end_date %}
+
                                     {% if item.lease_end_date < today %}
+
                                         <span class="tenant-contact">
                                             <span class="tenant-lease-expired">
                                                 Lease expired
                                             </span>
                                         </span>
+
                                     {% elif item.lease_end_date <= lease_soon_date %}
+
                                         <span class="tenant-contact">
                                             <span class="tenant-lease-soon">
                                                 Expiring soon
                                             </span>
                                         </span>
+
                                     {% endif %}
+
                                 {% endif %}
+
                             </td>
 
+
                             <td>
+
                                 {% if item.status %}
+
                                     <span class="tenant-status">
                                         <i class="ph-fill ph-check-circle"></i>
                                         Active
                                     </span>
+
                                 {% else %}
+
                                     <span class="tenant-status inactive">
                                         <i class="ph-fill ph-x-circle"></i>
                                         Inactive
                                     </span>
+
                                 {% endif %}
+
                             </td>
 
+
                             <td>
+
                                 <div class="tenant-actions">
+
                                     <a
                                         href="{% url 'tenant_edit' item.pk %}"
                                         class="tenant-action-btn tenant-edit-btn"
@@ -772,12 +1102,15 @@
                                         Edit
                                     </a>
 
+
                                     {% if request.user.is_superuser %}
+
                                         <form
                                             method="post"
                                             action="{% url 'tenant_delete' item.pk %}"
                                             onsubmit="return confirm('Permanently delete this tenant and ALL data connected to this tenant, including family members, tenant staff, guest visits, ID/tag issue records, held documents and login account? Company, building and unit master data will be preserved. This action cannot be undone.');"
                                         >
+
                                             {% csrf_token %}
 
                                             <button
@@ -787,15 +1120,24 @@
                                                 <i class="ph ph-trash"></i>
                                                 Delete
                                             </button>
+
                                         </form>
+
                                     {% endif %}
+
                                 </div>
+
                             </td>
+
                         </tr>
 
+
                     {% empty %}
+
                         <tr>
+
                             <td colspan="12" class="tenant-empty">
+
                                 <i class="ph ph-users tenant-empty-icon"></i>
 
                                 <div class="tenant-empty-title">
@@ -803,40 +1145,68 @@
                                 </div>
 
                                 <div class="tenant-empty-text">
+
                                     {% if search %}
+
                                         {% if lease_list %}
+
                                             No lease alerts match "{{ search }}". Try another search term.
+
                                         {% else %}
+
                                             No tenants match "{{ search }}". Try another search term.
+
                                         {% endif %}
+
                                     {% else %}
+
                                         {% if lease_list %}
+
                                             No expired or soon-to-expire rental leases were found.
+
                                         {% else %}
+
                                             No tenant records are available.
+
                                         {% endif %}
+
                                     {% endif %}
+
                                 </div>
+
                             </td>
+
                         </tr>
+
                     {% endfor %}
+
                 </tbody>
+
             </table>
+
         </div>
 
+
         <!-- PAGINATION -->
+
         {% if page_obj.paginator.num_pages > 1 %}
+
             <div class="tenant-pagination">
 
                 <div class="tenant-pagination-info">
-                    Page <strong>{{ page_obj.number }}</strong>
-                    of <strong>{{ page_obj.paginator.num_pages }}</strong>
-                    · Showing {{ page_obj.start_index }}–{{ page_obj.end_index }}
-                    of {{ page_obj.paginator.count }}
+
+                    Showing
+                    <strong>{{ page_obj.start_index }}–{{ page_obj.end_index }}</strong>
+                    of
+                    <strong>{{ page_obj.paginator.count }}</strong>
+
                 </div>
 
+
                 <div class="tenant-pagination-links">
+
                     {% if page_obj.has_previous %}
+
                         <a
                             href="?page=1{% if search %}&amp;search={{ search|urlencode }}{% endif %}"
                             class="tenant-page-btn"
@@ -852,13 +1222,18 @@
                             <i class="ph ph-caret-left"></i>
                             Previous
                         </a>
+
                     {% endif %}
 
+
                     <span class="tenant-page-current">
-                        {{ page_obj.number }}
+                        Page {{ page_obj.number }}
+                        of {{ page_obj.paginator.num_pages }}
                     </span>
 
+
                     {% if page_obj.has_next %}
+
                         <a
                             href="?page={{ page_obj.next_page_number }}{% if search %}&amp;search={{ search|urlencode }}{% endif %}"
                             class="tenant-page-btn"
@@ -874,12 +1249,17 @@
                             Last
                             <i class="ph ph-caret-double-right"></i>
                         </a>
+
                     {% endif %}
+
                 </div>
+
             </div>
+
         {% endif %}
 
     </div>
+
 </div>
 
 {% endblock %}

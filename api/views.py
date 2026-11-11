@@ -1248,7 +1248,7 @@ class TenantProfileUpdateAPIView(APIView):
 def _get_security_authorized_visit(request, lookup_field, lookup_value):
     """
     Scopes security operations:
-    Tenant can perform security operations for guest visits within their authorized building / units.
+    Tenant can perform security operations only for currently allocated units.
     Superuser can access all.
     """
     kwargs = {lookup_field: lookup_value}
@@ -1266,12 +1266,16 @@ def _get_security_authorized_visit(request, lookup_field, lookup_value):
     if not tenant:
         return None, "Not authorized for security operations."
 
-    # Verify that the visit belongs to tenant's building or allocated units
-    allocated_building_ids = tenant.unit_allocations.filter(
-        released_at__isnull=True, unit__status=True
-    ).values_list('unit__building_id', flat=True).distinct()
-
-    if visit.unit.building_id not in allocated_building_ids and visit.tenant_id != tenant.id:
+    # Tenant security access is unit-scoped, not building-scoped. A Tenant
+    # allocated to one unit must not gain access to other units in that building.
+    if not tenant.unit_allocations.filter(
+        released_at__isnull=True,
+        unit_id=visit.unit_id,
+        unit__status=True,
+        unit__building__status=True,
+        unit__company__status=True,
+        unit__work_site__status=True,
+    ).exists():
         return None, "You do not have security authority for this property / unit."
 
     return visit, None

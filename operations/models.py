@@ -986,6 +986,7 @@ class TenantFamilyMember(models.Model):
     )
     name = models.CharField(max_length=150)
     mobile_number = models.CharField(max_length=30)
+    relationship = models.CharField(max_length=100, blank=True, default='')
     email = models.EmailField(max_length=254, blank=True, null=True)
     address = models.TextField(blank=True, default='')
     unit = models.ForeignKey(
@@ -1082,9 +1083,6 @@ class TenantUnitAllocation(models.Model):
         errors = {}
         if self.unit_id and not self.unit.status:
             errors['unit'] = 'Only active units can be allocated to a tenant.'
-        if self.tenant_id and self.unit_id:
-            if self.tenant.unit.company_id != self.unit.company_id:
-                errors['unit'] = 'The unit must belong to the same company as the tenant.'
         if errors:
             raise ValidationError(errors)
 

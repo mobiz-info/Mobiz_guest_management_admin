@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 
 {% block title %}Guest Visits{% endblock %}
@@ -24,7 +25,6 @@ Visitor requests, tenant approval and Gate Pass management
     font-family: inherit;
 }
 
-/* Main card */
 .gv-card {
     width: 100%;
     box-sizing: border-box;
@@ -35,9 +35,7 @@ Visitor requests, tenant approval and Gate Pass management
     box-shadow: 0 4px 18px rgba(15, 23, 42, 0.05);
 }
 
-/* =========================================================
-   TOOLBAR
-   ========================================================= */
+/* TOOLBAR */
 
 .gv-toolbar {
     display: flex;
@@ -66,20 +64,14 @@ Visitor requests, tenant approval and Gate Pass management
     height: 40px;
     padding: 0 13px;
     box-sizing: border-box;
-
     border: 1px solid #d7dee8;
     border-radius: 8px;
     outline: none;
-
     background: #ffffff;
     color: #1e293b;
-
     font-family: inherit;
     font-size: 12px;
-
-    transition:
-        border-color .18s ease,
-        box-shadow .18s ease;
+    transition: border-color .18s ease, box-shadow .18s ease;
 }
 
 .gv-search-input::placeholder {
@@ -94,29 +86,22 @@ Visitor requests, tenant approval and Gate Pass management
 .gv-search-btn,
 .gv-clear-btn {
     min-height: 40px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-
     padding: 0 14px;
-
     border: 1px solid #d7dee8;
     border-radius: 8px;
-
     background: #ffffff;
     color: #475569;
-
     text-decoration: none;
     font-family: inherit;
     font-size: 11px;
     font-weight: 700;
-
     cursor: pointer;
     white-space: nowrap;
     flex-shrink: 0;
-
     transition: all .16s ease;
 }
 
@@ -127,34 +112,24 @@ Visitor requests, tenant approval and Gate Pass management
     color: #1e293b;
 }
 
-/* Create button */
-
 .gv-create-btn {
     min-height: 40px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 7px;
-
     padding: 0 16px;
-
     border: 1px solid #1e9724;
     border-radius: 8px;
-
     background: #1e9724;
     color: #ffffff;
-
     text-decoration: none;
     font-family: inherit;
     font-size: 11px;
     font-weight: 750;
-
     white-space: nowrap;
     flex-shrink: 0;
-
     box-shadow: 0 3px 9px rgba(79, 70, 229, .14);
-
     transition: all .16s ease;
 }
 
@@ -165,15 +140,12 @@ Visitor requests, tenant approval and Gate Pass management
     transform: translateY(-1px);
 }
 
-/* =========================================================
-   TABLE
-   ========================================================= */
+/* TABLE */
 
 .gv-table-wrapper {
     width: 100%;
     max-width: 100%;
     overflow-x: auto;
-
     scrollbar-width: thin;
     scrollbar-color: #cbd5e1 #f8fafc;
 }
@@ -181,43 +153,32 @@ Visitor requests, tenant approval and Gate Pass management
 .gv-table {
     width: 100%;
     min-width: 1220px;
-
     border-collapse: separate;
     border-spacing: 0;
-
     table-layout: auto;
     text-align: left;
 }
 
 .gv-table thead th {
     padding: 12px 11px;
-
     background: #f8fafc;
     border-bottom: 1px solid #e2e8f0;
-
     color: #64748b;
-
     font-size: 9.5px;
     font-weight: 800;
     letter-spacing: .045em;
-
     text-align: left;
     text-transform: uppercase;
     vertical-align: middle;
-
     white-space: nowrap;
 }
 
 .gv-table tbody td {
     padding: 13px 11px;
-
     border-bottom: 1px solid #edf1f5;
-
     color: #334155;
-
     font-size: 11px;
     line-height: 1.55;
-
     vertical-align: middle;
     overflow-wrap: anywhere;
 }
@@ -235,15 +196,11 @@ Visitor requests, tenant approval and Gate Pass management
     border-bottom: none;
 }
 
-/* =========================================================
-   TEXT
-   ========================================================= */
+/* TEXT */
 
 .gv-name {
     display: block;
-
     color: #172033;
-
     font-size: 11.5px;
     font-weight: 800;
     line-height: 1.45;
@@ -251,25 +208,18 @@ Visitor requests, tenant approval and Gate Pass management
 
 .gv-muted {
     display: block;
-
     margin-top: 3px;
-
     color: #718096;
-
     font-size: 9.5px;
     line-height: 1.55;
 }
 
 .gv-id-number {
     display: block;
-
     margin-top: 4px;
-
     color: #334155;
-
     font-size: 10.5px;
     font-weight: 700;
-
     overflow-wrap: anywhere;
     word-break: break-word;
 }
@@ -279,25 +229,19 @@ Visitor requests, tenant approval and Gate Pass management
     font-weight: 750;
 }
 
-/* =========================================================
-   BADGES
-   ========================================================= */
+/* BADGES */
 
 .gv-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 4px;
-
     padding: 4px 8px;
-
     border: 1px solid transparent;
     border-radius: 6px;
-
     font-size: 9px;
     font-weight: 800;
     line-height: 1.4;
-
     white-space: nowrap;
 }
 
@@ -319,15 +263,12 @@ Visitor requests, tenant approval and Gate Pass management
     color: #b42346;
 }
 
-/* =========================================================
-   ACTION BUTTONS
-   ========================================================= */
+/* ACTION BUTTONS */
 
 .gv-actions {
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
-
     gap: 6px;
     flex-wrap: wrap;
 }
@@ -341,33 +282,25 @@ Visitor requests, tenant approval and Gate Pass management
 .gv-actions a,
 .gv-table td form button {
     min-height: 30px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 5px;
-
     padding: 5px 9px;
     box-sizing: border-box;
-
     border: 1px solid #dfe5ec;
     border-radius: 7px;
-
     font-family: inherit;
     font-size: 9.5px;
     font-weight: 750;
-
     line-height: 1.35;
     text-align: center;
     text-decoration: none;
-
     white-space: nowrap;
     cursor: pointer;
-
     transition: all .15s ease;
 }
 
-/* Green */
 .gv-approve {
     background: #effaf5;
     color: #087443;
@@ -379,7 +312,6 @@ Visitor requests, tenant approval and Gate Pass management
     color: #065f3a;
 }
 
-/* Red */
 .gv-deny {
     background: #fff3f4;
     color: #b42346;
@@ -391,7 +323,6 @@ Visitor requests, tenant approval and Gate Pass management
     color: #971b3c;
 }
 
-/* Gate pass */
 .gv-pass {
     background: #f1f3ff;
     color: #4338ca;
@@ -403,9 +334,7 @@ Visitor requests, tenant approval and Gate Pass management
     color: #3730a3;
 }
 
-/* =========================================================
-   CHECK-IN FORM
-   ========================================================= */
+/* CHECK-IN FORM */
 
 .gv-id-checkin-form {
     min-width: 140px;
@@ -414,29 +343,19 @@ Visitor requests, tenant approval and Gate Pass management
 .gv-id-checkin-form select,
 .gv-id-checkin-form input {
     display: block;
-
     width: 140px;
     max-width: 100%;
-
     box-sizing: border-box;
-
     padding: 7px 8px;
     margin-bottom: 6px;
-
     border: 1px solid #d7dee8;
     border-radius: 7px;
-
     outline: none;
-
     background: #ffffff;
     color: #334155;
-
     font-family: inherit;
     font-size: 10px;
-
-    transition:
-        border-color .16s ease,
-        box-shadow .16s ease;
+    transition: border-color .16s ease, box-shadow .16s ease;
 }
 
 .gv-id-checkin-form select:focus,
@@ -450,65 +369,47 @@ Visitor requests, tenant approval and Gate Pass management
     white-space: normal !important;
 }
 
-/* =========================================================
-   CHECKOUT
-   ========================================================= */
+/* CHECKOUT */
 
 .gv-checkout-time {
     display: block;
-
     color: #166534;
-
     font-size: 10.5px;
     font-weight: 800;
 }
 
 .gv-checkout-user {
     display: block;
-
     margin-top: 3px;
-
     color: #64748b;
     font-size: 9px;
 }
 
-/* =========================================================
-   EMPTY STATE
-   ========================================================= */
+/* EMPTY STATE */
 
 .gv-empty {
     padding: 55px 16px !important;
-
     text-align: center !important;
-
     color: #94a3b8 !important;
-
     font-size: 11px !important;
     line-height: 1.8 !important;
 }
 
-/* =========================================================
-   PAGINATION
-   ========================================================= */
+/* PAGINATION */
 
 .gv-pagination {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 12px;
     flex-wrap: wrap;
-
     padding: 14px 18px;
-
     border-top: 1px solid #e8edf3;
-
     background: #ffffff;
 }
 
 .gv-pagination-info {
     color: #64748b;
-
     font-size: 10.5px;
     line-height: 1.6;
 }
@@ -522,7 +423,6 @@ Visitor requests, tenant approval and Gate Pass management
     display: flex;
     align-items: center;
     justify-content: center;
-
     gap: 5px;
     flex-wrap: wrap;
 }
@@ -531,25 +431,18 @@ Visitor requests, tenant approval and Gate Pass management
 .gv-page-current {
     min-height: 32px;
     min-width: 32px;
-
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 4px;
-
     padding: 0 9px;
-
     border: 1px solid #dbe2ea;
     border-radius: 7px;
-
     background: #ffffff;
     color: #475569;
-
     text-decoration: none;
-
     font-size: 10px;
     font-weight: 750;
-
     transition: all .15s ease;
 }
 
@@ -563,16 +456,12 @@ Visitor requests, tenant approval and Gate Pass management
     border-color: #4f46e5;
     background: #4f46e5;
     color: #ffffff;
-
     box-shadow: 0 2px 6px rgba(79, 70, 229, .14);
 }
 
-/* =========================================================
-   RESPONSIVE
-   ========================================================= */
+/* RESPONSIVE */
 
 @media (max-width: 900px) {
-
     .gv-toolbar {
         align-items: stretch;
     }
@@ -587,7 +476,6 @@ Visitor requests, tenant approval and Gate Pass management
 }
 
 @media (max-width: 600px) {
-
     .gv-toolbar {
         align-items: stretch;
         flex-direction: column;
@@ -639,9 +527,7 @@ Visitor requests, tenant approval and Gate Pass management
 
     <div class="gv-card">
 
-        <!-- =====================================================
-             SEARCH TOOLBAR
-             ===================================================== -->
+        <!-- SEARCH TOOLBAR -->
 
         <div class="gv-toolbar">
 
@@ -695,9 +581,7 @@ Visitor requests, tenant approval and Gate Pass management
         </div>
 
 
-        <!-- =====================================================
-             GUEST VISITS TABLE
-             ===================================================== -->
+        <!-- GUEST VISITS TABLE -->
 
         <div class="gv-table-wrapper">
 
@@ -705,45 +589,20 @@ Visitor requests, tenant approval and Gate Pass management
 
                 <thead>
                     <tr>
+                        <th>Guest / Accompanying Persons</th>
 
-                        <th>
-                            Guest / Accompanying Persons
-                        </th>
+                        {% if is_unit_self_service %}
+                            <th>Tenant / Unit</th>
+                        {% endif %}
 
-                     
-
-                        <th>
-                            Purpose / Vehicle
-                        </th>
-
-                        <th>
-                            Visit Date
-                        </th>
-
-                        <th>
-                            Status
-                        </th>
-
-                        <th>
-                            Gate Pass
-                        </th>
-
-                        <th>
-                            Check-in
-                        </th>
-
-                        <th>
-                            Guest ID / Return
-                        </th>
-
-                        <th>
-                            Check-out
-                        </th>
-
-                        <th>
-                            Actions
-                        </th>
-
+                        <th>Purpose / Vehicle</th>
+                        <th>Visit Date</th>
+                        <th>Status</th>
+                        <th>Gate Pass</th>
+                        <th>Check-in</th>
+                        <th>Guest ID / Return</th>
+                        <th>Check-out</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
 
@@ -754,14 +613,11 @@ Visitor requests, tenant approval and Gate Pass management
 
                         <tr>
 
-                            <!-- =================================================
-                                 GUEST
-                                 ================================================= -->
+                            <!-- GUEST -->
 
                             <td>
 
                                 {% if visit.guest_photo %}
-
                                     <img
                                         src="{{ visit.guest_photo.url }}"
                                         alt="Guest photo"
@@ -776,89 +632,76 @@ Visitor requests, tenant approval and Gate Pass management
                                             border:1px solid #e2e8f0;
                                         "
                                     >
-
                                 {% endif %}
-
 
                                 <span class="gv-name">
                                     {{ visit.guest_name }}
                                 </span>
 
-
                                 <span class="gv-muted">
-                                    {% if visit.unit.company.country.dial_code %}{{ visit.unit.company.country.dial_code }} {% endif %}{{ visit.guest_mobile_number|default:"No mobile number" }}
+                                    {% if visit.unit.company.country.dial_code %}
+                                        {{ visit.unit.company.country.dial_code }}
+                                    {% endif %}
+                                    {{ visit.guest_mobile_number|default:"No mobile number" }}
                                     ·
                                     {{ visit.get_visit_type_display }}
                                     ·
                                     Request #{{ visit.pk }}
                                 </span>
 
-
                                 {% if visit.accompanying_people.all %}
-
                                     <span class="gv-muted">
-
                                         With:
 
                                         {% for person in visit.accompanying_people.all %}
-
                                             {{ person.name }}
                                             ({{ person.mobile_number }})
 
-                                            {% if not forloop.last %}
-                                                ,
-                                            {% endif %}
-
+                                            {% if not forloop.last %}, {% endif %}
                                         {% endfor %}
-
                                     </span>
-
                                 {% endif %}
 
                             </td>
 
 
-                            <!-- =================================================
-                                 TENANT
-                                 ================================================= -->
+                            {% if is_unit_self_service %}
 
-                            <td>
+                                <!-- TENANT / UNIT -->
 
-                                <span class="gv-name">
-                                    {{ visit.tenant.full_name }}
-                                </span>
+                                <td>
 
-                                <span class="gv-muted">
-                                    {{ visit.unit.building.name }}
-                                    ·
-                                    {{ visit.unit.name }}
-                                </span>
+                                    <span class="gv-name">
+                                        {{ visit.tenant.full_name }}
+                                    </span>
 
-                            </td>
+                                    <span class="gv-muted">
+                                        {{ visit.unit.building.name }}
+                                        ·
+                                        {{ visit.unit.name }}
+                                    </span>
+
+                                </td>
+
+                            {% endif %}
 
 
-                            <!-- =================================================
-                                 PURPOSE / VEHICLE
-                                 ================================================= -->
+                            <!-- PURPOSE / VEHICLE -->
 
                             <td>
 
                                 {{ visit.purpose_of_visit.name }}
 
                                 {% if visit.vehicle_details %}
-
                                     <span class="gv-muted">
                                         Vehicle: {{ visit.vehicle_details }}
                                     </span>
-
                                 {% endif %}
 
                             </td>
 
 
-                            <!-- =================================================
-                                 VISIT DATE
-                                 ================================================= -->
+                            <!-- VISIT DATE -->
 
                             <td>
 
@@ -867,19 +710,15 @@ Visitor requests, tenant approval and Gate Pass management
                                 </strong>
 
                                 {% if visit.visit_time %}
-
                                     <span class="gv-muted">
                                         {{ visit.visit_time|time:'h:i A' }}
                                     </span>
-
                                 {% endif %}
 
                             </td>
 
 
-                            <!-- =================================================
-                                 STATUS
-                                 ================================================= -->
+                            <!-- STATUS -->
 
                             <td>
 
@@ -894,17 +733,11 @@ Visitor requests, tenant approval and Gate Pass management
                                     <span class="gv-badge {{ visit.status }}">
 
                                         {% if visit.status == 'pending' %}
-
                                             Pending Approval
-
                                         {% elif visit.status == 'approved' %}
-
                                             Approved
-
                                         {% else %}
-
                                             Rejected
-
                                         {% endif %}
 
                                     </span>
@@ -914,32 +747,24 @@ Visitor requests, tenant approval and Gate Pass management
                             </td>
 
 
-                            <!-- =================================================
-                                 GATE PASS
-                                 ================================================= -->
+                            <!-- GATE PASS -->
 
                             <td>
 
                                 {% if visit.gate_pass_code %}
-
                                     <strong>
                                         {{ visit.gate_pass_code }}
                                     </strong>
-
                                 {% else %}
-
                                     <span class="gv-muted">
                                         Not generated
                                     </span>
-
                                 {% endif %}
 
                             </td>
 
 
-                            <!-- =================================================
-                                 CHECK-IN
-                                 ================================================= -->
+                            <!-- CHECK-IN: ID DOCUMENT IS OPTIONAL -->
 
                             <td>
 
@@ -948,8 +773,6 @@ Visitor requests, tenant approval and Gate Pass management
                                     <strong>
                                         {{ visit.checked_in_at|date:'d-m-Y h:i A' }}
                                     </strong>
-
-
 
                                 {% elif visit.status == 'approved' and can_manage_checkin %}
 
@@ -961,15 +784,12 @@ Visitor requests, tenant approval and Gate Pass management
 
                                         {% csrf_token %}
 
-
                                         <select
                                             name="id_type"
-                                            required
-                                            aria-label="Guest ID type"
+                                            aria-label="Guest ID type (optional)"
                                         >
-
                                             <option value="">
-                                                ID type *
+                                                ID type (Optional)
                                             </option>
 
                                             <option value="national_id">
@@ -987,16 +807,15 @@ Visitor requests, tenant approval and Gate Pass management
                                             <option value="other">
                                                 Other ID
                                             </option>
-
                                         </select>
 
 
                                         <input
+                                            type="text"
                                             name="id_number"
-                                            required
                                             maxlength="100"
-                                            placeholder="ID number *"
-                                            aria-label="Guest ID number"
+                                            placeholder="ID number (Optional)"
+                                            aria-label="Guest ID number (optional)"
                                         >
 
 
@@ -1004,11 +823,10 @@ Visitor requests, tenant approval and Gate Pass management
                                             class="gv-approve"
                                             type="submit"
                                         >
-                                            Check in &amp; Receive ID
+                                            Check in
                                         </button>
 
                                     </form>
-
 
                                 {% else %}
 
@@ -1019,33 +837,36 @@ Visitor requests, tenant approval and Gate Pass management
                             </td>
 
 
-                            <!-- =================================================
-                                 GUEST ID TRACKING
-                                 ================================================= -->
+                            <!-- GUEST ID TRACKING -->
 
                             <td>
 
-                                {% if visit.id_number %}
+                                {% if visit.id_received_at or visit.id_number %}
 
-                                    <strong>
-                                        {{ visit.get_id_type_display }}
-                                    </strong>
+                                    {% if visit.id_number %}
 
+                                        <strong>
+                                            {{ visit.get_id_type_display|default:"ID Document" }}
+                                        </strong>
 
-                                    <span class="gv-id-number">
-                                        ID:
-                                        {{ visit.id_number|default:"Not available" }}
-                                    </span>
+                                        <span class="gv-id-number">
+                                            ID: {{ visit.id_number }}
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="gv-muted">
+                                            No ID details recorded
+                                        </span>
+
+                                    {% endif %}
 
 
                                     {% if visit.id_received_at %}
 
                                         <span class="gv-muted">
-
                                             Received:
                                             {{ visit.id_received_at|date:'d-m-Y h:i A' }}
-
-
                                         </span>
 
                                     {% endif %}
@@ -1058,13 +879,11 @@ Visitor requests, tenant approval and Gate Pass management
                                         </span>
 
                                         <span class="gv-muted">
-
                                             {{ visit.id_returned_at|date:'d-m-Y h:i A' }}
 
                                             {% if visit.id_returned_by %}
                                                 · {{ visit.id_returned_by.username }}
                                             {% endif %}
-
                                         </span>
 
 
@@ -1077,7 +896,6 @@ Visitor requests, tenant approval and Gate Pass management
                                         <span class="gv-muted">
                                             Original ID must be returned before checkout.
                                         </span>
-
 
                                         {% if is_tenant_self_service %}
 
@@ -1106,16 +924,16 @@ Visitor requests, tenant approval and Gate Pass management
 
                                 {% else %}
 
-                                    —
+                                    <span class="gv-muted">
+                                        No ID received
+                                    </span>
 
                                 {% endif %}
 
                             </td>
 
 
-                            <!-- =================================================
-                                 CHECK-OUT
-                                 ================================================= -->
+                            <!-- CHECK-OUT -->
 
                             <td>
 
@@ -1214,17 +1032,37 @@ Visitor requests, tenant approval and Gate Pass management
                             </td>
 
 
-                            <!-- =================================================
-                                 ACTIONS
-                                 ================================================= -->
+                            <!-- ACTIONS -->
 
                             <td>
 
                                 <div class="gv-actions">
 
                                     {% if visit.status == 'pending' and can_accept_unit_requests and visit.visit_type == 'walk_in' and visit.unit_approval_status == 'pending' %}
-                                        <form method="post" action="{% url 'guest_visit_unit_accept' visit.pk %}">{% csrf_token %}<button class="gv-approve" type="submit">Accept for Tenant Approval</button></form>
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'guest_visit_unit_accept' visit.pk %}"
+                                        >
+                                            {% csrf_token %}
+                                            <button class="gv-approve" type="submit">
+                                                Accept for Tenant Approval
+                                            </button>
+                                        </form>
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'guest_visit_deny' visit.pk %}"
+                                            onsubmit="return confirm('Cancel this walk-in request?');"
+                                        >
+                                            {% csrf_token %}
+                                            <button class="gv-deny" type="submit">
+                                                Cancel Request
+                                            </button>
+                                        </form>
+
                                     {% endif %}
+
 
                                     {% if visit.status == 'pending' and can_approve_visits and visit.unit_approval_status == 'approved' %}
 
@@ -1232,34 +1070,21 @@ Visitor requests, tenant approval and Gate Pass management
                                             method="post"
                                             action="{% url 'guest_visit_approve' visit.pk %}"
                                         >
-
                                             {% csrf_token %}
-
-                                            <button
-                                                class="gv-approve"
-                                                type="submit"
-                                            >
+                                            <button class="gv-approve" type="submit">
                                                 Approve
                                             </button>
-
                                         </form>
-
 
                                         <form
                                             method="post"
                                             action="{% url 'guest_visit_deny' visit.pk %}"
                                             onsubmit="return confirm('Deny this guest visit?');"
                                         >
-
                                             {% csrf_token %}
-
-                                            <button
-                                                class="gv-deny"
-                                                type="submit"
-                                            >
+                                            <button class="gv-deny" type="submit">
                                                 Deny
                                             </button>
-
                                         </form>
 
                                     {% endif %}
@@ -1271,11 +1096,8 @@ Visitor requests, tenant approval and Gate Pass management
                                             class="gv-pass"
                                             href="{% url 'guest_visit_gate_pass' visit.pk %}"
                                         >
-
                                             <i class="ph ph-identification-card"></i>
-
                                             View Gate Pass
-
                                         </a>
 
                                     {% endif %}
@@ -1292,7 +1114,7 @@ Visitor requests, tenant approval and Gate Pass management
                         <tr>
 
                             <td
-                                colspan="10"
+                                colspan="{% if is_unit_self_service %}10{% else %}9{% endif %}"
                                 class="gv-empty"
                             >
 
@@ -1304,7 +1126,6 @@ Visitor requests, tenant approval and Gate Pass management
                                         margin-bottom:10px;
                                     "
                                 ></i>
-
 
                                 {% if search %}
 
@@ -1334,9 +1155,7 @@ Visitor requests, tenant approval and Gate Pass management
         </div>
 
 
-        <!-- =====================================================
-             PAGINATION
-             ===================================================== -->
+        <!-- PAGINATION -->
 
         {% if page_obj.paginator.num_pages > 1 %}
 
@@ -1379,21 +1198,16 @@ Visitor requests, tenant approval and Gate Pass management
                             href="?page=1{% if search %}&search={{ search|urlencode }}{% endif %}"
                             class="gv-page-btn"
                         >
-
                             <i class="ph ph-caret-double-left"></i>
                             First
-
                         </a>
-
 
                         <a
                             href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
                             class="gv-page-btn"
                         >
-
                             <i class="ph ph-caret-left"></i>
                             Previous
-
                         </a>
 
                     {% endif %}
@@ -1410,21 +1224,16 @@ Visitor requests, tenant approval and Gate Pass management
                             href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search|urlencode }}{% endif %}"
                             class="gv-page-btn"
                         >
-
                             Next
                             <i class="ph ph-caret-right"></i>
-
                         </a>
-
 
                         <a
                             href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search|urlencode }}{% endif %}"
                             class="gv-page-btn"
                         >
-
                             Last
                             <i class="ph ph-caret-double-right"></i>
-
                         </a>
 
                     {% endif %}

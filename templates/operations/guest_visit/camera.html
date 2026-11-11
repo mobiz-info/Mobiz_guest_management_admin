@@ -3,504 +3,502 @@
 
 {% block title %}Capture Guest Photo{% endblock %}
 {% block page_title %}Capture Guest Photo{% endblock %}
-{% block page_subtitle %}Secure guest photo capture{% endblock %}
+{% block page_subtitle %}Capture and attach the visitor photograph{% endblock %}
 
 {% block content %}
+
 <style>
-    .camera-page {
-        min-height: calc(100vh - 120px);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 24px 14px 40px;
-        background:
-            radial-gradient(circle at 10% 10%, rgba(99,102,241,.16), transparent 28%),
-            radial-gradient(circle at 90% 90%, rgba(6,182,212,.12), transparent 30%);
-        box-sizing: border-box;
+.gc-wrap{
+    max-width:680px;
+    margin:24px auto;
+    padding:0 12px;
+}
+
+.gc-card{
+    background:#fff;
+    border:1px solid #e8edf5;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 12px 40px rgba(15,23,42,.07);
+}
+
+.gc-head{
+    padding:19px 23px;
+    background:linear-gradient(120deg,#f0f4ff,#fafaff);
+    border-bottom:1px solid #edf0f6;
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.gc-head-icon{
+    width:43px;
+    height:43px;
+    border-radius:13px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg,#6366f1,#4338ca);
+    color:#fff;
+    font-size:21px;
+    box-shadow:0 5px 12px rgba(79,70,229,.2);
+}
+
+.gc-head-content{
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+
+.gc-head-title{
+    color:#172033;
+    font-size:15px;
+    font-weight:800;
+}
+
+.gc-head-subtitle{
+    color:#8993a5;
+    font-size:11px;
+}
+
+.gc-body{
+    padding:24px;
+}
+
+.gc-camera-label{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:11px;
+}
+
+.gc-camera-label strong{
+    font-size:12px;
+    color:#334155;
+    font-weight:800;
+}
+
+.gc-camera-label span{
+    font-size:10px;
+    color:#94a3b8;
+}
+
+.gc-video-box{
+    position:relative;
+    width:100%;
+    min-height:310px;
+    background:linear-gradient(145deg,#111827,#1e293b);
+    border-radius:15px;
+    overflow:hidden;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:1px solid #26344b;
+}
+
+.gc-video-box video{
+    width:100%;
+    max-height:440px;
+    object-fit:cover;
+    display:none;
+}
+
+.gc-video-box video.active{
+    display:block;
+}
+
+.gc-placeholder{
+    padding:35px 20px;
+    text-align:center;
+    color:#cbd5e1;
+    font-size:12px;
+    line-height:1.8;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+
+.gc-placeholder i{
+    width:65px;
+    height:65px;
+    border-radius:20px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(129,140,248,.13);
+    color:#a5b4fc;
+    font-size:30px;
+    margin-bottom:16px;
+}
+
+.gc-placeholder strong{
+    color:#f1f5f9;
+    display:block;
+    font-size:14px;
+    margin-bottom:4px;
+}
+
+.gc-preview{
+    display:none;
+    width:100%;
+    max-height:440px;
+    object-fit:contain;
+    background:#fff;
+    border-radius:15px;
+    border:1px solid #e2e8f0;
+    margin-top:0;
+}
+
+.gc-status{
+    margin-top:16px;
+    padding:13px 15px;
+    background:#f5f7ff;
+    border:1px solid #e0e7ff;
+    border-radius:11px;
+    color:#59658a;
+    font-size:11px;
+    line-height:1.7;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.gc-status::before{
+    content:"";
+    min-width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#818cf8;
+}
+
+.gc-actions{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:21px;
+}
+
+.gc-btn{
+    min-height:42px;
+    padding:0 19px;
+    border-radius:9px;
+    font-size:11px;
+    font-weight:800;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:all .2s ease;
+}
+
+.gc-btn:hover:not(:disabled){
+    transform:translateY(-2px);
+}
+
+.gc-primary{
+    background:linear-gradient(135deg,#6366f1,#4f46e5);
+    border:1px solid #4f46e5;
+    color:#fff;
+    box-shadow:0 4px 10px rgba(79,70,229,.16);
+}
+
+.gc-primary:hover:not(:disabled){
+    box-shadow:0 6px 15px rgba(79,70,229,.25);
+}
+
+.gc-secondary{
+    background:#fff;
+    border:1px solid #dbe2ec;
+    color:#475569;
+}
+
+.gc-secondary:hover:not(:disabled){
+    background:#f8fafc;
+}
+
+.gc-success{
+    background:linear-gradient(135deg,#16a34a,#15803d);
+    border:1px solid #15803d;
+    color:#fff;
+    box-shadow:0 4px 10px rgba(21,128,61,.16);
+}
+
+.gc-success:hover:not(:disabled){
+    box-shadow:0 6px 15px rgba(21,128,61,.24);
+}
+
+.gc-btn:disabled{
+    opacity:.45;
+    cursor:not-allowed;
+    transform:none;
+}
+
+.gc-footer{
+    padding:13px 20px;
+    border-top:1px solid #edf0f6;
+    background:#fafbfe;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#94a3b8;
+    font-size:10px;
+}
+
+.gc-footer i{
+    color:#6366f1;
+    font-size:14px;
+}
+
+@media(max-width:600px){
+    .gc-wrap{
+        margin:12px auto;
+        padding:0 5px;
     }
 
-    .camera-shell {
-        width: min(680px, 100%);
-        overflow: hidden;
-        background: #fff;
-        border: 1px solid #dbe3ef;
-        border-radius: 26px;
-        box-shadow: 0 24px 70px rgba(15,23,42,.16);
-        text-align: center;
-        margin: 0 auto;
+    .gc-body{
+        padding:15px;
     }
 
-    .camera-head {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 12px;
-        padding: 24px 20px;
-        border-bottom: 1px solid #e2e8f0;
-        background: linear-gradient(135deg, #fff, #f7f9ff);
-        text-align: center;
+    .gc-head{
+        padding:15px;
     }
 
-    .camera-brand {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        width: 100%;
-        text-align: center;
+    .gc-video-box{
+        min-height:230px;
     }
 
-    .camera-brand-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: #fff;
-        background: linear-gradient(135deg, #6366f1, #4f46e5);
-        font-size: 25px;
-        box-shadow: 0 9px 22px rgba(79,70,229,.22);
-        margin: 0 auto;
+    .gc-actions{
+        flex-direction:column;
     }
 
-    .camera-heading-text {
-        width: 100%;
-        text-align: center;
+    .gc-btn{
+        width:100%;
+        min-height:43px;
     }
 
-    .camera-head h1 {
-        margin: 0;
-        font-size: 20px;
-        font-weight: 850;
-        color: #172033;
-        text-align: center;
+    .gc-camera-label{
+        gap:8px;
     }
-
-    .camera-head p {
-        margin: 7px 0 0;
-        font-size: 12px;
-        color: #64748b;
-        text-align: center;
-    }
-
-    .secure-badge {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        padding: 7px 12px;
-        border: 1px solid #bbf7d0;
-        border-radius: 999px;
-        background: #f0fdf4;
-        color: #166534;
-        font-size: 10px;
-        font-weight: 800;
-        text-align: center;
-        margin: 0 auto;
-    }
-
-    .camera-body {
-        padding: 22px;
-        text-align: center;
-    }
-
-    .camera-stage {
-        position: relative;
-        width: 100%;
-        aspect-ratio: 4 / 3;
-        overflow: hidden;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 20px;
-        background: #0f172a;
-        border: 1px solid #cbd5e1;
-        margin: 0 auto;
-    }
-
-    .camera-stage::after {
-        content: "";
-        position: absolute;
-        inset: 14px;
-        border: 1px solid rgba(255,255,255,.2);
-        border-radius: 15px;
-        pointer-events: none;
-    }
-
-    #cameraVideo,
-    #cameraResult {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        display: none;
-    }
-
-    #cameraVideo.active,
-    #cameraResult.active {
-        display: block;
-    }
-
-    #cameraCanvas {
-        display: none;
-    }
-
-    .camera-placeholder {
-        width: 100%;
-        text-align: center;
-        color: #cbd5e1;
-        padding: 24px;
-        box-sizing: border-box;
-    }
-
-    .camera-placeholder-icon {
-        width: 68px;
-        height: 68px;
-        margin: 0 auto 12px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255,255,255,.08);
-        font-size: 30px;
-    }
-
-    .camera-placeholder strong {
-        display: block;
-        color: #fff;
-        font-size: 15px;
-        text-align: center;
-    }
-
-    .camera-placeholder span {
-        display: block;
-        margin-top: 6px;
-        font-size: 11px;
-        line-height: 1.5;
-        text-align: center;
-    }
-
-    .camera-controls {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        flex-wrap: wrap;
-        width: 100%;
-        margin: 18px auto 0;
-        text-align: center;
-    }
-
-    .camera-controls button {
-        min-height: 44px;
-        min-width: 125px;
-        padding: 0 18px;
-        border-radius: 11px;
-        border: 1px solid #cbd5e1;
-        background: #fff;
-        color: #334155;
-        font-family: inherit;
-        font-size: 12px;
-        font-weight: 800;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-align: center;
-        line-height: 1.3;
-        transition: transform .18s ease, box-shadow .18s ease;
-    }
-
-    .camera-controls button:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 5px 12px rgba(15,23,42,.08);
-    }
-
-    .camera-controls button:focus-visible {
-        outline: 3px solid rgba(99,102,241,.3);
-        outline-offset: 3px;
-    }
-
-    .camera-controls .primary {
-        border-color: #4f46e5;
-        color: #fff;
-        background: linear-gradient(135deg, #6366f1, #4f46e5);
-        box-shadow: 0 8px 18px rgba(79,70,229,.22);
-    }
-
-    .camera-controls .primary:hover {
-        box-shadow: 0 10px 22px rgba(79,70,229,.3);
-    }
-
-    .camera-message {
-        min-height: 20px;
-        margin: 13px auto 0;
-        color: #64748b;
-        font-size: 11px;
-        line-height: 1.6;
-        text-align: center;
-        overflow-wrap: anywhere;
-    }
-
-    .camera-tip {
-        margin: 16px auto 0;
-        padding: 13px 15px;
-        border-radius: 12px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        color: #64748b;
-        font-size: 11px;
-        line-height: 1.7;
-        text-align: center;
-    }
-
-    .camera-tip strong {
-        color: #334155;
-    }
-
-    @media (max-width: 560px) {
-        .camera-page {
-            padding: 12px 8px 24px;
-        }
-
-        .camera-shell {
-            border-radius: 18px;
-        }
-
-        .camera-head {
-            padding: 20px 14px;
-        }
-
-        .camera-body {
-            padding: 14px;
-        }
-
-        .camera-head h1 {
-            font-size: 18px;
-        }
-
-        .camera-head p {
-            font-size: 11px;
-        }
-
-        .camera-controls {
-            gap: 8px;
-        }
-
-        .camera-controls button {
-            min-width: 115px;
-            min-height: 42px;
-            padding: 0 13px;
-            font-size: 11px;
-        }
-
-        .camera-tip {
-            padding: 11px;
-            font-size: 10px;
-        }
-    }
+}
 </style>
 
-<div class="camera-page">
-    <div class="camera-shell">
+<div class="gc-wrap">
+    <div class="gc-card">
 
-        <div class="camera-head">
-            <div class="camera-brand">
-                <div class="camera-brand-icon">📷</div>
-
-                <div class="camera-heading-text">
-                    <h1>Capture Guest Photo</h1>
-                    <p>Position the guest clearly inside the frame</p>
-                </div>
+        <div class="gc-head">
+            <div class="gc-head-icon">
+                <i class="ph ph-camera"></i>
             </div>
 
-            <div class="secure-badge">🔒 SECURE CAPTURE</div>
+            <div class="gc-head-content">
+                <div class="gc-head-title">Capture Guest Photo</div>
+                <div class="gc-head-subtitle">
+                    Visitor photograph registration
+                </div>
+            </div>
         </div>
 
-        <div class="camera-body">
+        <div class="gc-body">
 
-            <div class="camera-stage">
-                <div class="camera-placeholder" id="cameraPlaceholder">
-                    <div class="camera-placeholder-icon">📷</div>
-                    <strong>Camera is ready</strong>
-                    <span>Allow camera permission when your browser asks</span>
+            <div class="gc-camera-label" id="gc-camera-label">
+                <strong>Camera Preview</strong>
+                <span>Live visitor photo capture</span>
+            </div>
+
+            <div class="gc-video-box" id="gc-video-box">
+
+                <div class="gc-placeholder" id="gc-placeholder">
+                    <i class="ph ph-camera-slash"></i>
+                    <strong>Camera Not Started</strong>
+                    Click Start Camera to begin capturing
                 </div>
 
-                <video
-                    id="cameraVideo"
-                    autoplay
-                    muted
-                    playsinline
-                ></video>
+                <video id="gc-video" autoplay playsinline muted></video>
 
-                <img
-                    id="cameraResult"
-                    alt="Captured guest photo"
-                >
-
-                <canvas id="cameraCanvas"></canvas>
             </div>
 
-            <div class="camera-controls">
-                <button
-                    type="button"
-                    id="startCamera"
-                    class="primary"
-                >Start Camera</button>
+            <canvas id="gc-canvas" style="display:none"></canvas>
 
-                <button
-                    type="button"
-                    id="capturePhoto"
-                    style="display:none;"
-                >Capture Photo</button>
+            <img id="gc-preview"
+                 class="gc-preview"
+                 alt="Captured guest photo">
 
-                <button
-                    type="button"
-                    id="retakePhoto"
-                    style="display:none;"
-                >Retake</button>
-
-                <button
-                    type="button"
-                    id="usePhoto"
-                    class="primary"
-                    style="display:none;"
-                >Use This Photo</button>
-
-                <button
-                    type="button"
-                    id="closeCamera"
-                >Cancel</button>
+            <div class="gc-status" id="gc-status">
+                Click Start Camera and allow camera permission in your browser.
             </div>
 
-            <div
-                class="camera-message"
-                id="cameraMessage"
-                role="status"
-                aria-live="polite"
-            ></div>
+            <div class="gc-actions">
 
-            <div class="camera-tip">
-                If the browser asks for permission, select <strong>Allow</strong>.
-                After capturing, click <strong>Use This Photo</strong> to return it
-                to the Guest Visit form.
+                <button type="button"
+                        class="gc-btn gc-primary"
+                        id="gc-start">
+                    <i class="ph ph-video-camera"></i>
+                    Start Camera
+                </button>
+
+                <button type="button"
+                        class="gc-btn gc-primary"
+                        id="gc-capture"
+                        disabled>
+                    <i class="ph ph-camera"></i>
+                    Capture Photo
+                </button>
+
+                <button type="button"
+                        class="gc-btn gc-secondary"
+                        id="gc-retake"
+                        style="display:none">
+                    <i class="ph ph-arrow-counter-clockwise"></i>
+                    Retake Photo
+                </button>
+
+                <button type="button"
+                        class="gc-btn gc-success"
+                        id="gc-use"
+                        style="display:none">
+                    <i class="ph ph-check-circle"></i>
+                    Use This Photo
+                </button>
+
             </div>
 
         </div>
+
+        <div class="gc-footer">
+            <i class="ph ph-shield-check"></i>
+            Secure visitor photo capture
+        </div>
+
     </div>
 </div>
 
 <script>
-(function () {
-    const video = document.getElementById('cameraVideo');
-    const canvas = document.getElementById('cameraCanvas');
-    const result = document.getElementById('cameraResult');
-    const placeholder = document.getElementById('cameraPlaceholder');
+(function(){
+    'use strict';
 
-    const startButton = document.getElementById('startCamera');
-    const captureButton = document.getElementById('capturePhoto');
-    const retakeButton = document.getElementById('retakePhoto');
-    const useButton = document.getElementById('usePhoto');
-    const closeButton = document.getElementById('closeCamera');
-    const message = document.getElementById('cameraMessage');
+    const video = document.getElementById('gc-video');
+    const canvas = document.getElementById('gc-canvas');
+    const preview = document.getElementById('gc-preview');
+    const placeholder = document.getElementById('gc-placeholder');
+    const status = document.getElementById('gc-status');
 
-    let stream = null;
+    const videoBox = document.getElementById('gc-video-box');
+    const cameraLabel = document.getElementById('gc-camera-label');
+
+    const startButton = document.getElementById('gc-start');
+    const captureButton = document.getElementById('gc-capture');
+    const retakeButton = document.getElementById('gc-retake');
+    const useButton = document.getElementById('gc-use');
+
+    let cameraStream = null;
     let capturedPhoto = '';
 
-    function stopCamera() {
-        if (stream) {
-            stream.getTracks().forEach(function (track) {
+    function setStatus(message, error){
+        status.textContent = message;
+        status.style.color = error ? '#b91c1c' : '#59658a';
+        status.style.background = error ? '#fff7f7' : '#f5f7ff';
+        status.style.borderColor = error ? '#fecaca' : '#e0e7ff';
+
+        status.style.borderLeft = error
+            ? '3px solid #dc2626'
+            : '1px solid #e0e7ff';
+    }
+
+    async function stopCamera(){
+
+        if(cameraStream){
+            cameraStream.getTracks().forEach(function(track){
                 track.stop();
             });
 
-            stream = null;
+            cameraStream = null;
         }
 
-        if (video) {
-            video.srcObject = null;
-        }
+        video.srcObject = null;
+        captureButton.disabled = true;
     }
 
-    function showError(text) {
-        message.textContent = text;
-        message.style.color = '#b91c1c';
-    }
+    startButton.addEventListener('click', async function(){
 
-    async function startCamera() {
-        message.style.color = '#64748b';
-        message.textContent = '';
-
-        if (!window.isSecureContext) {
-            showError(
-                'Camera requires HTTPS or localhost. Please open the project using localhost or HTTPS.'
+        if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+            setStatus(
+                'Camera access is unavailable. Use HTTPS or localhost and a supported browser.',
+                true
             );
             return;
         }
 
-        if (
-            !navigator.mediaDevices ||
-            !navigator.mediaDevices.getUserMedia
-        ) {
-            showError('This browser does not support camera access.');
-            return;
-        }
+        startButton.disabled = true;
+        setStatus('Requesting camera permission...');
 
-        try {
-            stopCamera();
+        try{
 
-            stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: { ideal: 'user' },
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
+            await stopCamera();
+
+            cameraStream = await navigator.mediaDevices.getUserMedia({
+                video:{
+                    facingMode:'user',
+                    width:{ideal:1280},
+                    height:{ideal:720}
                 },
-                audio: false
+                audio:false
             });
 
-            video.srcObject = stream;
-            video.classList.add('active');
-            result.classList.remove('active');
-            placeholder.style.display = 'none';
-
-            startButton.style.display = 'none';
-            captureButton.style.display = 'inline-flex';
-            retakeButton.style.display = 'none';
-            useButton.style.display = 'none';
+            video.srcObject = cameraStream;
 
             await video.play();
 
-            message.textContent = 'Camera is active. Capture when ready.';
+            // Show camera section
+            videoBox.style.display = 'flex';
+            cameraLabel.style.display = 'flex';
 
-        } catch (error) {
-            console.error('Guest camera error:', error);
+            video.classList.add('active');
+            placeholder.style.display = 'none';
 
-            stopCamera();
+            // Hide previous captured image
+            preview.style.display = 'none';
+            preview.removeAttribute('src');
 
-            if (error && error.name === 'NotAllowedError') {
-                showError(
-                    'Camera permission was denied. Allow camera access in the browser and try again.'
-                );
-            } else if (error && error.name === 'NotFoundError') {
-                showError('No camera was found on this device.');
-            } else if (error && error.name === 'NotReadableError') {
-                showError(
-                    'The camera is being used by another application. Close it and try again.'
-                );
-            } else {
-                showError(
-                    'Unable to access the camera. Please check browser permission and try again.'
-                );
+            captureButton.disabled = false;
+
+            retakeButton.style.display = 'none';
+            useButton.style.display = 'none';
+
+            setStatus(
+                'Camera is ready. Position the guest and click Capture Photo.'
+            );
+
+        }catch(error){
+
+            console.error('Camera error:',error);
+
+            let message = 'Unable to open camera.';
+
+            if(error.name === 'NotAllowedError'){
+                message = 'Camera permission denied. Allow camera access in browser settings and try again.';
+            }else if(error.name === 'NotFoundError'){
+                message = 'No camera was detected on this device.';
+            }else if(error.name === 'NotReadableError'){
+                message = 'Camera is being used by another application. Close other camera applications and retry.';
+            }else if(error.name === 'SecurityError'){
+                message = 'Camera requires a secure HTTPS connection or localhost.';
             }
 
-            startButton.style.display = 'inline-flex';
-            captureButton.style.display = 'none';
+            setStatus(message,true);
+            startButton.disabled = false;
         }
-    }
+    });
 
-    captureButton.addEventListener('click', function () {
-        if (!stream || !video.videoWidth || !video.videoHeight) {
-            showError('Camera is not ready yet.');
+    captureButton.addEventListener('click',function(){
+
+        if(!video.videoWidth || !video.videoHeight){
+            setStatus(
+                'Camera is not ready. Please wait and try again.',
+                true
+            );
             return;
         }
 
@@ -509,8 +507,8 @@
 
         const context = canvas.getContext('2d');
 
-        if (!context) {
-            showError('Unable to capture the photo. Please try again.');
+        if(!context){
+            setStatus('Unable to capture photo. Please try again.',true);
             return;
         }
 
@@ -522,73 +520,112 @@
             canvas.height
         );
 
-        capturedPhoto = canvas.toDataURL('image/jpeg', 0.88);
+        capturedPhoto = canvas.toDataURL('image/jpeg',0.85);
 
-        result.src = capturedPhoto;
-        result.classList.add('active');
+        // Display captured photo
+        preview.src = capturedPhoto;
+        preview.style.display = 'block';
+
+        // IMPORTANT: Completely hide camera box and its label
+        videoBox.style.display = 'none';
+        cameraLabel.style.display = 'none';
+
         video.classList.remove('active');
 
-        stopCamera();
+        captureButton.disabled = true;
 
-        captureButton.style.display = 'none';
+        startButton.style.display = 'none';
         retakeButton.style.display = 'inline-flex';
         useButton.style.display = 'inline-flex';
 
-        message.style.color = '#64748b';
-        message.textContent =
-            'Photo captured. Review it and choose "Use This Photo".';
+        setStatus(
+            'Photo captured successfully. Click Use This Photo to attach it to the Guest Visit form.'
+        );
+
+        stopCamera();
     });
 
-    retakeButton.addEventListener('click', function () {
+    retakeButton.addEventListener('click',function(){
+
         capturedPhoto = '';
-        result.removeAttribute('src');
-        result.classList.remove('active');
 
-        startCamera();
+        preview.removeAttribute('src');
+        preview.style.display = 'none';
+
+        // Show camera box again
+        videoBox.style.display = 'flex';
+        cameraLabel.style.display = 'flex';
+
+        video.classList.remove('active');
+        placeholder.style.display = 'flex';
+
+        retakeButton.style.display = 'none';
+        useButton.style.display = 'none';
+
+        startButton.style.display = 'inline-flex';
+        startButton.disabled = false;
+
+        captureButton.disabled = true;
+
+        setStatus(
+            'Click Start Camera to capture another photo.'
+        );
     });
 
-    useButton.addEventListener('click', function () {
-        if (!capturedPhoto) {
-            showError('Please capture a photo first.');
+    useButton.addEventListener('click',function(){
+
+        if(!capturedPhoto){
+            setStatus('Please capture a photo first.',true);
             return;
         }
 
-        if (!window.opener || window.opener.closed) {
-            showError(
-                'The Guest Visit form is no longer available. Close this page and open the camera again from the form.'
+        if(!window.opener || window.opener.closed){
+            setStatus(
+                'The Guest Visit form is no longer open. Please reopen the form and capture again.',
+                true
             );
             return;
         }
 
-        window.opener.postMessage(
-            {
-                type: 'guest-photo-captured',
-                photo: capturedPhoto
-            },
-            window.location.origin
-        );
+        try{
 
-        message.style.color = '#166534';
-        message.textContent =
-            'Photo added to the Guest Visit form. Closing camera...';
+            window.opener.postMessage({
+                type:'guest-photo-captured',
+                photo:capturedPhoto
+            },window.location.origin);
 
-        useButton.disabled = true;
+            setStatus('Photo sent successfully to Guest Visit form.');
 
-        window.setTimeout(function () {
-            window.close();
-        }, 350);
+            useButton.disabled = true;
+
+            setTimeout(function(){
+                window.close();
+            },700);
+
+        }catch(error){
+
+            console.error(error);
+
+            useButton.disabled = false;
+
+            setStatus(
+                'Could not send the photo to the Guest Visit form.',
+                true
+            );
+        }
     });
 
-    closeButton.addEventListener('click', function () {
-        stopCamera();
-        window.close();
+    window.addEventListener('beforeunload',function(){
+
+        if(cameraStream){
+            cameraStream.getTracks().forEach(function(track){
+                track.stop();
+            });
+        }
+
     });
 
-    window.addEventListener('beforeunload', stopCamera);
-
-    startButton.addEventListener('click', startCamera);
-
-    // Camera starts only after the user clicks Start Camera.
 })();
 </script>
+
 {% endblock %}

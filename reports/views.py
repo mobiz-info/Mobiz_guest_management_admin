@@ -20,6 +20,8 @@ from operations.models import (
     IDTag,
     IDTagIssue,
     Tenant,
+    TenantFamilyMember,
+    TenantStaffMember,
     TenantUnitAllocation,
     Unit,
     WorkSite,
@@ -444,6 +446,8 @@ TENANT_REPORTS = {
     'id-card-issue': ('ID Card Issue Report', 'id_card_issue'),
     'id-card-return': ('ID Card Return Report', 'id_card_return'),
     'active-id-tags': ('Active ID Tags Report', 'active_id_tags'),
+    'family-members': ('Family Members Report', 'family_members'),
+    'staff-report': ('Staff Report', 'staff_report'),
 }
 
 SUPERADMIN_REPORTS = {
@@ -1581,7 +1585,74 @@ def report_detail(request, report_type):
     # TENANT REPORTS
     # --------------------------------------------------------
 
-    scope, _ = _report_scope(request)
+    scope, obj = _report_scope(request)
+
+    if report_type in ('family-members', 'staff-report'):
+        if scope != 'tenant' or not obj:
+            raise Http404
+        if report_type == 'family-members':
+            qs = TenantFamilyMember.objects.filter(tenant=obj).select_related('unit', 'unit__building')
+            if selected_status in ('active', 'inactive') and obj.status != (selected_status == 'active'):
+                qs = qs.none()
+            if search:
+                qs = qs.filter(
+                    Q(name__icontains=search)
+                    | Q(mobile_number__icontains=search)
+                    | Q(relationship__icontains=search)
+                    | Q(unit__name__icontains=search)
+                    | Q(unit__building__name__icontains=search)
+                )
+            headers = ['Family Member Name', 'Mobile Number', 'Relationship', 'Assigned Unit', 'Status']
+            for member in qs.order_by('name'):
+                assigned_unit = member.unit
+                rows.append([
+                    member.name,
+                    member.mobile_number,
+                    member.relationship or '—',
+                    (f'{assigned_unit.building.name} / {assigned_unit.name}' if assigned_unit else '—'),
+                    'Active' if obj.status else 'Inactive',
+                ])
+        else:
+            # Tenant ownership is the report scope. Do not hide staff records
+            # merely because their unit allocation was later released or the
+            # staff member has no unit linked yet.
+            qs = TenantStaffMember.objects.filter(
+                tenant=obj
+            ).select_related('unit', 'unit__building')
+            if selected_status in ('active', 'inactive'):
+                qs = qs.filter(status=(selected_status == 'active'))
+            if search:
+                qs = qs.filter(
+                    Q(name__icontains=search)
+                    | Q(mobile_number__icontains=search)
+                    | Q(designation__icontains=search)
+                    | Q(unit__name__icontains=search)
+                    | Q(unit__building__name__icontains=search)
+                )
+            headers = ['Staff Name', 'Mobile Number', 'Designation', 'Assigned Unit', 'Status']
+            for member in qs.order_by('name'):
+                assigned_unit = member.unit
+                rows.append([
+                    member.name,
+                    member.mobile_number,
+                    member.designation or '—',
+                    (f'{assigned_unit.building.name} / {assigned_unit.name}' if assigned_unit else '—'),
+                    'Active' if member.status else 'Inactive',
+                ])
+
+        context = {
+            'title': title, 'headers': headers, 'rows': rows,
+            'start_date': start_date, 'end_date': end_date,
+            'status_choices': [('active', 'Active'), ('inactive', 'Inactive')],
+            'selected_status': selected_status, 'search': search,
+            'report_type': report_type, 'can_return_tags': False,
+            'is_superadmin': False, 'is_company_admin': False,
+            'show_date_filters': False,
+        }
+        download = request.GET.get('download', '')
+        if download in ('pdf', 'excel'):
+            return _report_export_response(request, report_type, title, headers, rows, download)
+        return render(request, 'reports/detail.html', context)
 
     if report_type == 'guest-visit':
         qs = _guest_visit_queryset(request)
@@ -1616,7 +1687,6 @@ def report_detail(request, report_type):
         # Company column is intentionally omitted for tenant reports.
         headers = [
             'Guest',
-            'Guest ID',
             'Verification ID Type',
             'Verification ID Number',
             'Additional Visitors',
@@ -1633,7 +1703,6 @@ def report_detail(request, report_type):
         for visit in qs.order_by('-visit_date', '-created_at'):
             rows.append([
                 visit.guest_name,
-                visit.visitor_id_card_number or '—',
                 visit.get_id_type_display() if visit.id_type else '—',
                 visit.id_number or '—',
                 visit.additional_visitors or 0,

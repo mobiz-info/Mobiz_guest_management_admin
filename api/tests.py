@@ -589,3 +589,39 @@ class MobizAPITests(MobizAPIBaseTestCase):
         docs_resp = self.client.get('/api/docs/')
         self.assertEqual(docs_resp.status_code, status.HTTP_200_OK)
         self.assertIn(b'swagger-ui', docs_resp.content)
+
+
+class CompanyLocationCascadeAPITests(APITestCase):
+    """The company form's dependent dropdowns must return only child records."""
+
+    def setUp(self):
+        self.user = User.objects.create_superuser(
+            username='location-admin', email='location-admin@example.com', password='StrongTestPass!2026'
+        )
+        self.client.force_authenticate(user=self.user)
+        self.country_in = Country.objects.create(name='Cascade India')
+        self.country_us = Country.objects.create(name='Cascade USA')
+        self.state_kerala = State.objects.create(country=self.country_in, name='Cascade Kerala')
+        self.state_texas = State.objects.create(country=self.country_us, name='Cascade Texas')
+        self.district_kozhikode = District.objects.create(state=self.state_kerala, name='Cascade Kozhikode')
+        self.district_austin = District.objects.create(state=self.state_texas, name='Cascade Austin')
+        self.area_city = Area.objects.create(district=self.district_kozhikode, name='Cascade City Area')
+        self.area_central = Area.objects.create(district=self.district_austin, name='Cascade Central Area')
+
+    def test_states_are_filtered_by_selected_country(self):
+        response = self.client.get('/api/states/', {'country': self.country_us.pk})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        returned_ids = {row['id'] for row in response.data}
+        self.assertEqual(returned_ids, {self.state_texas.pk})
+
+    def test_districts_are_filtered_by_selected_state(self):
+        response = self.client.get('/api/districts/', {'state': self.state_kerala.pk})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        returned_ids = {row['id'] for row in response.data}
+        self.assertEqual(returned_ids, {self.district_kozhikode.pk})
+
+    def test_areas_are_filtered_by_selected_district(self):
+        response = self.client.get('/api/areas/', {'district': self.district_austin.pk})
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        returned_ids = {row['id'] for row in response.data}
+        self.assertEqual(returned_ids, {self.area_central.pk})

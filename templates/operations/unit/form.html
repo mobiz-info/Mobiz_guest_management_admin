@@ -143,7 +143,7 @@ font-size:12px
 {% if request.user.is_superuser %}
 
 <div class="op-field">
-<label for="id_company">Company / Client *</label>
+<label for="id_company">Company / Client <span class="required-star">✳</span></label>
 
 <select name="company" id="id_company" required>
 <option value="" disabled {% if not values.company %}selected{% endif %}>Select Company</option>
@@ -173,7 +173,7 @@ font-size:12px
 {% endif %}
 
 <div class="op-field">
-<label for="id_work_site">Work Site *</label>
+<label for="id_work_site">Work Site <span class="required-star">✳</span></label>
 
 <select name="work_site" id="id_work_site" required>
 <option value="" disabled {% if not values.work_site %}selected{% endif %}>Select Work Site</option>
@@ -194,7 +194,7 @@ font-size:12px
 </div>
 
 <div class="op-field">
-<label for="id_building">Building / Property *</label>
+<label for="id_building">Building / Property <span class="required-star">✳</span></label>
 
 <select name="building" id="id_building" required>
 <option value="" disabled {% if not values.building %}selected{% endif %}>Select Building</option>
@@ -241,7 +241,7 @@ Floor <span style="font-weight:400;color:#64748b">(optional for villas)</span>
 </div>
 
 <div class="op-field">
-<label for="id_name">Unit Name / Number *</label>
+<label for="id_name">Unit Name / Number <span class="required-star">✳</span></label>
 <input type="text"
        name="name"
        id="id_name"
@@ -256,7 +256,7 @@ Floor <span style="font-weight:400;color:#64748b">(optional for villas)</span>
 </div>
 
 <div class="op-field">
-<label for="id_email">Unit Email / Username *</label>
+<label for="id_email">Unit Email / Username <span class="required-star">✳</span></label>
 <input type="email"
        name="email"
        id="id_email"
@@ -270,7 +270,7 @@ Floor <span style="font-weight:400;color:#64748b">(optional for villas)</span>
 </div>
 
 <div class="op-field">
-<label for="id_mobile_number">Mobile Number / Initial Password *</label>
+<label for="id_mobile_number">Mobile Number / Initial Password <span class="required-star">✳</span></label>
 
 <div class="phone-input-group">
 <span id="country-dial-code" class="phone-dial-code"></span>
@@ -289,7 +289,7 @@ Floor <span style="font-weight:400;color:#64748b">(optional for villas)</span>
 </div>
 
 <div class="op-field">
-<label for="id_establishment_type">Establishment Type *</label>
+<label for="id_establishment_type">Establishment Type <span class="required-star">✳</span></label>
 
 <select name="establishment_type" id="id_establishment_type" required>
 <option value="" disabled {% if not values.establishment_type %}selected{% endif %}>Select Establishment Type</option>
@@ -309,7 +309,7 @@ Floor <span style="font-weight:400;color:#64748b">(optional for villas)</span>
 </div>
 
 <div class="op-field">
-<label for="id_unit_type">Unit Type *</label>
+<label for="id_unit_type">Unit Type <span class="required-star">✳</span></label>
 
 <select name="unit_type" id="id_unit_type" required>
 <option value="" disabled {% if not values.unit_type %}selected{% endif %}>Select Unit Type</option>

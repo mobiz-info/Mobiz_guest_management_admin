@@ -68,6 +68,11 @@
 .family-search input::placeholder {
     color: #94a3b8;
 }
+.family-search-btn {
+    min-height:40px; padding:0 14px; border:1px solid #16a34a; border-radius:8px;
+    background:#16a34a; color:#fff; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap;
+}
+.family-search-btn:hover { background:#15803d; border-color:#15803d; }
 
 .family-add-btn {
     display: inline-flex;
@@ -348,6 +353,7 @@
                     placeholder="Search name, mobile or email..."
                     aria-label="Search family members"
                 >
+                <button class="family-search-btn" type="submit"><i class="ph ph-magnifying-glass"></i> Search</button>
 
                 {% if search %}
                     <a

@@ -243,6 +243,21 @@ def _master_save(request, instance, fields):
             errors[name] = ['This field is required.']
         if field.max_length and len(raw) > field.max_length:
             errors[name] = [f'Ensure this value has at most {field.max_length} characters.']
+        # Master names must be descriptive text, not numeric values.
+        if name == 'name' and raw:
+            if any(char.isdigit() for char in raw):
+                errors[name] = ['Numbers are not allowed in this name field.']
+            # Model unique constraints are case-sensitive on common SQLite
+            # deployments; enforce case-insensitive duplicates at form level.
+            duplicate = instance.__class__.objects.filter(name__iexact=raw)
+            if instance.pk:
+                duplicate = duplicate.exclude(pk=instance.pk)
+            parent_field = next((key for key in ('country', 'state', 'district')
+                                 if key in fields and getattr(instance, f'{key}_id', None)), None)
+            if parent_field:
+                duplicate = duplicate.filter(**{f'{parent_field}_id': getattr(instance, f'{parent_field}_id')})
+            if duplicate.exists():
+                errors[name] = ['This name already exists.']
         setattr(instance, name, raw or (None if field.null else ''))
     if not errors:
         try:
@@ -257,7 +272,10 @@ def _master_save(request, instance, fields):
 
 
 def _master_form(request, model, title, instance=None):
-    instance = instance or model()
+    # UUID primary keys are generated on unsaved instances too; never use pk
+    # truthiness to decide whether a create form is an edit form.
+    is_edit = instance is not None
+    instance = instance if is_edit else model()
     fields = _master_field_names(model)
     errors, non_field_errors = {}, []
     if request.method == 'POST':
@@ -267,7 +285,7 @@ def _master_form(request, model, title, instance=None):
             return None
     values = _master_values(request, instance, fields)
     context = {
-        'title': title, 'is_edit': bool(instance.pk), 'values': values,
+        'title': title, 'is_edit': is_edit, 'values': values,
         'errors': errors, 'non_field_errors': non_field_errors,
         'countries': Country.objects.filter(status=True).order_by('name'),
         'states': State.objects.select_related('country').filter(status=True).order_by('country__name', 'name'),

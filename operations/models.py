@@ -274,6 +274,10 @@ class BuildingTypeMaster(models.Model):
 
         errors = {}
 
+        name = (self.name or '').strip()
+        if name and any(character.isdigit() for character in name):
+            errors['name'] = 'Building Type name must not contain numbers.'
+
         if self.pk:
             previous = BuildingTypeMaster.objects.filter(
                 pk=self.pk

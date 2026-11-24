@@ -20,6 +20,8 @@ import binascii
 import secrets
 
 from core.models import Country, State, District, Area, Designation, EstablishmentType, PurposeOfVisit
+from .validators import validate_mobile_number
+
 from .models import (
     Company, CompanyStaff, CompanyDesignation, WorkSite, Building, BuildingTypeMaster,
     BuildingStaff, Floor, Unit, Tenant, TenantUnitAllocation, TenantFamilyMember, TenantStaffMember, GuestVisit, GuestVisitAccompanyingPerson, IDTag, IDTagIssue, HoldDocument,
@@ -177,7 +179,24 @@ def _save_company_post(request, company, creating=False):
             errors[name] = ['This field is required.']
         if model_field.max_length and len(value) > model_field.max_length:
             errors[name] = [f'Ensure this value has at most {model_field.max_length} characters.']
+        if name == 'name' and value and any(char.isdigit() for char in value):
+            errors[name] = ['Numbers are not allowed in the company name.']
+        if name in ('phone', 'concerned_staff_mobile') and value:
+            digits = ''.join(char for char in value if char.isdigit())
+            if any(char.isalpha() for char in value) or len(digits) < 7 or len(digits) > 15:
+                errors[name] = ['Enter a valid phone number containing 7 to 15 digits.']
         setattr(company, name, value or (None if model_field.null else ''))
+
+    # Prevent duplicate company records even when the same name/address use
+    # different letter casing or surrounding whitespace.
+    if company.name and company.address:
+        duplicate_company = Company.objects.filter(
+            name__iexact=company.name.strip(), address__iexact=company.address.strip()
+        )
+        if company.pk:
+            duplicate_company = duplicate_company.exclude(pk=company.pk)
+        if duplicate_company.exists():
+            errors['name'] = ['A company with the same name and address already exists.']
 
     if all(getattr(company, f'{key}_id', None) for key in ('country', 'state', 'district', 'area')):
         if company.state.country_id != company.country_id:
@@ -1363,6 +1382,10 @@ def _save_tenant_post(request, instance, units):
         errors['mobile_number'] = ['Mobile number is required.']
     elif len(mobile_number) > 30:
         errors['mobile_number'] = ['Mobile number must be 30 characters or fewer.']
+    else:
+        digits = ''.join(char for char in mobile_number if char.isdigit())
+        if any(char.isalpha() for char in mobile_number) or not 7 <= len(digits) <= 15:
+            errors['mobile_number'] = ['Enter a valid mobile number containing 7 to 15 digits.']
 
     if not address:
         errors['address'] = ['Tenant address is required.']
@@ -1623,6 +1646,7 @@ def tenant_list(request):
         'search': search,
         'is_building_staff': is_building_staff(request),
         'is_superuser': request.user.is_superuser,
+        'can_delete_tenants': bool(request.user.is_superuser or get_user_company(request) or get_building_staff(request)),
         'today': timezone.localdate(),
         'lease_soon_date': timezone.localdate() + timedelta(days=30),
     })
@@ -1684,6 +1708,7 @@ def tenant_lease_list(request):
         'search': search,
         'is_building_staff': is_building_staff(request),
         'is_superuser': request.user.is_superuser,
+        'can_delete_tenants': bool(request.user.is_superuser or get_user_company(request) or get_building_staff(request)),
         'today': today,
         'lease_soon_date': soon_date,
         'lease_list': True,
@@ -1692,12 +1717,12 @@ def tenant_lease_list(request):
 
 @login_required
 def tenant_create(request):
-    # Working assumption: only the common Super Admin creates tenant accounts.
-    if not request.user.is_superuser:
-        messages.error(request, 'Only Super Admin can create tenant accounts.')
-        return redirect('dashboard')
-
+    # Super Admin can create tenants globally; Company Admin can create tenants
+    # only for units belonging to their own active company.
     company = get_user_company(request)
+    if not request.user.is_superuser and not company:
+        messages.error(request, 'Only Super Admin or an authorized Company Admin can create tenant accounts.')
+        return redirect('dashboard')
 
     instance = Tenant()
     units = _tenant_available_units(request)
@@ -2006,8 +2031,10 @@ def _save_family_member_post(request, tenant, member):
         errors['name'] = ['Name must be 150 characters or fewer.']
     if not mobile_number:
         errors['mobile_number'] = ['Mobile number is required.']
-    elif len(mobile_number) > 30:
-        errors['mobile_number'] = ['Mobile number must be 30 characters or fewer.']
+    else:
+        mobile_error = validate_mobile_number(mobile_number)
+        if mobile_error:
+            errors['mobile_number'] = [mobile_error]
     if email and len(email) > 254:
         errors['email'] = ['Email must be 254 characters or fewer.']
     elif email:
@@ -2236,8 +2263,10 @@ def _save_staff_member_post(request, tenant, member):
             errors['designation'] = ['Select a designation created and enabled by the administrator.']
     if not mobile_number:
         errors['mobile_number'] = ['Mobile number is required.']
-    elif len(mobile_number) > 30:
-        errors['mobile_number'] = ['Mobile number must be 30 characters or fewer.']
+    else:
+        mobile_error = validate_mobile_number(mobile_number)
+        if mobile_error:
+            errors['mobile_number'] = [mobile_error]
     if not address:
         errors['address'] = ['Address is required.']
     if email:
@@ -2581,8 +2610,10 @@ def guest_visit_create(request):
         guest_mobile_number = values['guest_mobile_number'].strip()
         if not guest_mobile_number:
             errors['guest_mobile_number'] = ['Guest mobile number is required.']
-        elif len(guest_mobile_number) > 30:
-            errors['guest_mobile_number'] = ['Guest mobile number must be 30 characters or fewer.']
+        else:
+            mobile_error = validate_mobile_number(guest_mobile_number)
+            if mobile_error:
+                errors['guest_mobile_number'] = [mobile_error]
         try:
             additional_visitors = int(values['additional_visitors'] or 0)
             if additional_visitors < 0 or additional_visitors > 100:
@@ -2611,9 +2642,11 @@ def guest_visit_create(request):
                     f'Accompanying person {index}: enter both name and mobile number.'
                 )
                 continue
-            if len(name) > 150 or len(mobile) > 30:
+            mobile_digits = ''.join(char for char in mobile if char.isdigit())
+            if (len(name) > 150 or len(mobile) > 30 or any(char.isalpha() for char in mobile)
+                    or not 7 <= len(mobile_digits) <= 15):
                 errors.setdefault('accompanying_people', []).append(
-                    f'Accompanying person {index}: name must be 150 characters or fewer and mobile 30 characters or fewer.'
+                    f'Accompanying person {index}: enter a valid name and a mobile number containing 7 to 15 digits.'
                 )
                 continue
             valid_companions.append((name, mobile))
@@ -3295,7 +3328,7 @@ def id_tag_master_create(request):
     if not request.user.is_superuser:
         return HttpResponseForbidden('Only Super Admin can manage ID Card / NFC Tag master data.')
 
-    buildings = Building.objects.filter(status=True).select_related('company', 'work_site').order_by(
+    buildings = Building.objects.select_related('company', 'work_site').order_by(
         'company__name', 'work_site__name', 'name'
     )
     errors = {}
@@ -3316,6 +3349,11 @@ def id_tag_master_create(request):
             values['tag_number'] = _next_dynamic_tag_number()
         elif not values['tag_number']:
             errors['tag_number'] = 'Tag / Card Number is required for a predefined tag.'
+        elif not values['tag_number'].isdigit():
+            errors['tag_number'] = 'Card / Tag Number must contain digits only.'
+
+        if values['nfc_number'] and not values['nfc_number'].isdigit():
+            errors['nfc_number'] = 'NFC Number must contain digits only.'
 
         if values['tag_number'] and IDTag.objects.filter(tag_number=values['tag_number']).exists():
             errors['tag_number'] = 'This Tag / Card Number already exists.'
@@ -3359,7 +3397,7 @@ def id_tag_master_edit(request, pk):
         return HttpResponseForbidden('Only Super Admin can manage ID Card / NFC Tag master data.')
 
     tag = get_object_or_404(IDTag, pk=pk)
-    buildings = Building.objects.filter(status=True).select_related('company', 'work_site').order_by(
+    buildings = Building.objects.select_related('company', 'work_site').order_by(
         'company__name', 'work_site__name', 'name'
     )
     errors = {}
@@ -3378,8 +3416,15 @@ def id_tag_master_edit(request, pk):
 
         if not values['tag_number']:
             errors['tag_number'] = 'Tag / Card Number is required.'
+        elif values['tag_type'] == IDTag.TYPE_PREDEFINED and not values['tag_number'].isdigit():
+            errors['tag_number'] = 'Card / Tag Number must contain digits only.'
+        elif values['tag_type'] == IDTag.TYPE_DYNAMIC and not values['tag_number'].startswith('DYN-'):
+            errors['tag_number'] = 'Dynamic ID Card number must use the generated DYN- format.'
         elif IDTag.objects.filter(tag_number=values['tag_number']).exclude(pk=tag.pk).exists():
             errors['tag_number'] = 'This Tag / Card Number already exists.'
+
+        if values['nfc_number'] and not values['nfc_number'].isdigit():
+            errors['nfc_number'] = 'NFC Number must contain digits only.'
 
         building = _related(Building, values['building'], 'building', errors, required=True,
                             queryset=buildings)

@@ -164,27 +164,27 @@
 
 .building-table th:nth-child(2),
 .building-table td:nth-child(2) {
-    width: 13%;
+    width: 11%;
 }
 
 .building-table th:nth-child(3),
 .building-table td:nth-child(3) {
-    width: 10%;
+    width: 9%;
 }
 
 .building-table th:nth-child(4),
 .building-table td:nth-child(4) {
-    width: 11%;
+    width: 9%;
 }
 
 .building-table th:nth-child(5),
 .building-table td:nth-child(5) {
-    width: 11%;
+    width: 10%;
 }
 
 .building-table th:nth-child(6),
 .building-table td:nth-child(6) {
-    width: 13%;
+    width: 12%;
 }
 
 .building-table th:nth-child(7),
@@ -194,7 +194,7 @@
 
 .building-table th:nth-child(8),
 .building-table td:nth-child(8) {
-    width: 6%;
+    width: 8%;
 }
 
 .building-table th:nth-child(9),
@@ -209,7 +209,7 @@
 
 .building-table th:nth-child(11),
 .building-table td:nth-child(11) {
-    width: 15%;
+    width: 10%;
 }
 
 /* TABLE HEADINGS */
@@ -549,6 +549,16 @@
         flex-wrap: wrap;
     }
 }
+
+/* Keep status and action controls readable instead of compressing them */
+.building-table { min-width:1200px; }
+.building-table th:nth-child(10), .building-table td:nth-child(10) { width:8%; }
+.building-table th:nth-child(11), .building-table td:nth-child(11) { width:10%; }
+.building-actions { flex-wrap:wrap; gap:6px; padding:2px 0; }
+.building-action-btn { min-height:28px; padding:0 8px; font-size:10px; }
+.building-status { padding:4px 6px; font-size:10px; }
+.building-table td { vertical-align:middle; }
+@media(max-width:900px){ .building-table-wrapper{overflow-x:auto;} }
 </style>
 
 <div class="building-page">

@@ -705,9 +705,21 @@
         box-sizing:border-box;
     }
 }
+
+/* Advance Guest Visit form alignment */
+.gv-form-wrap { max-width:860px; box-sizing:border-box; }
+.gv-form-card { width:100%; }
+.gv-form-body { padding:22px 24px; }
+.gv-grid { align-items:start; gap:15px 18px; }
+.gv-field { min-width:0; }
+.gv-field input:not([type=checkbox]):not([type=radio]):not([type=hidden]), .gv-field select, .gv-field textarea { display:block; width:100%; box-sizing:border-box; }
+.gv-section { min-width:0; }
+.gv-form-wrap.unit-self-service { max-width:780px; }
+.gv-form-wrap.unit-self-service .gv-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+@media(max-width:650px){ .gv-form-body{padding:14px;} .gv-grid,.gv-form-wrap.unit-self-service .gv-grid{grid-template-columns:1fr;gap:12px;} }
 </style>
 
-<div class="gv-form-wrap">
+<div class="gv-form-wrap{% if is_unit_self_service %} unit-self-service{% endif %}">
 <div class="gv-form-card">
 
 <div class="gv-form-title">
@@ -733,7 +745,7 @@
 {% if is_unit_self_service %}
 
 <div class="gv-field full">
-    <label for="id_visit_type">Visit Type *</label>
+    <label for="id_visit_type">Visit Type <span class="required-star">✳</span></label>
     <select name="visit_type" id="id_visit_type" required>
         <option value="advance" selected>Advance Visit</option>
     </select>
@@ -744,7 +756,7 @@
 </div>
 
 <div class="gv-field full">
-    <label for="id_tenant">Tenant to notify for approval *</label>
+    <label for="id_tenant">Tenant to notify for approval <span class="required-star">✳</span></label>
     <select name="tenant" id="id_tenant" required>
         <option value="">Select tenant</option>
         {% for tenant in tenants %}
@@ -766,7 +778,7 @@
 <input type="hidden" name="tenant" value="{{ self_service_tenant.pk }}">
 
 <div class="gv-field full">
-    <label for="id_visit_type">Visit Type *</label>
+    <label for="id_visit_type">Visit Type <span class="required-star">✳</span></label>
     <select name="visit_type" id="id_visit_type" required>
         <option value="advance" {% if values.visit_type == 'advance' %}selected{% endif %}>Advance Visit — submit for approval</option>
         <option value="walk_in" {% if values.visit_type == 'walk_in' %}selected{% endif %}>Walk-in Visit — send to Unit for acceptance</option>
@@ -782,7 +794,7 @@
 {% else %}
 
 <div class="gv-field full">
-    <label for="id_tenant">Visiting Tenant *</label>
+    <label for="id_tenant">Visiting Tenant <span class="required-star">✳</span></label>
     <select name="tenant" id="id_tenant" required>
         <option value="">Select tenant</option>
         {% for tenant in tenants %}
@@ -797,7 +809,7 @@
 </div>
 
 <div class="gv-field">
-    <label for="id_visit_type">Visit Type *</label>
+    <label for="id_visit_type">Visit Type <span class="required-star">✳</span></label>
     <select name="visit_type" id="id_visit_type" required>
         <option value="advance" {% if values.visit_type == 'advance' %}selected{% endif %}>Advance Visit</option>
         <option value="walk_in" {% if values.visit_type == 'walk_in' %}selected{% endif %}>Walk-in Visit (arrived at gate)</option>
@@ -812,7 +824,7 @@
 
 {% if not is_unit_self_service %}
 <div class="gv-field">
-    <label for="id_building">Building *</label>
+    <label for="id_building">Building <span class="required-star">✳</span></label>
     <select name="building" id="id_building" required>
         <option value="">Select building</option>
         {% for building in allocated_buildings %}
@@ -832,7 +844,7 @@
 </div>
 
 <div class="gv-field">
-    <label for="id_unit">Unit being visited *</label>
+    <label for="id_unit">Unit being visited <span class="required-star">✳</span></label>
     <select name="unit" id="id_unit" required disabled>
         <option value="">Select building first</option>
         {% for tenant in tenants %}
@@ -856,7 +868,7 @@
 {% endif %}
 
 <div class="gv-field">
-    <label for="id_guest_name">Guest Name *</label>
+    <label for="id_guest_name">Guest Name <span class="required-star">✳</span></label>
     <input
         id="id_guest_name"
         name="guest_name"
@@ -871,13 +883,16 @@
 </div>
 
 <div class="gv-field">
-    <label for="id_guest_mobile_number">Guest Mobile Number *</label>
+    <label for="id_guest_mobile_number">Guest Mobile Number <span class="required-star">✳</span></label>
     <div class="gv-phone-wrap">
         <span class="gv-dial-code" id="guestDialCode">{{ dial_code|default:"" }}</span>
         <input
             id="id_guest_mobile_number"
             name="guest_mobile_number"
-            maxlength="30"
+            type="tel"
+            minlength="7"
+            maxlength="20"
+            inputmode="tel"
             required
             value="{{ values.guest_mobile_number }}"
             placeholder="Enter visitor mobile number"
@@ -908,7 +923,7 @@
 </div>
 
 <div class="gv-field">
-    <label for="id_purpose_of_visit">Purpose of Visit *</label>
+    <label for="id_purpose_of_visit">Purpose of Visit <span class="required-star">✳</span></label>
     <select name="purpose_of_visit" id="id_purpose_of_visit" required>
         <option value="">Select purpose</option>
         {% for purpose in purposes %}
@@ -923,7 +938,7 @@
 </div>
 
 <div class="gv-field">
-    <label for="id_visit_date">Visit Date *</label>
+    <label for="id_visit_date">Visit Date <span class="required-star">✳</span></label>
     <input
         type="date"
         name="visit_date"

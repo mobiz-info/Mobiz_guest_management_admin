@@ -5,6 +5,7 @@ from django.db import IntegrityError, transaction
 from datetime import date
 
 from core.models import Country, State, District, Area, EstablishmentType, PurposeOfVisit
+from operations.validators import validate_mobile_number
 from operations.models import Company, CompanyStaff, WorkSite, Building, BuildingTypeMaster, BuildingStaff, Floor, Unit, Tenant, TenantUnitAllocation, TenantFamilyMember, GuestVisit, GuestVisitAccompanyingPerson
 
 
@@ -493,3 +494,31 @@ class TenantWorkingAssumptionTests(TestCase):
         self.assertTrue(TenantUnitAllocation.objects.filter(
             tenant=tenant, unit=self.unit, released_at__isnull=True
         ).exists())
+
+
+class MobileNumberValidationTests(TestCase):
+    def test_accepts_valid_mobile_number(self):
+        self.assertIsNone(validate_mobile_number('+91 98470 12365'))
+
+    def test_rejects_alphabetic_mobile_number(self):
+        self.assertIsNotNone(validate_mobile_number('98765ABCDE'))
+
+    def test_rejects_sequential_mobile_number(self):
+        self.assertIsNotNone(validate_mobile_number('1234567890'))
+
+    def test_rejects_repeated_digit_mobile_number(self):
+        self.assertIsNotNone(validate_mobile_number('9999999999'))
+
+    def test_rejects_mobile_number_outside_supported_length(self):
+        self.assertIsNotNone(validate_mobile_number('12345'))
+
+
+class BuildingTypeValidationTests(TestCase):
+    def test_building_type_rejects_numbers(self):
+        item = BuildingTypeMaster(name='Tower 123', code='other')
+        with self.assertRaises(ValidationError):
+            item.full_clean()
+
+    def test_building_type_accepts_text_name(self):
+        item = BuildingTypeMaster(name='Residential Tower', code='other')
+        item.full_clean()

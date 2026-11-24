@@ -27,13 +27,14 @@
                     </div>
                     <div class="fg">
                         <label>Card / Tag Number <span class="req">*</span></label>
-                        <input type="text" name="tag_number" id="id_tag_number" value="{{ values.tag_number }}" maxlength="80" {% if not is_edit %}{% endif %}>
+                        <input type="text" name="tag_number" id="id_tag_number" value="{{ values.tag_number }}" maxlength="80" {% if values.tag_type != 'dynamic' %}inputmode="numeric" pattern="[0-9]+" title="Enter digits only for predefined Card / Tag Number"{% else %}readonly{% endif %}>
                         {% if errors.tag_number %}<div class="err">{{ errors.tag_number }}</div>{% endif %}
                         {% if not is_edit %}<div class="help" id="dynamic_help">For Dynamic ID Card, this is generated automatically.</div>{% endif %}
                     </div>
                     <div class="fg">
                         <label>NFC Number</label>
-                        <input type="text" name="nfc_number" value="{{ values.nfc_number }}" maxlength="100" placeholder="Optional NFC identifier">
+                        <input type="text" name="nfc_number" value="{{ values.nfc_number }}" maxlength="100" inputmode="numeric" pattern="[0-9]*" title="Enter digits only" placeholder="Optional NFC identifier">
+                        {% if errors.nfc_number %}<div class="err">{{ errors.nfc_number }}</div>{% endif %}
                     </div>
                     <div class="fg">
                         <label>Building Allocation <span class="req">*</span></label>

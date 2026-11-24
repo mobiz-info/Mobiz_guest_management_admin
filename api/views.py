@@ -2009,6 +2009,13 @@ class StateViewSet(viewsets.ModelViewSet):
     queryset = State.objects.all()
     serializer_class = StateSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('country')
+        country_id = self.request.query_params.get('country')
+        if country_id:
+            queryset = queryset.filter(country_id=country_id)
+        return queryset.order_by('name')
+
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [permissions.IsAuthenticated()]
@@ -2019,6 +2026,13 @@ class DistrictViewSet(viewsets.ModelViewSet):
     queryset = District.objects.all()
     serializer_class = DistrictSerializer
 
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('state', 'state__country')
+        state_id = self.request.query_params.get('state')
+        if state_id:
+            queryset = queryset.filter(state_id=state_id)
+        return queryset.order_by('name')
+
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
             return [permissions.IsAuthenticated()]
@@ -2028,6 +2042,13 @@ class DistrictViewSet(viewsets.ModelViewSet):
 class AreaViewSet(viewsets.ModelViewSet):
     queryset = Area.objects.all()
     serializer_class = AreaSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('district', 'district__state', 'district__state__country')
+        district_id = self.request.query_params.get('district')
+        if district_id:
+            queryset = queryset.filter(district_id=district_id)
+        return queryset.order_by('name')
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:

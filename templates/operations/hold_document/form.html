@@ -18,6 +18,7 @@
 .hd-field{min-width:0}
 .hd-field.full{grid-column:1/-1}
 .hd-field label{display:block;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:6px}
+.hd-field .req{color:#dc2626;font-weight:800}
 .hd-field input,.hd-field select,.hd-field textarea{width:100%;min-height:40px;padding:9px 11px;border:1px solid #d4dce8;border-radius:8px;font-size:12px;box-sizing:border-box;background:#fff;color:#1e293b;font-family:inherit}
 .hd-field textarea{min-height:86px;resize:vertical}
 .hd-field input:focus,.hd-field select:focus,.hd-field textarea:focus{outline:none;border-color:#818cf8;box-shadow:0 0 0 3px rgba(99,102,241,.10)}
@@ -57,7 +58,7 @@
                     <!-- Guest Visit -->
                     <div class="hd-field full">
 
-                        <label for="id_hold_visit">Guest Visit *</label>
+                        <label for="id_hold_visit">Guest Visit <span class="req">*</span></label>
 
                         <select name="visit" id="id_hold_visit" required>
 
@@ -98,7 +99,7 @@
                     <!-- Document / Item -->
                     <div class="hd-field">
 
-                        <label for="id_item_name">Document / Item *</label>
+                        <label for="id_item_name">Document / Item <span class="req">*</span></label>
 
                         <input
                             type="text"

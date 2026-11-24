@@ -62,7 +62,10 @@
 
 .country-search {
     position: relative;
-    width: 290px;
+    width: 360px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .country-search .search-icon {
@@ -76,6 +79,8 @@
 }
 
 .country-search-input {
+    flex: 1;
+    min-width: 0;
     width: 100%;
     height: 36px;
     box-sizing: border-box;
@@ -618,6 +623,18 @@
     }
 }
 
+.country-search button {
+    height: 36px;
+    padding: 0 14px;
+    border: 1px solid #2563eb;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 </style>
 
 
@@ -650,10 +667,6 @@
                     autocomplete="off"
                 >
 
-                <button
-                    type="submit"
-                    style="display:none;"
-                ></button>
 
             </form>
 

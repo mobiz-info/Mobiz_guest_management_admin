@@ -1446,7 +1446,31 @@
             position: relative;
             z-index: 1;
         }
-    </style>
+    
+
+/* REQUIRED FIELD INDICATORS — consistent red styling across forms */
+.required,
+.required-mark,
+.required-star,
+.req,
+.op-required {
+    color: #dc2626 !important;
+}
+.required-star {
+    font-weight: 800;
+    margin-left: 3px;
+}
+.required-note,
+.required-explanation,
+.mandatory-note,
+.field-help,
+.help-text,
+.form-text,
+.form-hint,
+.op-hint {
+    color: #dc2626 !important;
+}
+</style>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const phoneSelector = [

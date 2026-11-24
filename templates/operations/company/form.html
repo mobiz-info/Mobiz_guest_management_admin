@@ -667,6 +667,7 @@
                                 <div class="company-form-group full-width">
                                     <label for="id_address" class="company-form-label">
                                         Company Address
+                                        <span class="required">*</span>
                                     </label>
 
                                     <textarea
@@ -674,6 +675,7 @@
                                         id="id_address"
                                         rows="2"
                                         placeholder="Enter company address"
+                                        required
                                     >{{ values.address|default:'' }}</textarea>
 
                                     {% for error in errors.address %}
@@ -767,9 +769,10 @@
                                 <div class="company-form-group">
                                     <label for="id_country" class="company-form-label">
                                         Country
+                                        <span class="required">*</span>
                                     </label>
 
-                                    <select name="country" id="id_country">
+                                    <select name="country" id="id_country" required>
                                         <option value="">Select Country</option>
 
                                         {% for country in countries %}
@@ -791,9 +794,10 @@
                                 <div class="company-form-group">
                                     <label for="id_state" class="company-form-label">
                                         State / Province / Emirate
+                                        <span class="required">*</span>
                                     </label>
 
-                                    <select name="state" id="id_state">
+                                    <select name="state" id="id_state" required>
                                         <option value="">Select State / Province / Emirate</option>
 
                                         {% for state in states %}
@@ -818,9 +822,10 @@
                                 <div class="company-form-group">
                                     <label for="id_district" class="company-form-label">
                                         District
+                                        <span class="required">*</span>
                                     </label>
 
-                                    <select name="district" id="id_district">
+                                    <select name="district" id="id_district" required>
                                         <option value="">Select District</option>
 
                                         {% for district in districts %}
@@ -845,9 +850,10 @@
                                 <div class="company-form-group">
                                     <label for="id_area" class="company-form-label">
                                         Area
+                                        <span class="required">*</span>
                                     </label>
 
-                                    <select name="area" id="id_area">
+                                    <select name="area" id="id_area" required>
                                         <option value="">Select Area</option>
 
                                         {% for area in areas %}

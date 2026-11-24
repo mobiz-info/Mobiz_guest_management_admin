@@ -81,3 +81,9 @@ dist/
 *.bak
 *.old
 *.orig
+
+# Local database and user data
+*.sqlite3
+*.db
+*.sql
+media/

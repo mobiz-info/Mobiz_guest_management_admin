@@ -1103,7 +1103,7 @@
                                     </a>
 
 
-                                    {% if request.user.is_superuser %}
+                                    {% if can_delete_tenants %}
 
                                         <form
                                             method="post"
